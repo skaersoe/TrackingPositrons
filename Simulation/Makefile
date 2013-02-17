@@ -64,7 +64,7 @@ CUDA_SAMPLES_PATH ?= $(CUDA_PATH)/samples
 
 # Common binaries
 NVCC            ?= $(CUDA_BIN_PATH)/nvcc
-GCC             ?= clang++
+GCC             ?= g++
 
 # Extra user flags
 EXTRA_NVCCFLAGS ?=
@@ -121,34 +121,19 @@ all: build
 
 build: na63sim
 
+lib/geometry.so: src/geometry.cxx
+	$(GCC) --shared $(CCFLAGS) $(EXTRA_CCFLAGS) $(INCLUDES) $(RCFLAGS) -o $@ -c $<
 
-# bodysystemcuda.o: bodysystemcuda.cu
-#   $(NVCC) $(NVCCFLAGS) $(EXTRA_NVCCFLAGS) $(GENCODE_FLAGS) $(INCLUDES) -o $@ -c $<
+lib/na63sim.so: src/na63sim.cu
+	$(NVCC) --shared $(NVCCFLAGS) $(EXTRA_NVCCFLAGS) $(GENCODE_FLAGS) $(INCLUDES) -o $@ -c $<
 
-# nbody.o: nbody.cpp
-#   $(GCC) $(CCFLAGS) $(EXTRA_CCFLAGS) $(INCLUDES) -o $@ -c $<
-# 
-# render_particles.o: render_particles.cpp
-#   $(GCC) $(CCFLAGS) $(EXTRA_CCFLAGS) $(INCLUDES) -o $@ -c $<
-# 
-# nbody: nbody.o bodysystemcuda.o render_particles.o 
-#   $(GCC) $(CCFLAGS) -o $@ $+ $(LDFLAGS) $(EXTRA_LDFLAGS)
-#   mkdir -p ../../bin/$(OSLOWER)/$(TARGET)
-#   cp $@ ../../bin/$(OSLOWER)/$(TARGET)
-
-geometry.o: src/geometry.cxx
-	$(GCC) $(CCFLAGS) $(EXTRA_CCFLAGS) $(INCLUDES) $(RCFLAGS) -o $@ -c $<
-
-na63sim.o: src/na63sim.cu
-	$(NVCC) $(NVCCFLAGS) $(EXTRA_NVCCFLAGS) $(GENCODE_FLAGS) $(INCLUDES) -o $@ -c $<
-
-na63sim: geometry.o na63sim.o
+na63sim: lib/geometry.so lib/na63sim.so
 	$(GCC) $(CCFLAGS) -o $@ $+ $(LDFLAGS) $(EXTRA_LDFLAGS) $(RLDFLAGS)
 	mkdir -p bin/$(OSLOWER)/$(TARGET)
-	cp $@ bin/$(OSLOWER)/$(TARGET)
+	mv $@ bin/$(OSLOWER)/$(TARGET)
 
 run: build
-	./na63sim
+	bin/$(OSLOWER)/$(TARGET)/na63sim
 
 clean:
-	rm -f na63sim na63sim.o *.bin
+	rm -f na63sim na63sim.o *.bin lib/*.so
