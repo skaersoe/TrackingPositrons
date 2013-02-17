@@ -60,10 +60,11 @@ CUDA_PATH       ?= /Developer/NVIDIA/CUDA-5.0
 CUDA_INC_PATH   ?= $(CUDA_PATH)/include
 CUDA_LIB_PATH   ?= $(CUDA_PATH)/lib
 CUDA_BIN_PATH   ?= $(CUDA_PATH)/bin
+CUDA_SAMPLES_PATH ?= $(CUDA_PATH)/samples
 
 # Common binaries
 NVCC            ?= $(CUDA_BIN_PATH)/nvcc
-GCC             ?= g++
+GCC             ?= clang++
 
 # Extra user flags
 EXTRA_NVCCFLAGS ?=
@@ -76,8 +77,9 @@ GENCODE_SM30    := -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,
 GENCODE_FLAGS   := $(GENCODE_SM10) $(GENCODE_SM20) $(GENCODE_SM30)
 
 
-ROOTLIBS := `root-config --libs`
-ROOTINC := `root-config --cflags`
+# Flags
+RCFLAGS :=-c `root-config --cflags`
+RLDFLAGS :=`root-config --glibs`
 
 # OS-specific build flags
 ifneq ($(DARWIN),) 
@@ -112,20 +114,38 @@ endif
 
 
 # Common includes and paths for CUDA
-INCLUDES      := -I$(CUDA_INC_PATH) -I. -I.. -I../../common/inc -I../../../shared/inc $(ROOTINC)
+INCLUDES      := -I$(CUDA_INC_PATH) -I./include -I../Reconstruction/include -I../Alignment/include -I../Visulaization/include -I$(CUDA_SAMPLES_PATH)/C/common/inc -I$(CUDA_SAMPLES_PATH)/shared/inc 
 
 # Target rules
 all: build
 
 build: na63sim
 
-na63sim.o: na63sim.cu
+
+# bodysystemcuda.o: bodysystemcuda.cu
+#   $(NVCC) $(NVCCFLAGS) $(EXTRA_NVCCFLAGS) $(GENCODE_FLAGS) $(INCLUDES) -o $@ -c $<
+
+# nbody.o: nbody.cpp
+#   $(GCC) $(CCFLAGS) $(EXTRA_CCFLAGS) $(INCLUDES) -o $@ -c $<
+# 
+# render_particles.o: render_particles.cpp
+#   $(GCC) $(CCFLAGS) $(EXTRA_CCFLAGS) $(INCLUDES) -o $@ -c $<
+# 
+# nbody: nbody.o bodysystemcuda.o render_particles.o 
+#   $(GCC) $(CCFLAGS) -o $@ $+ $(LDFLAGS) $(EXTRA_LDFLAGS)
+#   mkdir -p ../../bin/$(OSLOWER)/$(TARGET)
+#   cp $@ ../../bin/$(OSLOWER)/$(TARGET)
+
+geometry.o: src/geometry.cxx
+	$(GCC) $(CCFLAGS) $(EXTRA_CCFLAGS) $(INCLUDES) $(RCFLAGS) -o $@ -c $<
+
+na63sim.o: src/na63sim.cu
 	$(NVCC) $(NVCCFLAGS) $(EXTRA_NVCCFLAGS) $(GENCODE_FLAGS) $(INCLUDES) -o $@ -c $<
 
-na63sim: na63sim.o
-	$(GCC) $(CCFLAGS) -o $@ $+ $(LDFLAGS) $(EXTRA_LDFLAGS) $(ROOTLIBS)
-	mkdir -p ../../bin/$(OSLOWER)/$(TARGET)
-	cp $@ ../../bin/$(OSLOWER)/$(TARGET)
+na63sim: geometry.o na63sim.o
+	$(GCC) $(CCFLAGS) -o $@ $+ $(LDFLAGS) $(EXTRA_LDFLAGS) $(RLDFLAGS)
+	mkdir -p bin/$(OSLOWER)/$(TARGET)
+	cp $@ bin/$(OSLOWER)/$(TARGET)
 
 run: build
 	./na63sim
