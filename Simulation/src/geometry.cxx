@@ -14,7 +14,7 @@
 #include <GL/freeglut.h>
 #endif
 
-
+#include <paramgl.h>
 #include <cstdlib>
 #include <cstdio>
 #include <algorithm>
@@ -23,7 +23,15 @@
 
 #include <cuda_runtime.h>
 #include <cuda_gl_interop.h>
+#include <helper_cuda.h>
+#include <helper_cuda_gl.h>
 
+#include <helper_functions.h>
+
+/* Includes, cuda */
+#include <cuda_runtime.h>
+#include <cublas_v2.h>
+#include <shrQATest.h>
 
 int main (int argc, char const *argv[])
 {
