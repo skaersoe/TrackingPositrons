@@ -111,9 +111,11 @@ else
       TARGET    := release
 endif
 
+# Standard
+CCFLAGS += -std=c++11 -pedantic
 
 # Common includes and paths for CUDA
-INCLUDES      := -I$(CUDA_INC_PATH) -I./include -I../Reconstruction/include -I../Alignment/include -I../Visulaization/include -I$(CUDA_SAMPLES_PATH)/C/common/inc -I$(CUDA_SAMPLES_PATH)/shared/inc 
+INCLUDES      := -I$(CUDA_INC_PATH) -I./include -I../Reconstruction/include -I../Alignment/include -I../Visulaization/include -I$(CUDA_SAMPLES_PATH)/common/inc -I$(CUDA_SAMPLES_PATH)/shared/inc 
 
 # Target rules
 all: build
