@@ -1,0 +1,1 @@
+void GenerateParticles(HepMC::GenParticle* p, long N);

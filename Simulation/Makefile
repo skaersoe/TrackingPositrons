@@ -1,15 +1,18 @@
 CC=g++
-CFLAGS=-pedantic -m64
+NVCC=nvcc
+NVCCFLAGS=-arch=sm_30 --machine=64
+CFLAGS=-pedantic
 SRC=src
-INCLUDE=-I$(SRC)
+INCLUDE=-I$(SRC) -L$(HEPMC)/lib -lHepMC
 
 all: simulator
 
-simulator: $(SRC)/simulator.cpp particle
-	$(CC) $(CFLAGS) $(SRC)/simulator.cpp $(SRC)/Particle.o -o bin/simulator
+simulator: $(SRC)/simulator.cpp GenerateParticles
+	$(CC) $(CFLAGS) $(INCLUDE) $(SRC)/simulator.cpp -o bin/simulator
+	rm src/*.o
 
-particle: $(SRC)/Particle.cpp
-	$(CC) $(CFLAGS) -c $(SRC)/Particle.cpp
+GenerateParticles: $(SRC)/GenerateParticles.cpp
+	$(NVCC) $(NVCCFLAGS) --compile $(SRC)/GenerateParticles.cpp
 
 clean:
 	rm src/*.o
