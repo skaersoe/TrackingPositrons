@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <iostream>
 
 #include "Simulation/GenerateParticles.h"
 
@@ -17,11 +17,12 @@ __global__ void cudaPopulateElectrons(simple_particle_t* _p, const int N) {
   p->r[2] = 0;
   p->m = 1;
   p->q = -1;
+  __syncthreads();
 }
 
 int error(cudaError_t err) {
   if (err == cudaSuccess) return 0;
-  printf("An error occurred.\n");
+  std::cerr << "An error occurred." << std::endl;
   return -1;
 }
 
@@ -35,7 +36,10 @@ void GenerateParticles(simple_particle_t* p, const int N) {
   if (error(cudaMalloc(&devicePtr,dataSize))) return;
   if (error(cudaMemcpy(devicePtr,p,dataSize,cudaMemcpyHostToDevice))) return;
 
+  std::cout << "About to initialize " << blocksPerGrid << " blocks of " << threadsPerBlock << " each, resulting in a total of " << blocksPerGrid * threadsPerBlock << " threads." << std::endl;
   cudaPopulateElectrons<<<blocksPerGrid,threadsPerBlock>>>(p,N);
+
+  cudaThreadSynchronize();
 
   if (error(cudaMemcpy(p,devicePtr,dataSize,cudaMemcpyDeviceToHost))) return;
   if (error(cudaFree(devicePtr))) return;

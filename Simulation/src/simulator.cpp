@@ -17,7 +17,7 @@ int main(int argc,char *argv[]) {
   simple_particle_t p[N];
   // Populate
   clock_t timer = clock();
-  // GenerateParticles(p,N);
+  GenerateParticles(p,N);
   timer = clock() - timer;
   std::cout << "Populated in " << (float)timer/CLOCKS_PER_SEC << " seconds." << std::endl;
 
