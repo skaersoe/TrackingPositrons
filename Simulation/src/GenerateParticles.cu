@@ -19,18 +19,24 @@ __global__ void cudaPopulateElectrons(simple_particle_t* _p, const int N) {
   p->q = -1;
 }
 
+int error(cudaError_t err) {
+  if (err == cudaSuccess) return 0;
+  printf("An error occurred.\n");
+  return -1;
+}
+
 void GenerateParticles(simple_particle_t* p, const int N) {
-  dim3 threadsPerBlock(256,1,1);
-  dim3 blocksPerGrid((N-1)/threadsPerBlock.x+1,1,1);
+  int threadsPerBlock = 256;
+  int blocksPerGrid = (N - 1) / threadsPerBlock + 1;
   const int dataSize = N*sizeof(simple_particle_t);
 
   void* devicePtr = (void*)p;
   
-  cudaMalloc(&devicePtr,dataSize);
-  cudaMemcpy(devicePtr,p,dataSize,cudaMemcpyHostToDevice);
+  if (error(cudaMalloc(&devicePtr,dataSize))) return;
+  if (error(cudaMemcpy(devicePtr,p,dataSize,cudaMemcpyHostToDevice))) return;
 
   cudaPopulateElectrons<<<blocksPerGrid,threadsPerBlock>>>(p,N);
 
-  cudaMemcpy(p,devicePtr,dataSize,cudaMemcpyDeviceToHost);
-  cudaFree(devicePtr);
+  if (error(cudaMemcpy(p,devicePtr,dataSize,cudaMemcpyDeviceToHost))) return;
+  if (error(cudaFree(devicePtr))) return;
 }

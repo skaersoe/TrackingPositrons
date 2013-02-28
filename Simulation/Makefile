@@ -3,8 +3,7 @@ NVCC=nvcc
 NVCCFLAGS=-ccbin /usr/bin -arch=sm_30 -m64
 CXXFLAGS=-pedantic -m64 -std=c++11
 SRC=src
-HEADERS=Simulation
-INCLUDE=-I$(SRC) -I$(CUDA)/include -I$(HEADERS) -L$(HEPMC)/lib -L$(CUDA)/lib -lhepmc -lcuda -lcudart
+INCLUDE=-I./ -I$(SRC) -I$(CUDA)/include -L$(HEPMC)/lib -L$(CUDA)/lib -lhepmc -lcuda -lcudart
 
 all: Simulator
 
