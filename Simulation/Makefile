@@ -1,18 +1,21 @@
-CC=g++
+CXX=g++
 NVCC=nvcc
-NVCCFLAGS=-arch=sm_30 --machine=64
-CFLAGS=-pedantic
+NVCCFLAGS=-ccbin /usr/bin -arch=sm_30 -m64
+CXXFLAGS=-pedantic -m64 -std=c++11
 SRC=src
-INCLUDE=-I$(SRC) -L$(HEPMC)/lib -lHepMC
+INCLUDE=-I$(SRC) -I$(CUDA)/include -L$(HEPMC)/lib -L$(CUDA)/lib -lhepmc -lcuda -lcudart
 
-all: simulator
+all: Simulator
 
-simulator: $(SRC)/simulator.cpp GenerateParticles
-	$(CC) $(CFLAGS) $(INCLUDE) $(SRC)/simulator.cpp -o bin/simulator
-	rm src/*.o
+Simulator: $(SRC)/Simulator.cpp GenerateParticles Step
+	$(CXX) $(CXXFLAGS) $(INCLUDE) *.o $(SRC)/Simulator.cpp -o bin/simulator
+	rm ./*.o
 
-GenerateParticles: $(SRC)/GenerateParticles.cpp
-	$(NVCC) $(NVCCFLAGS) --compile $(SRC)/GenerateParticles.cpp
+GenerateParticles: $(SRC)/GenerateParticles.cu
+	$(NVCC) $(NVCCFLAGS) -c $(SRC)/GenerateParticles.cu
+
+Step: $(SRC)/Step.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(SRC)/Step.cpp
 
 clean:
 	rm src/*.o

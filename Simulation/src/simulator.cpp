@@ -1,21 +1,26 @@
 #include <iostream>
+#include <time.h>
 
-// External
-#include "HepMC/GenParticle.h"
+// #include "HepMC/GenParticle.h"
 
-// Local
 #include "GenerateParticles.h"
+#include "Particle.h"
+#include "Step.h"
 
 #define SIMULATOR_PARTICLES 1024
 
 int main(int argc,char *argv[]) {
   std::cout << "Simulator starting." << std::endl;
 
-  const long N = SIMULATOR_PARTICLES;
+
+  const int N = SIMULATOR_PARTICLES;
   // Allocate particles
-  HepMC::GenParticle p[N];
-  // Populate on GPU
+  simple_particle_t p[N];
+  // Populate
+  clock_t timer = clock();
   GenerateParticles(p,N);
+  timer = clock() - timer;
+  std::cout << "Populated in " << (float)timer/CLOCKS_PER_SEC << " seconds." << std::endl;
 
   std::cout << "Simulator exiting." << std::endl;
   return 0;
