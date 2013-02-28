@@ -1,7 +1,7 @@
 #include "Simulation/Step.h"
 
 void apply_magnetic_field(float* p, float dt, float q) {
-  const static float B[] = {0,0,1};
+  const static float B[] = {0.1,0.1,0.1};
 
   float p_x = p[0];
   float p_y = p[1];

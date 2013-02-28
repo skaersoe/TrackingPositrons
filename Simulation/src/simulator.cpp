@@ -5,7 +5,7 @@
 
 #include "Simulation/GenerateParticles.h"
 #include "Simulation/Particle.h"
-#include "Simulation/Step.h"
+#include "Simulation/Propagate.h"
 
 #define SIMULATOR_PARTICLES 1024
 
@@ -20,6 +20,9 @@ int main(int argc,char *argv[]) {
   GenerateParticles(p,N);
   timer = clock() - timer;
   std::cout << "Populated in " << (float)timer/CLOCKS_PER_SEC << " seconds." << std::endl;
+
+  // Propagate
+  propagate(p,N);
 
   std::cout << "Simulator exiting." << std::endl;
   return 0;

@@ -2,13 +2,13 @@
 
 #include "Simulation/GenerateParticles.h"
 
-__global__ void cudaPopulateElectrons(simple_particle_t* _p, const int N) {
-  int index = blockIdx.x * blockDim.x + threadIdx.x;
-  if (index > N) return;
+__global__ void cudaPopulateElectrons(simple_particle_t* p_, const int N) {
+  int index = threadIdx.x + blockDim.x * blockIdx.x;
+  if (index >= N) return;
   float px = -0.05 + 0.1 * (N - index) / index;
   float py =  0.05 - 0.1 * (N - index) / index;
   float pz =  0.10 + 9.9 * (N - index) / index;
-  simple_particle_t *p = &_p[index];
+  simple_particle_t* p = &p_[index];
   p->p[0] = px;
   p->p[1] = py;
   p->p[2] = pz;
@@ -17,12 +17,11 @@ __global__ void cudaPopulateElectrons(simple_particle_t* _p, const int N) {
   p->r[2] = 0;
   p->m = 1;
   p->q = -1;
-  __syncthreads();
 }
 
 int error(cudaError_t err) {
   if (err == cudaSuccess) return 0;
-  std::cerr << "An error occurred." << std::endl;
+  std::cerr << "CUDA Error: " << cudaGetErrorString(err) << std::endl;
   return -1;
 }
 
@@ -31,13 +30,14 @@ void GenerateParticles(simple_particle_t* p, const int N) {
   int blocksPerGrid = (N - 1) / threadsPerBlock + 1;
   const int dataSize = N*sizeof(simple_particle_t);
 
-  void* devicePtr = (void*)p;
+  simple_particle_t* devicePtr = NULL;
   
-  if (error(cudaMalloc(&devicePtr,dataSize))) return;
-  if (error(cudaMemcpy(devicePtr,p,dataSize,cudaMemcpyHostToDevice))) return;
+  if (error(cudaMalloc((void**)&devicePtr,dataSize))) return;
+  if (error(cudaMemcpy((void*)devicePtr,p,dataSize,cudaMemcpyHostToDevice))) return;
 
+  std::cout << "Copied " << N << " instances of size " << sizeof(simple_particle_t) << " bytes each, resulting in a total of " << dataSize << " bytes of data on the device." << std::endl;
   std::cout << "About to initialize " << blocksPerGrid << " blocks of " << threadsPerBlock << " each, resulting in a total of " << blocksPerGrid * threadsPerBlock << " threads." << std::endl;
-  cudaPopulateElectrons<<<blocksPerGrid,threadsPerBlock>>>(p,N);
+  cudaPopulateElectrons<<<blocksPerGrid,threadsPerBlock>>>(devicePtr,N);
 
   cudaThreadSynchronize();
 
