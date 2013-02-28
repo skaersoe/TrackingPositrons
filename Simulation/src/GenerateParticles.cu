@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "GenerateParticles.h"
+#include "Simulation/GenerateParticles.h"
 
 __global__ void cudaPopulateElectrons(simple_particle_t* _p, const int N) {
   int index = blockIdx.x * blockDim.x + threadIdx.x;

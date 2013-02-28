@@ -3,9 +3,9 @@
 
 // #include "HepMC/GenParticle.h"
 
-#include "GenerateParticles.h"
-#include "Particle.h"
-#include "Step.h"
+#include "Simulation/GenerateParticles.h"
+#include "Simulation/Particle.h"
+#include "Simulation/Step.h"
 
 #define SIMULATOR_PARTICLES 1024
 

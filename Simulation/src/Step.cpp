@@ -1,4 +1,4 @@
-#include "Step.h"
+#include "Simulation/Step.h"
 
 void apply_magnetic_field(float* p, float dt, float q) {
   const static float B[] = {0,0,1};
