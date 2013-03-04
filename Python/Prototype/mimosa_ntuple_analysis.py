@@ -54,21 +54,36 @@ class NA63Detector(object):
         self.STRIP_SIZE_Y = 0.0184
         self.STRIP_SIZE_Z = 0.020
 
-        self.POS_MIMOSA_ONE_X = 0
-        self.POS_MIMOSA_ONE_Y = 0
+        self.POS_MIMOSA_ONE_X = 1.516
+        self.POS_MIMOSA_ONE_Y = -1.193
         self.POS_MIMOSA_ONE_Z = 336.200
-
-        self.POS_MIMOSA_TWO_X = 0
-        self.POS_MIMOSA_TWO_Y = 0
+        self.TILT_MIMOSA_ONE_X = 0.181
+        self.TILT_MIMOSA_ONE_Y = 0.0
+        self.TILT_MIMOSA_ONE_Z = 0.0
+        
+        
+        self.POS_MIMOSA_TWO_X = 2.640
+        self.POS_MIMOSA_TWO_Y = -1.805
         self.POS_MIMOSA_TWO_Z = 622.200
+        self.TILT_MIMOSA_TWO_X = 0.533
+        self.TILT_MIMOSA_TWO_Y = 0.0
+        self.TILT_MIMOSA_TWO_Z = 0.0
+
+
 
         self.POS_MIMOSA_THREE_X = 0
         self.POS_MIMOSA_THREE_Y = 0
         self.POS_MIMOSA_THREE_Z = 0.0 ## set to surface to avoid 
+        self.TILT_MIMOSA_THREE_X = 1.5
+        self.TILT_MIMOSA_THREE_Y = 0.0
+        self.TILT_MIMOSA_THREE_Z = 0.0
 
-        self.POS_MIMOSA_FOUR_X = 0
-        self.POS_MIMOSA_FOUR_Y = 0
+        self.POS_MIMOSA_FOUR_X = 1.133
+        self.POS_MIMOSA_FOUR_Y = -0.757
         self.POS_MIMOSA_FOUR_Z = 258.000
+        self.TILT_MIMOSA_FOUR_X = 1.734
+        self.TILT_MIMOSA_FOUR_Y = 0.0
+        self.TILT_MIMOSA_FOUR_Z = 0.0
 
         self.RANGE_MIMOSA_ONE_X = [self.POS_MIMOSA_ONE_X - self.DIM_MIMOSA_X/2.0, self.POS_MIMOSA_ONE_X + self.DIM_MIMOSA_X/2.0]
         self.RANGE_MIMOSA_ONE_Y = [self.POS_MIMOSA_ONE_Y - self.DIM_MIMOSA_Y/2.0, self.POS_MIMOSA_ONE_Y + self.DIM_MIMOSA_Y/2.0]
@@ -481,7 +496,8 @@ class NA63Detector(object):
         
     
 
-f = TFile("/Users/mdj/Dropbox/Research/AUTestBeamGPU/taf.dev/datDSF/run7_05.root", "read")
+# f = TFile("/Users/mdj/Dropbox/Research/AUTestBeamGPU/taf.dev/datDSF/run7_05.root", "read")
+f = TFile("/Users/mdj/Dropbox/Research/AUTestBeamGPU/taf.dev/datDSF/run7_07.root", "read")
 # f = TFile("/Users/mdj/Dropbox/Research/AUTestBeamGPU/taf.dev/datDSF/run18_02.root", "read")
 
 t = f.Get("T") # TTeee
@@ -538,8 +554,8 @@ def getPlanes(evt=1):
         
     return allhits, perplanehits
     
-Nevt = 1000
-Sevt = 50000
+Nevt = 500
+Sevt = 5000
 
 na63 = NA63Detector()
 na63.createEve()
@@ -562,13 +578,13 @@ for evt_i in xrange(Sevt,Sevt+Nevt):
     # print hits
 
     if evt_i % 100 == 0:
-        print "%2.0f%% done..." % (float(evt_i)/float(Sevt+Nevt)*100.0)
+        print "%2.0f%% done..." % (float(evt_i-Sevt)/float(Nevt)*100.0)
 
         
     for hit in hits:
         # print "det", hit.det
         det_pos = na63.get_center_of_detector(hit.det)
-        intersects_entry[hit.det-1].SetNextPoint( hit.u/(11520.0)*na63.DIM_MIMOSA_X/2, hit.v/(5760.0)*na63.DIM_MIMOSA_Y/2,det_pos[2])
+        intersects_entry[hit.det-1].SetNextPoint(det_pos[0]+(hit.u/(11520.0)*na63.DIM_MIMOSA_X/2),det_pos[1]+(hit.v/(5760.0)*na63.DIM_MIMOSA_Y/2),det_pos[2])
         
         hit_planes[hit.det-1].Fill(hit.u/10.0, hit.v/10.0)
 
@@ -613,10 +629,18 @@ for evt_i in xrange(Sevt,Sevt+Nevt):
                     
                         xes =  TEveLine("all")
                         xes.SetLineColor(kGreen)    
-                        xes.SetNextPoint(p3hit.u/(11520.0)*na63.DIM_MIMOSA_X/2, p3hit.v/(5760.0)*na63.DIM_MIMOSA_Y/2, na63.get_center_of_detector(p3hit.det)[2])
-                        xes.SetNextPoint(p4hit.u/(11520.0)*na63.DIM_MIMOSA_X/2, p4hit.v/(5760.0)*na63.DIM_MIMOSA_Y/2, na63.get_center_of_detector(p4hit.det)[2])
-                        xes.SetNextPoint(p1hit.u/(11520.0)*na63.DIM_MIMOSA_X/2, p1hit.v/(5760.0)*na63.DIM_MIMOSA_Y/2, na63.get_center_of_detector(p1hit.det)[2])
-                        xes.SetNextPoint(p2hit.u/(11520.0)*na63.DIM_MIMOSA_X/2, p2hit.v/(5760.0)*na63.DIM_MIMOSA_Y/2, na63.get_center_of_detector(p2hit.det)[2])
+                        
+                        
+                        dp3 = na63.get_center_of_detector(p3hit.det)
+                        dp4 = na63.get_center_of_detector(p4hit.det)
+                        dp1 = na63.get_center_of_detector(p1hit.det)
+                        dp2 = na63.get_center_of_detector(p2hit.det)
+                        
+                        
+                        xes.SetNextPoint(dp3[0]+(p3hit.u/(11520.0)*na63.DIM_MIMOSA_X/2), dp3[1] + (p3hit.v/(5760.0)*na63.DIM_MIMOSA_Y/2), dp3[2])
+                        xes.SetNextPoint(dp4[0]+(p4hit.u/(11520.0)*na63.DIM_MIMOSA_X/2), dp4[1] + (p4hit.v/(5760.0)*na63.DIM_MIMOSA_Y/2), dp4[2])
+                        xes.SetNextPoint(dp1[0]+(p1hit.u/(11520.0)*na63.DIM_MIMOSA_X/2), dp1[1] + (p1hit.v/(5760.0)*na63.DIM_MIMOSA_Y/2), dp1[2])
+                        xes.SetNextPoint(dp2[0]+(p2hit.u/(11520.0)*na63.DIM_MIMOSA_X/2), dp2[1] + (p2hit.v/(5760.0)*na63.DIM_MIMOSA_Y/2), dp2[2])
                         gEve.AddElement(xes)
     
     
