@@ -4,7 +4,8 @@
 typedef struct {
   float r[3];
   float p[3];
-  float q, m;
+  float q;
+  float m; // GeV
 } simple_particle_t;
 
 #endif

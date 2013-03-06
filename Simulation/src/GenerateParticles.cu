@@ -1,13 +1,15 @@
 #include <iostream>
 
 #include "Simulation/GenerateParticles.h"
+#include "Simulation/CudaHelper.h"
 
-__global__ void cudaPopulateElectrons(simple_particle_t* p_, const int N) {
+__global__
+void cudaPopulateElectrons(simple_particle_t* p_, const int N) {
   int index = threadIdx.x + blockDim.x * blockIdx.x;
   if (index >= N) return;
-  float px = -0.05 + 0.1 * (N - index) / index;
-  float py =  0.05 - 0.1 * (N - index) / index;
-  float pz =  0.10 + 9.9 * (N - index) / index;
+  float px = -0.5e-2 + 1e-2 * (index + 1) / N;
+  float py =  0.5e-2 - 1e-2 * (index + 1) / N;
+  float pz =  0.1 + 9.9 * (index + 1) / N;
   simple_particle_t* p = &p_[index];
   p->p[0] = px;
   p->p[1] = py;
@@ -15,17 +17,13 @@ __global__ void cudaPopulateElectrons(simple_particle_t* p_, const int N) {
   p->r[0] = 0;
   p->r[1] = 0;
   p->r[2] = 0;
-  p->m = 1;
+  p->m = 5.109989e-4;
   p->q = -1;
 }
 
-int error(cudaError_t err) {
-  if (err == cudaSuccess) return 0;
-  std::cerr << "CUDA Error: " << cudaGetErrorString(err) << std::endl;
-  return -1;
-}
-
-void GenerateParticles(simple_particle_t* p, const int N) {
+__host__
+void GenerateParticles(simple_particle_t* p, launch_args_t args) {
+  const int N = args.N;
   int threadsPerBlock = 256;
   int blocksPerGrid = (N - 1) / threadsPerBlock + 1;
   const int dataSize = N*sizeof(simple_particle_t);
@@ -35,11 +33,12 @@ void GenerateParticles(simple_particle_t* p, const int N) {
   if (error(cudaMalloc((void**)&devicePtr,dataSize))) return;
   if (error(cudaMemcpy((void*)devicePtr,p,dataSize,cudaMemcpyHostToDevice))) return;
 
-  std::cout << "Copied " << N << " instances of size " << sizeof(simple_particle_t) << " bytes each, resulting in a total of " << dataSize << " bytes of data on the device." << std::endl;
-  std::cout << "About to initialize " << blocksPerGrid << " blocks of " << threadsPerBlock << " each, resulting in a total of " << blocksPerGrid * threadsPerBlock << " threads." << std::endl;
+  if (args.debug) {
+    std::cout << "Copied " << N << " instances of size " << sizeof(simple_particle_t) << " bytes each, resulting in a total of " << dataSize << " bytes of data on the device." << std::endl;
+    std::cout << "About to initialize " << blocksPerGrid << " blocks of " << threadsPerBlock << " each, resulting in a total of " << blocksPerGrid * threadsPerBlock << " threads." << std::endl;
+  }
   cudaPopulateElectrons<<<blocksPerGrid,threadsPerBlock>>>(devicePtr,N);
-
-  cudaThreadSynchronize();
+  cudaDeviceSynchronize();
 
   if (error(cudaMemcpy(p,devicePtr,dataSize,cudaMemcpyDeviceToHost))) return;
   if (error(cudaFree(devicePtr))) return;
