@@ -2,8 +2,12 @@
 #define PROPAGATE_H
 
 #include "Simulation/Particle.h"
-#include "Simulation/LaunchArguments.h"
+#include "Simulation/Arguments.h"
 
-void propagate(simple_particle_t *p, const launch_args_t args);
+namespace Simulation {
+
+  void propagate(simple_particle_t *p, simulator_args_t args);
+
+}
 
 #endif
