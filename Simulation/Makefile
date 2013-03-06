@@ -2,28 +2,29 @@ CC=GCC
 CXX=g++
 NVCC=nvcc
 NVCCFLAGS=-ccbin /usr/bin -arch=sm_30 -m64
-CFLAGS=-m64 -std=c99
-CXXFLAGS=-m64 -std=c++03
+CFLAGS=-m64 -std=c99 `root-config --cflags`
+CXXFLAGS=-m64 -std=c++11 `root-config --cflags`
 SRC=src
 INCLUDE_CUDA=-I$(CUDA)/include -L$(CUDA)/lib64 -L$(CUDA)/lib -lcuda -lcudart
-INCLUDE_ROOT=-I$(ROOTSYS)/lib
 INCLUDE=-I./ -I$(SRC) $(INCLUDE_CUDA)
 
-all: Simulator
+all: main
 
-Simulator: $(SRC)/Simulator.cpp GenerateParticles.o Propagate.o CudaHelper.o
-	$(CXX) $(CXXFLAGS) $(INCLUDE) *.o $(SRC)/Simulator.cpp -o bin/simulator
-	rm ./*.o
+main: Simulator.o
+	$(CXX) $(CXXFLAGS) $(INCLUDE) *.o $(SRC)/Main.cpp -o bin/simulator
 
-GenerateParticles.o: $(SRC)/GenerateParticles.cu
+Simulator.o: $(SRC)/Simulator.cpp GenerateParticles.o Propagate.o
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(SRC)/Simulator.cpp
+
+GenerateParticles.o: $(SRC)/GenerateParticles.cu CudaHelper.o
 	$(NVCC) $(NVCCFLAGS) $(INCLUDE) -c $(SRC)/GenerateParticles.cu
 
-Propagate.o: $(SRC)/Propagate.cu
+Propagate.o: $(SRC)/Propagate.cu CudaHelper.o
 	$(NVCC) $(NVCCFLAGS) $(INCLUDE) -c $(SRC)/Propagate.cu
 
 CudaHelper.o: $(SRC)/CudaHelper.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(SRC)/CudaHelper.cpp
 
 clean:
-	rm src/*.o
+	rm ./*.o
 	rm bin/*

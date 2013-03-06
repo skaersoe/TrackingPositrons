@@ -5,9 +5,14 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
+#include "Simulation/Simulator.h"
 #include "Simulation/Particle.h"
-#include "Simulation/LaunchArguments.h"
+#include "Simulation/Arguments.h"
 
-void GenerateParticles(simple_particle_t* p, launch_args_t args);
+namespace Simulation {
+
+  void generateParticles(simple_particle_t* p, simulator_args_t args);
+
+}
 
 #endif
