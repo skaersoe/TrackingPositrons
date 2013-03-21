@@ -16,7 +16,7 @@ main: Simulator.o
 Simulator.o: $(SRC)/Simulator.cpp GenerateParticles.o Propagate.o
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(SRC)/Simulator.cpp
 
-GenerateParticles.o: $(SRC)/GenerateParticles.cu CudaHelper.o
+GenerateParticles.o: $(SRC)/GenerateParticles.cu
 	$(NVCC) $(NVCCFLAGS) $(INCLUDE) -c $(SRC)/GenerateParticles.cu
 
 Propagate.o: $(SRC)/Propagate.cu CudaHelper.o
@@ -28,3 +28,5 @@ CudaHelper.o: $(SRC)/CudaHelper.cpp
 clean:
 	rm ./*.o
 	rm bin/*
+
+.PHONY: clean

@@ -1,5 +1,5 @@
-#ifndef GENERATEPARTICLES_H
-#define GENERATEPARTICLES_H
+#ifndef NA63_SIMULATION_GENERATEPARTICLES_H
+#define NA63_SIMULATION_GENERATEPARTICLES_H
 
 // #include "HepMC/GenParticle.h"
 #include <cuda.h>

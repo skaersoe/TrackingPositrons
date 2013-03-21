@@ -15,9 +15,10 @@ namespace Simulation {
   Simulator::Simulator(simulator_args_t args) {
     setArgs(args);
     particles = NULL;
+    externalParticles = true;
   }
   Simulator::~Simulator() {
-    delete particles;
+    deleteParticles();
   }
 
   simulator_args_t Simulator::getArgs() {
@@ -27,11 +28,25 @@ namespace Simulation {
   void Simulator::setArgs(simulator_args_t args) {
     this->args = args;
   }
+  
+  void Simulator::deleteParticles() {
+    if (!externalParticles) {
+      delete particles;
+      args.N = 0;
+    }
+  }
+
+  void Simulator::setParticles(simple_particle_t *particles, const unsigned N) {
+    deleteParticles();
+    args.N = N;
+    this->particles = particles;
+  }
 
   void Simulator::generateParticles() {
-    delete particles;
-    particles = new simple_particle_t[args.nParticles];
+    deleteParticles();
+    particles = new simple_particle_t[args.N];
     Simulation::generateParticles(particles,args);
+    externalParticles = false;
   }
 
   void Simulator::propagate() {

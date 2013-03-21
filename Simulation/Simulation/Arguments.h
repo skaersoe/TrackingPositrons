@@ -1,5 +1,5 @@
-#ifndef LAUNCHARGUMENTS_H
-#define LAUNCHARGUMENTS_H
+#ifndef NA63_SIMULATION_LAUNCHARGUMENTS_H
+#define NA63_SIMULATION_LAUNCHARGUMENTS_H
 
 namespace Simulation {
 
@@ -11,7 +11,10 @@ namespace Simulation {
   typedef struct {
     simulator_device_t device;
     bool debug;
-    unsigned nParticles;
+    bool render;
+    unsigned N;
+    float dt;
+    int steps;
   } simulator_args_t;
 
 }

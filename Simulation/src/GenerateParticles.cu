@@ -19,16 +19,14 @@ namespace Simulation {
     p->r[0] = 0;
     p->r[1] = 0;
     p->r[2] = 0;
-    p->m = 5.109989e-4;
-    p->q = -1;
+    p->id = 11; // Electrons
   }
 
   __host__
   void generateParticles(simple_particle_t* p, simulator_args_t args) {
-    const int N = args.nParticles;
     int threadsPerBlock = 256;
-    int blocksPerGrid = (N - 1) / threadsPerBlock + 1;
-    const int dataSize = N*sizeof(simple_particle_t);
+    int blocksPerGrid = (args.N - 1) / threadsPerBlock + 1;
+    const int dataSize = args.N*sizeof(simple_particle_t);
 
     simple_particle_t* devicePtr = NULL;
     
@@ -36,11 +34,11 @@ namespace Simulation {
     if (error(cudaMemcpy((void*)devicePtr,p,dataSize,cudaMemcpyHostToDevice))) return;
 
     if (args.debug) {
-      std::cout << "Copied " << N << " instances of size " << sizeof(simple_particle_t) << " bytes each, resulting in a total of " << dataSize << " bytes of data on the device." << std::endl;
+      std::cout << "Copied " << args.N << " instances of size " << sizeof(simple_particle_t) << " bytes each, resulting in a total of " << dataSize << " bytes of data on the device." << std::endl;
       std::cout << "About to initialize " << blocksPerGrid << " blocks of " << threadsPerBlock << " each, resulting in a total of " << blocksPerGrid * threadsPerBlock << " threads." << std::endl;
     }
     
-    cuda_generateParticles_electrons<<<blocksPerGrid,threadsPerBlock>>>(devicePtr,N);
+    cuda_generateParticles_electrons<<<blocksPerGrid,threadsPerBlock>>>(devicePtr,args.N);
     cudaDeviceSynchronize();
 
     if (error(cudaMemcpy(p,devicePtr,dataSize,cudaMemcpyDeviceToHost))) return;

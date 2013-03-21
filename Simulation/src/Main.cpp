@@ -10,13 +10,13 @@ using namespace Simulation;
 int main(int argc,char *argv[]) {
 
   /* Set some default values. N must be specified by user */
-  simulator_args_t args = { .device = GPU, .debug = false, .nParticles=0 };
+  simulator_args_t args = { .device = GPU, .debug = false, .render = false, .N = 0 };
   /* Parse input */
   if (argc < 2) {
     std::cerr << "Missing input: number of particles to simulate." << std::endl;
     return -1;
   }
-  sscanf(argv[1],"%d",&args.nParticles);
+  sscanf(argv[1],"%d",&args.N);
   for (int i=2;i<argc;i++) {
     std::string token(argv[i]);
     if (token == "-CPU")
@@ -25,6 +25,8 @@ int main(int argc,char *argv[]) {
         args.device = GPU;
     else if (token == "-debug")
       args.debug = true;
+    else if (token == "-render")
+      args.render = true;
     else {
       std::cout << "Unrecognized argument: " << token << std::endl;
        return -1;
