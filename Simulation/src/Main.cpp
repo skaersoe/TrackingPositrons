@@ -5,7 +5,7 @@
 #include "Simulation/Particle.h"
 #include "Simulation/Arguments.h"
 
-using namespace Simulation;
+using namespace NA63;
 
 int main(int argc,char *argv[]) {
 
@@ -36,7 +36,7 @@ int main(int argc,char *argv[]) {
   std::cout << "Simulator starting." << std::endl;
 
   // Create Simulator object
-  Simulator *sim = new Simulation::Simulator(args);
+  Simulator *sim = new Simulator(args);
 
   // Populate
   clock_t timer = clock();

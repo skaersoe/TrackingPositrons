@@ -1,7 +1,7 @@
 #ifndef NA63_SIMULATION_LAUNCHARGUMENTS_H
 #define NA63_SIMULATION_LAUNCHARGUMENTS_H
 
-namespace Simulation {
+namespace NA63 {
 
   typedef enum {
     CPU,

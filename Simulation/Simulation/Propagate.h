@@ -10,7 +10,7 @@ typedef struct {
   float dt;
 } kernel_args_t;
 
-namespace Simulation {
+namespace NA63 {
 
   void propagate(simple_particle_t *p, simulator_args_t args);
 

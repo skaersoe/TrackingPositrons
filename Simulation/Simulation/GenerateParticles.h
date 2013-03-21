@@ -9,7 +9,7 @@
 #include "Simulation/Particle.h"
 #include "Simulation/Arguments.h"
 
-namespace Simulation {
+namespace NA63 {
 
   void generateParticles(simple_particle_t* p, simulator_args_t args);
 

@@ -4,7 +4,7 @@
 #include "Simulation/GenerateParticles.h"
 #include "Simulation/Propagate.h"
 
-namespace Simulation {
+namespace NA63 {
 
   Simulator::Simulator(void) : Simulator::Simulator(args) {
     simulator_args_t args = {
@@ -45,12 +45,12 @@ namespace Simulation {
   void Simulator::generateParticles() {
     deleteParticles();
     particles = new simple_particle_t[args.N];
-    Simulation::generateParticles(particles,args);
+    NA63::generateParticles(particles,args);
     externalParticles = false;
   }
 
   void Simulator::propagate() {
-    Simulation::propagate(particles,args);
+    NA63::propagate(particles,args);
   }
 
 }

@@ -1,7 +1,7 @@
 #ifndef NA63_SIMULATION_PARTICLE_H
 #define NA63_SIMULATION_PARTICLE_H
 
-namespace Simulation {
+namespace NA63 {
 
   typedef struct {
     float r[3];

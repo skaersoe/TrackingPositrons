@@ -3,7 +3,7 @@
 #include "Simulation/GenerateParticles.h"
 #include "Simulation/CudaHelper.h"
 
-namespace Simulation {
+namespace NA63 {
 
   __global__
   void cuda_generateParticles_electrons(simple_particle_t* p_, const int N) {

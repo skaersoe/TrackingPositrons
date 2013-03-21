@@ -4,7 +4,7 @@
 #include "Simulation/Propagate.h"
 #include "Simulation/CudaHelper.h"
 
-namespace Simulation {
+namespace NA63 {
 
   /** Forward declaration */
   __host__ void propagateGPU(simple_particle_t *p, simulator_args_t args);

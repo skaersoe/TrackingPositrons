@@ -6,7 +6,7 @@
 #include "Simulation/Particle.h"
 #include "Simulation/Arguments.h"
 
-namespace Simulation {
+namespace NA63 {
 
   class Simulator {
 
