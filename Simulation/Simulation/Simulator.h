@@ -4,15 +4,29 @@
 #include <thrust/host_vector.h>
 
 #include "Simulation/Track.h"
-#include "Simulation/Arguments.h"
+#include "Simulation/Particle.h"
+#include "Geometry/Geometry.h"
 
 namespace na63 {
+
+  typedef enum {
+    CPU,
+    GPU
+  } SimulatorDevice;
+
+  typedef struct {
+    SimulatorDevice device; // Run on CPU or GPU
+    bool debug;             // Display debugging messages
+    bool render;            // Render visually (NYI)
+    unsigned N;             // Number of tracks
+    Geometry *geometry;
+  } SimulatorPars;
 
   class Simulator {
 
     public:
       Simulator(void);
-      Simulator(SimulatorPars pars);
+      Simulator(SimulatorDevice device, bool debug);
 
       ~Simulator();
 
@@ -32,6 +46,7 @@ namespace na63 {
       SimulatorPars pars_;
       Track *tracks_;
       bool external_tracks;
+      Geometry geometry;
 
       void DeleteTracks();
 

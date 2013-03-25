@@ -1,5 +1,5 @@
-#ifndef NA63_MATERIAL_H
-#define NA63_MATERIAL_H
+#ifndef NA63_GEOMETRY_MATERIAL_H
+#define NA63_GEOMETRY_MATERIAL_H
 
 namespace na63 {
 
@@ -16,7 +16,7 @@ namespace na63 {
     ~Material();
 
     float density() { return pars_.density; }
-    MaterialPars pars() { return pars_; };
+    MaterialPars pars() { return pars_; }
 
   private:
     MaterialPars pars_;
@@ -25,4 +25,4 @@ namespace na63 {
 
 }
 
-#endif /* NA63_MATERIAL_H */
+#endif /* NA63_GEOMETRY_MATERIAL_H */

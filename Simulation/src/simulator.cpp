@@ -7,10 +7,15 @@
 namespace na63 {
 
   Simulator::Simulator(void)
-    : Simulator::Simulator({ .device = GPU, .debug = false }) {}
-  Simulator::Simulator(SimulatorPars p) {
-    set_pars(p);
-    tracks_ = NULL;
+    : Simulator::Simulator(GPU, false) {}
+  Simulator::Simulator(SimulatorDevice device, bool debug) {
+    pars_ = {
+      .device = device,
+      .debug = debug,
+      .render = false,
+      .N = 0,
+      .geometry = &geometry
+    };
     external_tracks = true;
   }
   Simulator::~Simulator() {
@@ -30,6 +35,9 @@ namespace na63 {
     tracks_ = t;
   }
 
+  /**
+   * Generates some hardcoded electrons.
+   */
   void Simulator::GenerateTracks() {
     DeleteTracks();
     tracks_ = new Track[pars_.N];
@@ -38,6 +46,7 @@ namespace na63 {
   }
 
   void Simulator::Propagate() {
+    geometry.GenerateParameterArrays();
     na63::Propagate(tracks_,pars_);
   }
 

@@ -11,6 +11,8 @@ namespace na63 {
   __host__ void PropagateCPU(Track *t, SimulatorPars args);
   __host__ __device__ void Timestep(Track *t, float dt);
   __global__ void PropagateKernel(Track *t_, int *keys, KernelPars args);
+  __host__ cudaError_t AllocateGeometry(Geometry *geometry, KernelPars *p);
+  __host__ cudaError_t FreeGeometry(KernelPars *p);
 
   /** Auxiliary function, intended for debugging. */
   __host__
@@ -27,9 +29,6 @@ namespace na63 {
    __host__
   void Propagate(Track *t, SimulatorPars args) {
 
-    args.dt = 0.001;
-    args.steps = 2<<12;
-
     if (args.debug) for (int i=0;i<5;i++) PrintLocation(t,i);
 
     if (args.device == CPU)
@@ -43,9 +42,9 @@ namespace na63 {
   /** Regular CPU version for comparison and debugging. */
   __host__
   void PropagateCPU(Track *t, SimulatorPars args) {
-    for (int i=0;i<args.N;i++)
-      for (int j=0;j<args.steps;j++)
-        Timestep(&t[i],args.dt);
+    // Not currently implemented
+    t = t;
+    args = args;
   }
 
   __host__
@@ -57,9 +56,15 @@ namespace na63 {
     const unsigned size_tracks = args.N*sizeof(Track);
     const unsigned size_keys = args.N*sizeof(int);
     const unsigned size_total = size_tracks + size_keys;
-    KernelPars kernel_args = { .N = args.N };
+    KernelPars kernel_args;
+    kernel_args.N = args.N;
+    kernel_args.material_arr = NULL;
+    kernel_args.particle_arr = NULL;
 
-    // Allocate and copy to device
+    // Allocate geometry arrays (might be dynamic later)
+    if (CudaError(AllocateGeometry(args.geometry, &kernel_args))) return;
+
+    // Allocate tracks and copy to device
     Track *devptr_tracks = NULL;
     if (CudaError(cudaMalloc((void**)&devptr_tracks,size_total))) return;
     if (CudaError(cudaMemcpy(devptr_tracks,tracks,size_tracks,cudaMemcpyHostToDevice))) return;
@@ -74,18 +79,64 @@ namespace na63 {
     }
     // Launch kernel
     for (int i=0; i<10; i++) {
-      // Should be dynamic
+      // Should be dynamic //
       kernel_args.steps = 100;
       kernel_args.dt = 0.001;
+      // ----------------- //
       PropagateKernel<<<blocksPerGrid,threadsPerBlock>>>(devptr_tracks,devptr_keys,kernel_args);
       cudaDeviceSynchronize();
       thrust::sort_by_key(devptr_thrust_keys, devptr_thrust_keys + args.N, devptr_thrust_tracks);
-    }
+    } // End kernel launch loop
 
     // Copy back and free memory
     if (CudaError(cudaMemcpy(tracks,devptr_tracks,size_tracks,cudaMemcpyDeviceToHost))) return;
     if (CudaError(cudaFree(devptr_tracks))) return;
+    if (CudaError(FreeGeometry(&kernel_args))) return;
 
+  }
+
+  __host__
+  cudaError_t FreeGeometry(KernelPars *p) {
+    cudaError_t err;
+    if ((err = cudaFree(p->material_arr)) != cudaSuccess) return err;
+    if ((err = cudaFree(p->material_arr)) != cudaSuccess) return err;
+    return cudaSuccess;
+  }
+  __host__
+  cudaError_t AllocateGeometry(Geometry *geometry, KernelPars *p) {
+    cudaError_t err;
+
+    // Free previously allocated geometry if necessary
+    if (p->material_arr != NULL) {
+      if ((err = cudaFree(p->material_arr)) != cudaSuccess) return err;
+    }
+    if (p->particle_arr != NULL) {
+      if ((err = cudaFree(p->particle_arr)) != cudaSuccess) return err;
+    }
+
+    // Allocate space
+    const unsigned size_material = geometry->materials_size()*sizeof(MaterialPars);
+    const unsigned size_particle = geometry->particles_size()*sizeof(ParticlePars);
+    err = cudaMalloc((void**)&p->material_arr,
+                     size_material);
+    if (err != cudaSuccess) return err;
+    err = cudaMalloc((void**)&p->particle_arr,
+                     size_particle);
+    if (err != cudaSuccess) return err;
+
+    // Copy geometry to device (could potentially be asynchronous?)
+    err = cudaMemcpy(p->material_arr,
+                     geometry->material_arr(),
+                     size_material,
+                     cudaMemcpyHostToDevice);
+    if (err != cudaSuccess) return err;
+    err = cudaMemcpy(p->material_arr,
+                     geometry->material_arr(),
+                     size_material,
+                     cudaMemcpyHostToDevice);
+    if (err != cudaSuccess) return err;
+
+    return cudaSuccess;
   }
 
   /** Called from host function, lets each thread loop over one particle */
