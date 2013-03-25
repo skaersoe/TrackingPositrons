@@ -4,9 +4,9 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-namespace NA63 {
+namespace na63 {
 
-int error(cudaError_t err);
+  int CudaError(cudaError_t err);
 
 }
 

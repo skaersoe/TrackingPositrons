@@ -1,56 +1,53 @@
 #include <iostream>
 
 #include "Simulation/Simulator.h"
-#include "Simulation/GenerateParticles.h"
+#include "Simulation/GenerateTracks.h"
 #include "Simulation/Propagate.h"
 
-namespace NA63 {
+namespace na63 {
 
-  Simulator::Simulator(void) : Simulator::Simulator(args) {
-    simulator_args_t args = {
-      .device = GPU,
-      .debug = false
+  Simulator::Simulator(void)
+    : Simulator::Simulator(GPU, false) {}
+  Simulator::Simulator(SimulatorDevice device, bool debug) {
+    pars_ = {
+      .device = device,
+      .debug = debug,
+      .render = false,
+      .N = 0,
+      .geometry = &geometry
     };
-  }
-  Simulator::Simulator(simulator_args_t args) {
-    setArgs(args);
-    particles = NULL;
-    externalParticles = true;
+    external_tracks = true;
   }
   Simulator::~Simulator() {
-    deleteParticles();
-  }
-
-  simulator_args_t Simulator::getArgs() {
-    return args;
-  }
-
-  void Simulator::setArgs(simulator_args_t args) {
-    this->args = args;
+    DeleteTracks();
   }
   
-  void Simulator::deleteParticles() {
-    if (!externalParticles) {
-      delete particles;
-      args.N = 0;
+  void Simulator::DeleteTracks() {
+    if (!external_tracks) {
+      delete tracks_;
+      pars_.N = 0;
     }
   }
 
-  void Simulator::setParticles(simple_particle_t *particles, const unsigned N) {
-    deleteParticles();
-    args.N = N;
-    this->particles = particles;
+  void Simulator::SetTracks(Track *t, const unsigned N) {
+    DeleteTracks();
+    pars_.N = N;
+    tracks_ = t;
   }
 
-  void Simulator::generateParticles() {
-    deleteParticles();
-    particles = new simple_particle_t[args.N];
-    NA63::generateParticles(particles,args);
-    externalParticles = false;
+  /**
+   * Generates some hardcoded electrons.
+   */
+  void Simulator::GenerateTracks() {
+    DeleteTracks();
+    tracks_ = new Track[pars_.N];
+    na63::GenerateTracks(tracks_,pars_);
+    external_tracks = false;
   }
 
-  void Simulator::propagate() {
-    NA63::propagate(particles,args);
+  void Simulator::Propagate() {
+    geometry.GenerateParameterArrays();
+    na63::Propagate(tracks_,pars_);
   }
 
 }

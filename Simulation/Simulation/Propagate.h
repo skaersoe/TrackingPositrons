@@ -1,18 +1,22 @@
 #ifndef NA63_SIMULATION_PROPAGATE_H
 #define NA63_SIMULATION_PROPAGATE_H
 
+#include "Simulation/Track.h"
+#include "Simulation/Simulator.h"
 #include "Simulation/Particle.h"
-#include "Simulation/Arguments.h"
+#include "Geometry/Material.h"
 
-typedef struct {
-  unsigned N;
-  unsigned steps;
-  float dt;
-} kernel_args_t;
+namespace na63 {
 
-namespace NA63 {
+  typedef struct {
+    unsigned N;
+    unsigned steps;
+    float dt;
+    MaterialPars *material_arr;
+    ParticlePars *particle_arr;
+  } KernelPars;
 
-  void propagate(simple_particle_t *p, simulator_args_t args);
+  void Propagate(Track *t, SimulatorPars args);
 
 }
 

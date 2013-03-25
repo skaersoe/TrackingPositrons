@@ -1,21 +1,21 @@
 #ifndef NA63_SIMULATION_LAUNCHARGUMENTS_H
 #define NA63_SIMULATION_LAUNCHARGUMENTS_H
 
-namespace NA63 {
+namespace na63 {
 
   typedef enum {
     CPU,
     GPU
-  } simulator_device_t;
+  } SimulatorDevice;
 
   typedef struct {
-    simulator_device_t device;
+    SimulatorDevice device;
     bool debug;
     bool render;
     unsigned N;
     float dt;
     int steps;
-  } simulator_args_t;
+  } SimulatorPars;
 
 }
 
