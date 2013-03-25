@@ -6,12 +6,12 @@
 #include <cuda_runtime.h>
 
 #include "Simulation/Simulator.h"
-#include "Simulation/Particle.h"
+#include "Simulation/Track.h"
 #include "Simulation/Arguments.h"
 
-namespace NA63 {
+namespace na63 {
 
-  void generateParticles(simple_particle_t* p, simulator_args_t args);
+  void GenerateTracks(Track *t, SimulatorPars args);
 
 }
 

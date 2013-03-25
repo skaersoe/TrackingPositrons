@@ -2,15 +2,15 @@
 #include <time.h>
 
 #include "Simulation/Simulator.h"
-#include "Simulation/Particle.h"
+#include "Simulation/Track.h"
 #include "Simulation/Arguments.h"
 
-using namespace NA63;
+using namespace na63;
 
 int main(int argc,char *argv[]) {
 
   /* Set some default values. N must be specified by user */
-  simulator_args_t args = { .device = GPU, .debug = false, .render = false, .N = 0 };
+  SimulatorPars args = { .device = GPU, .debug = false, .render = false, .N = 0 };
   /* Parse input */
   if (argc < 2) {
     std::cerr << "Missing input: number of particles to simulate." << std::endl;
@@ -40,13 +40,13 @@ int main(int argc,char *argv[]) {
 
   // Populate
   clock_t timer = clock();
-  sim->generateParticles();
+  sim->GenerateTracks();
   timer = clock() - timer;
   std::cout << "Populated in " << (float)timer/CLOCKS_PER_SEC << " seconds." << std::endl;
 
   // Propagate
   timer = clock();
-  sim->propagate();
+  sim->Propagate();
   timer = clock() - timer;
   std::cout << "Propagated in " << (float)timer/CLOCKS_PER_SEC << " seconds." << std::endl;
 

@@ -3,33 +3,37 @@
 
 #include <thrust/host_vector.h>
 
-#include "Simulation/Particle.h"
+#include "Simulation/Track.h"
 #include "Simulation/Arguments.h"
 
-namespace NA63 {
+namespace na63 {
 
   class Simulator {
 
     public:
       Simulator(void);
-      Simulator(simulator_args_t args);
+      Simulator(SimulatorPars pars);
 
       ~Simulator();
 
-      simulator_args_t getArgs();
+      SimulatorPars pars() {
+        return pars_;
+      }
 
-      void setArgs(simulator_args_t args);
-      void setParticles(simple_particle_t *particles, const unsigned N);
+      void set_pars(SimulatorPars p) {
+        pars_ = p;
+      }
+      void SetTracks(Track *t, const unsigned N);
 
-      void generateParticles();
-      void propagate();
+      void GenerateTracks();
+      void Propagate();
 
     private:
-      simulator_args_t args;
-      simple_particle_t *particles;
-      bool externalParticles;
+      SimulatorPars pars_;
+      Track *tracks_;
+      bool external_tracks;
 
-      void deleteParticles();
+      void DeleteTracks();
 
   };
 

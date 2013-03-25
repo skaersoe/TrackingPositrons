@@ -4,20 +4,20 @@
 #include "Simulation/Propagate.h"
 #include "Simulation/CudaHelper.h"
 
-namespace NA63 {
+namespace na63 {
 
   /** Forward declaration */
-  __host__ void propagateGPU(simple_particle_t *p, simulator_args_t args);
-  __host__ void propagateCPU(simple_particle_t *p, simulator_args_t args);
-  __host__ __device__ void timestep(simple_particle_t* p, float dt);
-  __global__ void propagateKernel(simple_particle_t *p_, int *keys, kernel_args_t args);
+  __host__ void PropagateGPU(Track *t, SimulatorPars args);
+  __host__ void PropagateCPU(Track *t, SimulatorPars args);
+  __host__ __device__ void Timestep(Track *t, float dt);
+  __global__ void PropagateKernel(Track *t_, int *keys, KernelPars args);
 
   /** Auxiliary function, intended for debugging. */
   __host__
-  void print_location(simple_particle_t *p, const int i) {
-    std::cout << "Particle " << i << " is at (" << p[i].r[0] << "," << p[i].r[1]
-      << "," << p[i].r[2] << ") with momentum (" << p[i].p[0] << "," << p[i].p[1]
-      << "," << p[i].p[2] << ")" << std::endl;
+  void PrintLocation(Track *t, const int i) {
+    std::cout << "Particle " << i << " is at (" << t[i].r[0] << "," << t[i].r[1]
+      << "," << t[i].r[2] << ") with momentum (" << t[i].p[0] << "," << t[i].p[1]
+      << "," << t[i].p[2] << ")" << std::endl;
   }
 
   /**
@@ -25,51 +25,51 @@ namespace NA63 {
    * on the input arguments.
    */
    __host__
-  void propagate(simple_particle_t *p, simulator_args_t args) {
+  void Propagate(Track *t, SimulatorPars args) {
 
     args.dt = 0.001;
     args.steps = 2<<12;
 
-    if (args.debug) for (int i=0;i<args.N;i++) print_location(p,i);
+    if (args.debug) for (int i=0;i<5;i++) PrintLocation(t,i);
 
     if (args.device == CPU)
-      propagateCPU(p,args);
+      PropagateCPU(t,args);
     else
-      propagateGPU(p,args);
+      PropagateGPU(t,args);
 
-    if (args.debug) for (int i=0;i<args.N;i++) print_location(p,i);
+    if (args.debug) for (int i=0;i<5;i++) PrintLocation(t,i);
   }
 
   /** Regular CPU version for comparison and debugging. */
   __host__
-  void propagateCPU(simple_particle_t *p, simulator_args_t args) {
+  void PropagateCPU(Track *t, SimulatorPars args) {
     for (int i=0;i<args.N;i++)
       for (int j=0;j<args.steps;j++)
-        timestep(&p[i],args.dt);
+        Timestep(&t[i],args.dt);
   }
 
   __host__
-  void propagateGPU(simple_particle_t *p, simulator_args_t args) {
+  void PropagateGPU(Track *tracks, SimulatorPars args) {
 
     // CUDA Parameters
     int threadsPerBlock = 256;
     int blocksPerGrid = (args.N - 1) / threadsPerBlock + 1;
-    const unsigned size_particles = args.N*sizeof(simple_particle_t);
+    const unsigned size_tracks = args.N*sizeof(Track);
     const unsigned size_keys = args.N*sizeof(int);
-    const unsigned size_total = size_particles + size_keys;
-    kernel_args_t kernel_args = { .N = args.N };
+    const unsigned size_total = size_tracks + size_keys;
+    KernelPars kernel_args = { .N = args.N };
 
     // Allocate and copy to device
-    simple_particle_t *devPtr_p = NULL;
-    if (error(cudaMalloc((void**)&devPtr_p,size_total))) return;
-    if (error(cudaMemcpy(devPtr_p,p,size_particles,cudaMemcpyHostToDevice))) return;
-    int *devPtr_keys = (int*)((long)devPtr_p + (long)size_particles);
+    Track *devptr_tracks = NULL;
+    if (CudaError(cudaMalloc((void**)&devptr_tracks,size_total))) return;
+    if (CudaError(cudaMemcpy(devptr_tracks,tracks,size_tracks,cudaMemcpyHostToDevice))) return;
+    int *devptr_keys = (int*)((long)devptr_tracks + (long)size_tracks);
     // Thrust wrappers
-    thrust::device_ptr<simple_particle_t> devPtr_thrust_p(devPtr_p);
-    thrust::device_ptr<int>               devPtr_thrust_keys(devPtr_keys);
+    thrust::device_ptr<Track> devptr_thrust_tracks(devptr_tracks);
+    thrust::device_ptr<int>   devptr_thrust_keys(devptr_keys);
 
     if (args.debug) {
-      std::cout << "Copied " << args.N << " instances of size " << sizeof(simple_particle_t) + sizeof(float) << " bytes each, resulting in a total of " << size_total << " bytes of data on the device." << std::endl;
+      std::cout << "Copied " << args.N << " instances of size " << sizeof(Track) + sizeof(float) << " bytes each, resulting in a total of " << size_total << " bytes of data on the device." << std::endl;
       std::cout << "About to initialize " << blocksPerGrid << " blocks of " << threadsPerBlock << " each, resulting in a total of " << blocksPerGrid * threadsPerBlock << " threads." << std::endl;
     }
     // Launch kernel
@@ -77,28 +77,28 @@ namespace NA63 {
       // Should be dynamic
       kernel_args.steps = 100;
       kernel_args.dt = 0.001;
-      propagateKernel<<<blocksPerGrid,threadsPerBlock>>>(devPtr_p,devPtr_keys,kernel_args);
+      PropagateKernel<<<blocksPerGrid,threadsPerBlock>>>(devptr_tracks,devptr_keys,kernel_args);
       cudaDeviceSynchronize();
-      thrust::sort_by_key(devPtr_thrust_keys, devPtr_thrust_keys + args.N, devPtr_thrust_p);
+      thrust::sort_by_key(devptr_thrust_keys, devptr_thrust_keys + args.N, devptr_thrust_tracks);
     }
 
     // Copy back and free memory
-    if (error(cudaMemcpy(p,devPtr_p,size_particles,cudaMemcpyDeviceToHost))) return;
-    if (error(cudaFree(devPtr_p))) return;
+    if (CudaError(cudaMemcpy(tracks,devptr_tracks,size_tracks,cudaMemcpyDeviceToHost))) return;
+    if (CudaError(cudaFree(devptr_tracks))) return;
 
   }
 
   /** Called from host function, lets each thread loop over one particle */
   __global__
-  void propagateKernel(simple_particle_t *p_, int *keys, kernel_args_t args) {
+  void PropagateKernel(Track *t_, int *keys, KernelPars args) {
 
     int index = threadIdx.x + blockDim.x * blockIdx.x;
     if (index >= args.N) return;
 
-    simple_particle_t* p = &p_[index];
+    Track* t = &t_[index];
 
     for (int i=0;i<args.steps;i++) {
-      timestep(p,args.dt);
+      Timestep(t,args.dt);
     }
 
     keys[index] = index % 3;
@@ -107,17 +107,17 @@ namespace NA63 {
 
   /** Applies the magnetic field in a given point */
   __host__ __device__ inline
-  void apply_magnetic_field(float *p_src, float *p_tgt, float dt, float q) {
+  void ApplyMagneticField(float *t_src, float *t_tgt, float dt, float q) {
     const float B[] = {10,20,30};
     // Cross product
-    p_tgt[0] = dt * (q * (p_src[1] * B[2] - p_src[2] * B[1]) );
-    p_tgt[1] = dt * (q * (p_src[2] * B[0] - p_src[0] * B[2]) );
-    p_tgt[2] = dt * (q * (p_src[0] * B[1] - p_src[1] * B[0]) );
+    t_tgt[0] = dt * (q * (t_src[1] * B[2] - t_src[2] * B[1]) );
+    t_tgt[1] = dt * (q * (t_src[2] * B[0] - t_src[0] * B[2]) );
+    t_tgt[2] = dt * (q * (t_src[0] * B[1] - t_src[1] * B[0]) );
   }
 
   /** Auxiliary function for calculating Rung-Kutta coefficients */
   __host__ __device__ inline
-  void rk_3d(float *a, float *b, float *c, float d) {
+  void RK3D(float *a, float *b, float *c, float d) {
     c[0] = a[0] + d * b[0];
     c[1] = a[1] + d * b[1];
     c[2] = a[2] + d * b[2];
@@ -125,24 +125,24 @@ namespace NA63 {
 
   /** Propagates the particle for one timestep, dt, applying relevant forces */
   __host__ __device__ inline
-  void timestep(simple_particle_t* p, float dt) {
+  void Timestep(Track* t, float dt) {
     float k1[3], k2[3], k3[3], k4[3], k[3];
 
     // Rung-Kutta
-    apply_magnetic_field(p->p,k1,dt,-1); rk_3d(p->p,k1,k,0.5);
-    apply_magnetic_field(k,k2,dt,-1);    rk_3d(p->p,k2,k,0.5);
-    apply_magnetic_field(k,k3,dt,-1);    rk_3d(p->p,k3,k,1);
-    apply_magnetic_field(k,k4,dt,-1);
+    ApplyMagneticField(t->p,k1,dt,-1); RK3D(t->p,k1,k,0.5);
+    ApplyMagneticField(k,k2,dt,-1);    RK3D(t->p,k2,k,0.5);
+    ApplyMagneticField(k,k3,dt,-1);    RK3D(t->p,k3,k,1);
+    ApplyMagneticField(k,k4,dt,-1);
 
     // Update momentum
-    p->p[0] += (k1[0] + 2*k2[0] + 2*k3[0] + k4[0]) / 6;
-    p->p[1] += (k1[1] + 2*k2[1] + 2*k3[1] + k4[1]) / 6;
-    p->p[2] += (k1[2] + 2*k2[2] + 2*k3[2] + k4[2]) / 6;
+    t->p[0] += (k1[0] + 2*k2[0] + 2*k3[0] + k4[0]) / 6;
+    t->p[1] += (k1[1] + 2*k2[1] + 2*k3[1] + k4[1]) / 6;
+    t->p[2] += (k1[2] + 2*k2[2] + 2*k3[2] + k4[2]) / 6;
 
     // Update position
-    p->r[0] += dt * p->p[0];
-    p->r[1] += dt * p->p[1];
-    p->r[2] += dt * p->p[2];
+    t->r[0] += dt * t->p[0];
+    t->r[1] += dt * t->p[1];
+    t->r[2] += dt * t->p[2];
   }
 
 }
