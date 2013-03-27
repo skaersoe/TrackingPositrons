@@ -12,11 +12,14 @@ all: main
 
 main: Geometry.o
 
-Geometry.o: Material.o
+Geometry.o: Material.o Volumes
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(SRC)/Geometry.cpp
 
 Material.o:
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(SRC)/Material.cpp
+
+Volumes:
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(SRC)/Sphere.cpp
 
 clean:
 	rm ./*.o

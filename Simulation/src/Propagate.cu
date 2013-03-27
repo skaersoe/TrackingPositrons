@@ -99,7 +99,7 @@ namespace na63 {
   cudaError_t FreeGeometry(KernelPars *p) {
     cudaError_t err;
     if ((err = cudaFree(p->material_arr)) != cudaSuccess) return err;
-    if ((err = cudaFree(p->material_arr)) != cudaSuccess) return err;
+    if ((err = cudaFree(p->particle_arr)) != cudaSuccess) return err;
     return cudaSuccess;
   }
   __host__
