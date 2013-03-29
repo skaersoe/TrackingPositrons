@@ -19,7 +19,7 @@ namespace na63 {
       pars_.charge = charge;
       pars_.mass = mass;
     }
-    ~Particle();
+    ~Particle() {}
 
     int id() { return pars_.id; }
     float mass() { return pars_.mass; }

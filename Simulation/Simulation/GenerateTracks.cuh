@@ -5,8 +5,8 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-#include "Simulation/Simulator.h"
-#include "Simulation/Track.h"
+#include "Simulation/Simulator.hh"
+#include "Simulation/Track.hh"
 
 namespace na63 {
 

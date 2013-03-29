@@ -3,9 +3,9 @@
 
 #include <vector>
 
-#include "Geometry/Material.h"
-#include "Geometry/Volume.h"
-#include "Simulation/Particle.h"
+#include "Geometry/Material.hh"
+#include "Geometry/Volume.hh"
+#include "Simulation/Particle.hh"
 
 namespace na63 {
 
@@ -15,15 +15,13 @@ namespace na63 {
     Geometry(void);
     ~Geometry();
 
+    // For now, assume there's no reason to remove instances
     void AddMaterial(Material m) {
       materials_.push_back(m);
     }
     void AddParticle(Particle p) {
       particles_.push_back(p);
     }
-    /**
-     * Since volumes types vary in size, we can only maintain pointers here
-     */
     void AddVolume(Volume *v) {
       volumes_.push_back(v);
     }
@@ -38,16 +36,20 @@ namespace na63 {
     int volumes_size()   { return volumes_.size(); }
     MaterialPars *material_arr();
     ParticlePars *particle_arr();
+    VolumePars   *volume_arr();
 
   private:
     std::vector<Material> materials_;
     std::vector<Particle> particles_;
-    std::vector<Volume*> volumes_;
+    // Since volume is abstract, we can only maintain pointers here
+    std::vector<Volume*>  volumes_;
     MaterialPars *material_arr_;
     ParticlePars *particle_arr_;
+    VolumePars   *volume_arr_;
 
     void GenerateMaterialArray();
     void GenerateParticleArray();
+    void GenerateVolumeArray();
     void DeleteParameterArrays();
 
   };

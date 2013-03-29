@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Simulation/CudaHelper.h"
+#include "Simulation/CudaHelper.hh"
 
 namespace na63 {
 

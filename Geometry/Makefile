@@ -1,27 +1,18 @@
-CC=GCC
-CXX=g++
+CC=g++
 NVCC=nvcc
 NVCCFLAGS=-arch=sm_30 -m64
-CFLAGS=-m64 -std=c99 `root-config --cflags`
-CXXFLAGS=-m64 -std=c++11 `root-config --cflags`
+CCFLAGS=-m64 -std=c++11
 SRC=src
-INCLUDE_CUDA=$(INCLUDE) -I$(CUDA)/include -L$(CUDA)/lib64 -L$(CUDA)/lib -lcuda -lcudart
-INCLUDE=-I./ -I$(SRC) -I../Simulation
+INCLUDE_CUDA=-I$(CUDA)/include -L$(CUDA)/lib64 -L$(CUDA)/lib -lcuda -lcudart
+INCLUDE=-I../Geometry -I../Simulation -I$(SRC) $(INCLUDE_CUDA)
 
-all: main
+geometry: ccobjects nvccobjects
 
-main: Geometry.o
+ccobjects:
+	$(CC) $(CCFLAGS) $(INCLUDE) -c $(SRC)/*.cc
 
-Geometry.o: Material.o Volumes
-	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(SRC)/Geometry.cpp
-
-Material.o:
-	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(SRC)/Material.cpp
-
-Volumes:
-	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(SRC)/Sphere.cpp
+nvccobjects:
+	$(NVCC) $(NVCCFLAGS) $(INCLUDE) -c $(SRC)/*.cu
 
 clean:
 	rm ./*.o
-
-.PHONY: clean

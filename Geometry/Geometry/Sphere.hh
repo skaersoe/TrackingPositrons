@@ -1,7 +1,7 @@
 #ifndef NA63_GEOMETRY_SPHERE_H
 #define NA63_GEOMETRY_SPHERE_H
 
-#include "Geometry/Volume.h"
+#include "Geometry/Volume.hh"
 
 namespace na63 {
 
@@ -9,8 +9,19 @@ namespace na63 {
     Material *material;
     ThreeVector center;
     float radius_squared;
+    // Pad to volume parameter size
+    char padding[(int)(
+      VOLUME_PARAMETER_SIZE
+      - sizeof(Material*)
+      - sizeof(ThreeVector)
+      - sizeof(float)
+    )];
   } SpherePars;
 
+  /**
+   * Very simple geometric object to test inheritance and parameter
+   * functionality. Might be nice to keep.
+   */
   class Sphere : public Volume {
 
   public:
@@ -18,8 +29,10 @@ namespace na63 {
     ~Sphere();
 
     virtual bool Inside(ThreeVector point);
-    virtual unsigned ParameterSize() { return sizeof(SpherePars); }
-    virtual VolumePars pars() { return (VolumePars)&pars_; }
+    virtual VolumePars pars() {
+      // Dirty, dirty tricks
+      return *((VolumePars*)&pars_);
+    }
 
   private:
     SpherePars pars_;

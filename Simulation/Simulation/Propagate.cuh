@@ -1,10 +1,10 @@
 #ifndef NA63_SIMULATION_PROPAGATE_H
 #define NA63_SIMULATION_PROPAGATE_H
 
-#include "Simulation/Track.h"
-#include "Simulation/Simulator.h"
-#include "Simulation/Particle.h"
-#include "Geometry/Material.h"
+#include "Simulation/Track.hh"
+#include "Simulation/Simulator.hh"
+#include "Simulation/Particle.hh"
+#include "Geometry/Material.hh"
 
 namespace na63 {
 
@@ -14,6 +14,7 @@ namespace na63 {
     float dt;
     MaterialPars *material_arr;
     ParticlePars *particle_arr;
+    VolumePars   *volume_arr;
   } KernelPars;
 
   void Propagate(Track *t, SimulatorPars args);

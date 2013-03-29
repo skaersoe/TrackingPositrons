@@ -1,19 +1,19 @@
 #include <iostream>
 
-#include "Simulation/Simulator.h"
-#include "Simulation/GenerateTracks.h"
-#include "Simulation/Propagate.h"
+#include "Simulation/Simulator.hh"
+#include "Simulation/GenerateTracks.cuh"
+#include "Simulation/Propagate.cuh"
 
 namespace na63 {
 
   Simulator::Simulator(void)
-    : Simulator::Simulator(GPU, false) {}
-  Simulator::Simulator(SimulatorDevice device, bool debug) {
+    : Simulator::Simulator(GPU, false, 0) {}
+  Simulator::Simulator(SimulatorDevice device, bool debug, unsigned N) {
     pars_ = {
       .device = device,
       .debug = debug,
       .render = false,
-      .N = 0,
+      .N = N,
       .geometry = &geometry
     };
     external_tracks = true;

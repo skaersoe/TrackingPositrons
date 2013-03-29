@@ -13,7 +13,7 @@ namespace na63 {
     Material(float density) {
       pars_.density = density;
     }
-    ~Material();
+    ~Material() {}
 
     float density() { return pars_.density; }
     MaterialPars pars() { return pars_; }

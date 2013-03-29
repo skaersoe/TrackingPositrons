@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "Simulation/GenerateTracks.h"
-#include "Simulation/CudaHelper.h"
+#include "Simulation/GenerateTracks.cuh"
+#include "Simulation/CudaHelper.hh"
 
 namespace na63 {
 

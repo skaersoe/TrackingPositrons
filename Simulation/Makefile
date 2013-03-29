@@ -1,33 +1,25 @@
-CC=GCC
-CXX=g++
+CC=g++
 NVCC=nvcc
 NVCCFLAGS=-arch=sm_30 -m64
-CFLAGS=-m64 -std=c99 `root-config --cflags`
-CXXFLAGS=-m64 -std=c++11 `root-config --cflags`
+CCFLAGS=-m64 -std=c++11
 SRC=src
 INCLUDE_CUDA=-I$(CUDA)/include -L$(CUDA)/lib64 -L$(CUDA)/lib -lcuda -lcudart
-INCLUDE=-I./ -I../Geometry -I$(SRC) $(INCLUDE_CUDA)
+INCLUDE=-I../Geometry -I../Simulation -I$(SRC) $(INCLUDE_CUDA)
 
-all: main
+all: simulator
 
-main: Simulator.o
+standalone: simulator
+	$(CC) $(CCFLAGS) $(INCLUDE) ./*.o ../Geometry/*.o ./Main.cc -o bin/simulator
 
-standalone: Simulator.o
-	$(CXX) $(CXXFLAGS) $(INCLUDE) *.o $(SRC)/Main.cpp -o bin/simulator
+simulator: ccobjects nvccobjects geometry
 
-Simulator.o: $(SRC)/Simulator.cpp GenerateTracks.o Propagate.o Geometry.o
-	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(SRC)/Simulator.cpp
+ccobjects:
+	$(CC) $(CCFLAGS) $(INCLUDE) -c $(SRC)/*.cc
 
-GenerateTracks.o: $(SRC)/GenerateTracks.cu
-	$(NVCC) $(NVCCFLAGS) $(INCLUDE) -c $(SRC)/GenerateTracks.cu
+nvccobjects:
+	$(NVCC) $(NVCCFLAGS) $(INCLUDE) -c $(SRC)/*.cu
 
-Propagate.o: $(SRC)/Propagate.cu CudaHelper.o
-	$(NVCC) $(NVCCFLAGS) $(INCLUDE) -c $(SRC)/Propagate.cu
-
-CudaHelper.o: $(SRC)/CudaHelper.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(SRC)/CudaHelper.cpp
-
-Geometry.o:
+geometry:
 	make -C ../Geometry
 
 clean:

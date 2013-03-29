@@ -3,9 +3,9 @@
 
 #include <thrust/host_vector.h>
 
-#include "Simulation/Track.h"
-#include "Simulation/Particle.h"
-#include "Geometry/Geometry.h"
+#include "Simulation/Track.hh"
+#include "Simulation/Particle.hh"
+#include "Geometry/Geometry.hh"
 
 namespace na63 {
 
@@ -26,7 +26,7 @@ namespace na63 {
 
     public:
       Simulator(void);
-      Simulator(SimulatorDevice device, bool debug);
+      Simulator(SimulatorDevice device, bool debug, unsigned N);
 
       ~Simulator();
 

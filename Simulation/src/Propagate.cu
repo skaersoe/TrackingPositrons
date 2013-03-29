@@ -1,8 +1,8 @@
 #include <iostream>
 #include <thrust/sort.h>
 
-#include "Simulation/Propagate.h"
-#include "Simulation/CudaHelper.h"
+#include "Simulation/Propagate.cuh"
+#include "Simulation/CudaHelper.hh"
 
 namespace na63 {
 
@@ -60,6 +60,7 @@ namespace na63 {
     kernel_args.N = args.N;
     kernel_args.material_arr = NULL;
     kernel_args.particle_arr = NULL;
+    kernel_args.volume_arr   = NULL;
 
     // Allocate geometry arrays (might be dynamic later)
     if (CudaError(AllocateGeometry(args.geometry, &kernel_args))) return;
@@ -100,6 +101,7 @@ namespace na63 {
     cudaError_t err;
     if ((err = cudaFree(p->material_arr)) != cudaSuccess) return err;
     if ((err = cudaFree(p->particle_arr)) != cudaSuccess) return err;
+    if ((err = cudaFree(p->volume_arr))   != cudaSuccess) return err;
     return cudaSuccess;
   }
   __host__
@@ -113,15 +115,22 @@ namespace na63 {
     if (p->particle_arr != NULL) {
       if ((err = cudaFree(p->particle_arr)) != cudaSuccess) return err;
     }
+    if (p->volume_arr != NULL) {
+      if ((err = cudaFree(p->volume_arr)) != cudaSuccess) return err;
+    }
 
     // Allocate space
     const unsigned size_material = geometry->materials_size()*sizeof(MaterialPars);
     const unsigned size_particle = geometry->particles_size()*sizeof(ParticlePars);
+    const unsigned size_volume   = geometry->volumes_size()*sizeof(VolumePars);
     err = cudaMalloc((void**)&p->material_arr,
                      size_material);
     if (err != cudaSuccess) return err;
     err = cudaMalloc((void**)&p->particle_arr,
                      size_particle);
+    if (err != cudaSuccess) return err;
+    err = cudaMalloc((void**)&p->volume_arr,
+                     size_volume);
     if (err != cudaSuccess) return err;
 
     // Copy geometry to device (could potentially be asynchronous?)
@@ -130,9 +139,14 @@ namespace na63 {
                      size_material,
                      cudaMemcpyHostToDevice);
     if (err != cudaSuccess) return err;
-    err = cudaMemcpy(p->material_arr,
-                     geometry->material_arr(),
-                     size_material,
+    err = cudaMemcpy(p->particle_arr,
+                     geometry->particle_arr(),
+                     size_particle,
+                     cudaMemcpyHostToDevice);
+    if (err != cudaSuccess) return err;
+    err = cudaMemcpy(p->volume_arr,
+                     geometry->volume_arr(),
+                     size_volume,
                      cudaMemcpyHostToDevice);
     if (err != cudaSuccess) return err;
 
