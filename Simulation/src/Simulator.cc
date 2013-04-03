@@ -9,7 +9,7 @@ namespace na63 {
   Simulator::Simulator(void)
     : Simulator::Simulator(GPU, false, 0) {}
   Simulator::Simulator(SimulatorDevice device, bool debug, unsigned N) {
-    pars_ = {
+    pars = {
       .device = device,
       .debug = debug,
       .render = false,
@@ -25,13 +25,13 @@ namespace na63 {
   void Simulator::DeleteTracks() {
     if (!external_tracks) {
       delete tracks_;
-      pars_.N = 0;
+      pars.N = 0;
     }
   }
 
   void Simulator::SetTracks(Track *t, const unsigned N) {
     DeleteTracks();
-    pars_.N = N;
+    pars.N = N;
     tracks_ = t;
   }
 
@@ -40,14 +40,14 @@ namespace na63 {
    */
   void Simulator::GenerateTracks() {
     DeleteTracks();
-    tracks_ = new Track[pars_.N];
-    na63::GenerateTracks(tracks_,pars_);
+    tracks_ = new Track[pars.N];
+    na63::GenerateTracks(tracks_,pars);
     external_tracks = false;
   }
 
   void Simulator::Propagate() {
     geometry.GenerateParameterArrays();
-    na63::Propagate(tracks_,pars_);
+    na63::Propagate(tracks_,pars);
   }
 
 }

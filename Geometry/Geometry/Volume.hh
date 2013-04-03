@@ -1,7 +1,7 @@
 #ifndef NA63_GEOMETRY_VOLUME_H
 #define NA63_GEOMETRY_VOLUME_H
 
-#include "Material.hh"
+#include "Geometry/Material.hh"
 
 /* 
    Parameter size is hardcoded as we only know sizes at compile time.
@@ -36,6 +36,8 @@ namespace na63 {
     char size[VOLUME_PARAMETER_SIZE];
   } VolumePars;
 
+  typedef bool (*InsideKernel)(ThreeVector,VolumePars);
+
   /**
    * Abstract class. Derived classes must override Inside()
    */
@@ -45,9 +47,9 @@ namespace na63 {
     Volume(Material *m) {
       material_ = m;
     }
-    ~Volume();
+    ~Volume() {}
 
-    virtual bool Inside(ThreeVector point) =0;
+    virtual bool Inside(ThreeVector point) const =0;
     /**
      * Although parameters of derived classes are of the same size, C++ does not
      * allow structs to be cast directly. Instead, dirty tricks are used by
@@ -65,13 +67,17 @@ namespace na63 {
      *   static_assert(sizeof(SpherePars) == sizeof(VolumePars),
      *     "Incorrect parameter size of class derived from Volume");
      */
-    virtual VolumePars pars() =0;
-
-  protected:
-    Material *material() { return material_; };
+    virtual VolumePars pars() const =0;
+    /**
+     * Should return the static function pointer to the kernel function of the
+     * given volume type.
+     */
+    virtual InsideKernel kernel() const =0;
 
   private:
     Material *material_;
+
+    Material *material() const { return material_; };
 
   };
 

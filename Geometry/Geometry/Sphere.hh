@@ -25,19 +25,22 @@ namespace na63 {
   class Sphere : public Volume {
 
   public:
-    Sphere(Material *material, ThreeVector center, float radius);
-    ~Sphere();
 
-    virtual bool Inside(ThreeVector point);
-    virtual VolumePars pars() {
+    Sphere(Material *material, ThreeVector center, float radius);
+    ~Sphere() {}
+
+    virtual bool Inside(ThreeVector point) const;
+    virtual VolumePars pars() const {
       // Dirty, dirty tricks
       return *((VolumePars*)&pars_);
     }
+    virtual InsideKernel inside_kernel() const { return inside_kernel_; }
 
   private:
-    SpherePars pars_;
-
+    static InsideKernel inside_kernel_;
     static bool defined_before;
+
+    SpherePars pars_;
 
   };
 

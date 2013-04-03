@@ -1,5 +1,5 @@
-#ifndef NA63_SIMULATION_CUDA_HELPER_H
-#define NA63_SIMULATION_CUDA_HELPER_H
+#ifndef NA63_SIMULATION_CUDAHELPER_H
+#define NA63_SIMULATION_CUDAHELPER_H
 
 #include <cuda.h>
 #include <cuda_runtime.h>
@@ -10,4 +10,4 @@ namespace na63 {
 
 }
 
-#endif
+#endif /* NA63_SIMULATION_CUDAHELPER_H */

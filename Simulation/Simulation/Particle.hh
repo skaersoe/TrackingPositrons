@@ -21,10 +21,10 @@ namespace na63 {
     }
     ~Particle() {}
 
-    int id() { return pars_.id; }
-    float mass() { return pars_.mass; }
-    float charge() { return pars_.charge; }
-    ParticlePars pars() { return pars_; }
+    int id() const { return pars_.id; }
+    float mass() const { return pars_.mass; }
+    float charge() const { return pars_.charge; }
+    ParticlePars pars() const { return pars_; }
 
   private:
     ParticlePars pars_;
@@ -33,4 +33,4 @@ namespace na63 {
 
 }
 
-#endif
+#endif /* NA63_SIMULATION_PARTICLE_H */

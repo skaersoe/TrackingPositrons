@@ -1,6 +1,7 @@
 #include <cmath>
 
 #include "Geometry/Sphere.hh"
+#include "Geometry/Sphere.cuh"
 
 namespace na63 {
 
@@ -16,12 +17,8 @@ namespace na63 {
       defined_before = true;
     };
 
-  bool Sphere::Inside(ThreeVector point) {
-    point.x -= pars_.center.x;
-    point.y -= pars_.center.y;
-    point.z -= pars_.center.z;
-    return point.x*point.x + point.y*point.y + point.z*point.z
-           < pars_.radius_squared;
+  bool Sphere::Inside(ThreeVector point) const {
+    return Sphere_InsideWrapper(point,pars_);
   }
 
 }

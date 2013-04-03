@@ -15,8 +15,8 @@ namespace na63 {
     }
     ~Material() {}
 
-    float density() { return pars_.density; }
-    MaterialPars pars() { return pars_; }
+    float density() const { return pars_.density; }
+    MaterialPars pars() const { return pars_; }
 
   private:
     MaterialPars pars_;

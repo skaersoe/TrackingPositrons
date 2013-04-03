@@ -19,31 +19,34 @@ namespace na63 {
     bool debug;             // Display debugging messages
     bool render;            // Render visually (NYI)
     unsigned N;             // Number of tracks
-    Geometry *geometry;
+    Geometry *geometry;     // Pointer to associated geometry
   } SimulatorPars;
 
   class Simulator {
 
     public:
+      // Allow parameters to be altered freely
+      SimulatorPars pars;
+
       Simulator(void);
       Simulator(SimulatorDevice device, bool debug, unsigned N);
-
       ~Simulator();
 
-      SimulatorPars pars() {
-        return pars_;
-      }
-
       void set_pars(SimulatorPars p) {
-        pars_ = p;
+        pars = p;
       }
       void SetTracks(Track *t, const unsigned N);
 
+      /**
+       * Generates some hardcoded electrons.
+       */
       void GenerateTracks();
+      /**
+       * Runs the propagation.
+       */
       void Propagate();
 
     private:
-      SimulatorPars pars_;
       Track *tracks_;
       bool external_tracks;
       Geometry geometry;
@@ -54,4 +57,4 @@ namespace na63 {
 
 }
 
-#endif
+#endif /* NA63_SIMULATION_SIMULATOR_H */

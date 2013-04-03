@@ -13,7 +13,7 @@ namespace na63 {
 
   public:
     Geometry(void);
-    ~Geometry();
+    ~Geometry(void);
 
     // For now, assume there's no reason to remove instances
     void AddMaterial(Material m) {
@@ -31,9 +31,9 @@ namespace na63 {
      * generated.
      */
     void GenerateParameterArrays();
-    int materials_size() { return materials_.size(); }
-    int particles_size() { return particles_.size(); }
-    int volumes_size()   { return volumes_.size(); }
+    int materials_size() const { return materials_.size(); }
+    int particles_size() const { return particles_.size(); }
+    int volumes_size()   const { return volumes_.size(); }
     MaterialPars *material_arr();
     ParticlePars *particle_arr();
     VolumePars   *volume_arr();

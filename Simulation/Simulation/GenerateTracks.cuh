@@ -14,4 +14,4 @@ namespace na63 {
 
 }
 
-#endif
+#endif /* NA63_SIMULATION_GENERATEPARTICLES_H */
