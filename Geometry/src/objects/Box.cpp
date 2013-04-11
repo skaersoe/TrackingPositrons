@@ -54,12 +54,24 @@ bool Box::inside(point particle_position) {
 
   Eigen::Vector3f x_top;
   Eigen::Vector3f x_bottom;
+  Eigen::Vector3f x_negative;
 
   Eigen::Vector3f y_top;
   Eigen::Vector3f y_bottom;
+  Eigen::Vector3f y_negative;
 
   Eigen::Vector3f z_top;
   Eigen::Vector3f z_bottom;
+  Eigen::Vector3f z_negative;
+
+  Eigen::Vector3f x_bottom_distance;
+  Eigen::Vector3f x_top_distance;
+
+  Eigen::Vector3f y_bottom_distance;
+  Eigen::Vector3f y_top_distance;
+
+  Eigen::Vector3f z_bottom_distance;
+  Eigen::Vector3f z_top_distance;
 
   int x_top_sign;
   int x_bottom_sign;
@@ -76,12 +88,18 @@ bool Box::inside(point particle_position) {
   x_top = pos_vector + x_vector;
   x_bottom = pos_vector + ( - x_vector);
 
-  if ((x_vector * (particle_vector - x_top)) > 0)
+  x_top_distance = particle_vector - x_top;
+
+  if ((x_vector.dot(x_top_distance)) > 0)
     x_top_sign = 1;
   else
     x_top_sign = -1;
 
-  if ((( - x_vector) * (particle_vector - x_bottom)) > 0)
+  x_bottom_distance = particle_vector - x_bottom;
+
+  x_negative = -x_vector;
+
+  if ((x_negative.dot(x_bottom_distance)) > 0)
     x_bottom_sign = 1;
   else
     x_bottom_sign = -1;
@@ -95,12 +113,18 @@ bool Box::inside(point particle_position) {
   y_top = pos_vector + y_vector;
   y_bottom = pos_vector + ( - y_vector);
 
-  if ((y_vector * (particle_vector - y_top)) > 0)
+  y_top_distance = particle_vector - y_top;
+
+  if ((y_vector.dot(y_top_distance)) > 0)
     y_top_sign = 1;
   else
     y_top_sign = -1;
 
-  if ((( - y_vector) * (particle_vector - y_bottom)) > 0)
+  y_bottom_distance = particle_vector - y_bottom;  
+
+  y_negative = -y_vector;
+
+  if ((y_negative.dot(y_bottom_distance)) > 0)
     y_bottom_sign = 1;
   else
     y_bottom_sign = -1;
@@ -108,18 +132,26 @@ bool Box::inside(point particle_position) {
   if (y_top_sign == y_bottom_sign)
     return false;
 
+
+
   // Check if the particle is between the two edges normal to the z_vector.
   // if not, return false.
 
   z_top = pos_vector + z_vector;
   z_bottom = pos_vector + ( - z_vector);
 
-  if ((z_vector * (particle_vector - z_top)) > 0)
+  z_top_distance = particle_vector - z_top;
+
+  if ((z_vector.dot(z_top_distance)) > 0)
     z_top_sign = 1;
   else
     z_top_sign = -1;
 
-  if ((( - z_vector) * (particle_vector - z_bottom)) > 0)
+  z_bottom_distance = particle_vector - z_bottom;  
+
+  z_negative = -z_vector;
+
+  if ((z_negative.dot(z_bottom_distance)) > 0)
     z_bottom_sign = 1;
   else
     z_bottom_sign = -1;

@@ -28,17 +28,21 @@ private:
 	Eigen::Vector3f z_vector; //
 
 	Eigen::Matrix3f x_rotation; 	//
-	Eigen::Matrix3f y_rotation; 	// Rotation matrices for each axis (see: http://en.wikipedia.org/wiki/Rotation_matrix#In_three_dimensions)
-	Eigen::Matrix3f z_rotation; 	//
+	Eigen::Matrix3f y_rotation; 	// Rotation matrices for each axis
+	Eigen::Matrix3f z_rotation; 	// (see: http://en.wikipedia.org/wiki/Rotation_matrix#In_three_dimensions)
 	Eigen::Matrix3f total_rotation; // Total rotation (= x * y * z) see link above.
 
 public:
 	Box(float x_dim, float y_dim, float z_dim,
 			float x_pos, float y_pos, float z_pos); // Construct a box with given size and position.
 
-	point getDimension() { return dim ;} // Return the size of the box independent of coordinates (length, width, height).
+	point getDimension() { return dim ;} // Return the size of the box, independent of coordinates (length, width, height).
 
 	point getPosition() {return pos ;} // Return the position of the box center point.
+
+	Eigen::Vector3f getx() {return x_vector ;} //
+	Eigen::Vector3f gety() {return y_vector ;} // Returns the box vectors.
+	Eigen::Vector3f getz() {return z_vector ;} //
 
 	bool inside(point particle_position); // Returns 1 if the given point is inside the box, 0 otherwise.
 
