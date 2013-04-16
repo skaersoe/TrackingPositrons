@@ -6,13 +6,11 @@
 namespace na63 {
 
   typedef struct {
-    Material *material;
     ThreeVector center;
     float radius_squared;
     // Pad to volume parameter size
     char padding[(int)(
       VOLUME_PARAMETER_SIZE
-      - sizeof(Material*)
       - sizeof(ThreeVector)
       - sizeof(float)
     )];
@@ -30,21 +28,14 @@ namespace na63 {
     ~Sphere() {}
 
     virtual bool Inside(ThreeVector point) const;
-    virtual VolumePars pars() const {
-      // Dirty, dirty tricks
-      return *((VolumePars*)&pars_);
-    }
     virtual InsideKernel inside_kernel() const { return inside_kernel_; }
 
   private:
     static InsideKernel inside_kernel_;
-    static bool defined_before;
 
-    SpherePars pars_;
+    SpherePars *sphere_pars;
 
   };
-
-  bool Sphere::defined_before = false;
 
 }
 

@@ -13,20 +13,23 @@ namespace na63 {
   }
 
   MaterialPars* Geometry::material_arr() {
-    if (material_arr_ == nullptr)
+    if (material_arr_ == nullptr) {
       GenerateMaterialArray();
+    }
     return material_arr_;
   }
 
   ParticlePars* Geometry::particle_arr() {
-    if (particle_arr_ == nullptr)
+    if (particle_arr_ == nullptr) {
       GenerateParticleArray();
+    }
     return particle_arr_;
   }
 
   VolumePars* Geometry::volume_arr() {
-    if (volume_arr_ == nullptr)
+    if (volume_arr_ == nullptr) {
       GenerateVolumeArray();
+    }
     return volume_arr_;
   }
 
@@ -37,20 +40,21 @@ namespace na63 {
     GenerateVolumeArray();
   }
 
-  void Geometry::GenerateMaterialArray() {
-    int size = materials_.size();
-    material_arr_ = new MaterialPars[size];
+  template <class VectorType, class ArrayType>
+  void ParameterVectorToArray(VectorType *vec, ArrayType *arr) {
+    int size = vec->size();
+    arr = new ArrayType[size];
     for (int i=0;i<size;i++) {
-      material_arr_[i] = materials_[i].pars();
+      arr[i] = (*vec)[i].pars();
     }
   }
 
+  void Geometry::GenerateMaterialArray() {
+    ParameterVectorToArray(&materials_,material_arr_);
+  }
+
   void Geometry::GenerateParticleArray() {
-    int size = particles_.size();
-    particle_arr_ = new ParticlePars[size];
-    for (int i=0;i<size;i++) {
-      particle_arr_[i] = particles_[i].pars();
-    }
+    ParameterVectorToArray(&particles_,particle_arr_);
   }
 
   void Geometry::GenerateVolumeArray() {

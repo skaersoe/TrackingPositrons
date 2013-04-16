@@ -1,42 +1,34 @@
 #ifndef NA63_GEOMETRY_VOLUME_H
 #define NA63_GEOMETRY_VOLUME_H
 
+#include <cstring>
 #include "Geometry/Material.hh"
 
-/* 
-   Parameter size is hardcoded as we only know sizes at compile time.
-   Derived classes are expected to pad to this value with something like:
-
-     typedef struct {
-       float a[2];
-       char b[3];
-       char padding[
-         (int)(VOLUME_PARAMETER_SIZE - 2*sizeof(float) - 3*sizeof(char))
-       ];
-     } SomeParameters;
-
-   REMEMBER to cast to int, as sizeof() is unsigned and will result in an
-   enormous value instead of a negative number for parameter sets that exceed
-   the maximum size.
-   They should of course fail at compile time, and not cause the program to
-   attempt to allocate monstrous amounts of memory.
-*/
-
-#define VOLUME_PARAMETER_SIZE 128
+#define VOLUME_PARAMETER_SIZE 128 - sizeof(KernelIndex) - sizeof(int)
 
 namespace na63 {
 
-  // This should probably be defined elsewhere...
+  // This should probably be defined elsewhere
   typedef struct {
     float x, y, z;
   } ThreeVector;
 
+  // All volumes must be defined here
+  typedef enum {
+    SPHERE,
+    BOX
+  } KernelIndex;
+
   // All derived classes must pad to this size
   typedef struct {
-    char size[VOLUME_PARAMETER_SIZE];
+    // Generic fields
+    KernelIndex kernel_index;
+    int material_index;
+    // Volume-specific fields
+    char specific[VOLUME_PARAMETER_SIZE];
   } VolumePars;
 
-  typedef bool (*InsideKernel)(ThreeVector,VolumePars);
+  typedef bool (*InsideKernel)(ThreeVector,void*);
 
   /**
    * Abstract class. Derived classes must override Inside()
@@ -44,38 +36,29 @@ namespace na63 {
   class Volume {
 
   public:
-    Volume(Material *m) {
-      material_ = m;
+    Volume(Material *material, KernelIndex kernel_index) {
+      material_ = material;
+      pars_.kernel_index = kernel_index;
     }
     ~Volume() {}
 
+    VolumePars pars() { return pars_; }
+
     virtual bool Inside(ThreeVector point) const =0;
-    /**
-     * Although parameters of derived classes are of the same size, C++ does not
-     * allow structs to be cast directly. Instead, dirty tricks are used by
-     * casting the pointer:
-     *
-     *   return *((VolumePars*)&pars_);
-     *
-     * This result is technically undefined, so correctness is not guaranteed.
-     * A union could be used, but would require each derived class' parameters
-     * to be declared in the union explicitly.
-     *
-     * For added security, a static_assert() can be added to derived classes as
-     * below:
-     *
-     *   static_assert(sizeof(SpherePars) == sizeof(VolumePars),
-     *     "Incorrect parameter size of class derived from Volume");
-     */
-    virtual VolumePars pars() const =0;
     /**
      * Should return the static function pointer to the kernel function of the
      * given volume type.
      */
-    virtual InsideKernel kernel() const =0;
+    virtual InsideKernel inside_kernel() const =0;
+
+  protected:
+    void* SpecificParameters() {
+      return (void*)&pars_.specific;
+    }
 
   private:
     Material *material_;
+    VolumePars pars_;
 
     Material *material() const { return material_; };
 

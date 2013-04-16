@@ -5,7 +5,7 @@
 
 namespace na63 {
 
-  bool Sphere_InsideWrapper(ThreeVector point, const SpherePars pars);
+  bool Sphere_InsideWrapper(ThreeVector point, const SpherePars sphere);
 
 }
 

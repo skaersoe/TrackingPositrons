@@ -41,7 +41,7 @@ namespace na63 {
   private:
     std::vector<Material> materials_;
     std::vector<Particle> particles_;
-    // Since volume is abstract, we can only maintain pointers here
+    // Since volume is abstract, only pointers can be maintained here
     std::vector<Volume*>  volumes_;
     MaterialPars *material_arr_;
     ParticlePars *particle_arr_;
