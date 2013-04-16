@@ -3,7 +3,7 @@
 #ifndef NA63_BOX_H
 #define NA63_BOX_H
 
-namespace NA63 {
+namespace na63 {
 
 // Define a point in 3-dimensions.
 
@@ -35,6 +35,8 @@ private:
 public:
 	Box(float x_dim, float y_dim, float z_dim,
 			float x_pos, float y_pos, float z_pos); // Construct a box with given size and position.
+
+	~Box(); // Destructor.
 
 	point getDimension() { return dim ;} // Return the size of the box, independent of coordinates (length, width, height).
 

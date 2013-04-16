@@ -1,8 +1,8 @@
-#include "Box.h"
+#include "Geometry/Box.hh"
 #include <cmath>
 #include <Eigen/Core>
 
-namespace NA63 {
+namespace na63 {
 
 Box::Box(float x_dim, float y_dim, float z_dim,
     float x_pos, float y_pos, float z_pos) {
