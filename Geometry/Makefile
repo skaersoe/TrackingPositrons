@@ -6,6 +6,11 @@ SRC=src
 INCLUDE_CUDA=-I$(CUDA)/include -L$(CUDA)/lib64 -L$(CUDA)/lib -lcuda -lcudart
 INCLUDE=-I../Geometry -I../Simulation -I$(SRC) $(INCLUDE_CUDA)
 
+all: geometry
+
+test: geometry Main.cc
+	$(CC) $(CCFLAGS) $(INCLUDE) *.o Main.cc -o bin/Geometry
+
 geometry: ccobjects nvccobjects
 
 ccobjects:
