@@ -23,15 +23,17 @@ namespace na63 {
   class Sphere : public Volume {
 
   public:
-
-    Sphere(Material *material, ThreeVector center, float radius);
+    Sphere(const char* n, ThreeVector center, float radius);
+    Sphere(const Sphere& other);
     ~Sphere() {}
 
     virtual bool Inside(ThreeVector point) const;
-    virtual InsideKernel inside_kernel() const { return inside_kernel_; }
+
+  protected:
+    virtual InsideFunction inside_function() const { return inside_function_; }
 
   private:
-    static InsideKernel inside_kernel_;
+    static InsideFunction inside_function_;
 
     SpherePars *sphere_pars;
 

@@ -21,6 +21,6 @@ namespace na63 {
     return Sphere_Inside(point,sphere);
   }
 
-  InsideKernel Sphere::inside_kernel_ = Sphere_InsideKernel;
+  InsideFunction Sphere::inside_function_ = Sphere_InsideKernel;
 
 }
