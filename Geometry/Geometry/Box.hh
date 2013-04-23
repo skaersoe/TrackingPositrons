@@ -1,4 +1,4 @@
-#include <Eigen/Core>
+#include <eigen3/Eigen/Core>
 
 #ifndef NA63_BOX_H
 #define NA63_BOX_H

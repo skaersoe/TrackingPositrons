@@ -3,37 +3,31 @@
 
 #include <cmath>
 #include <iostream>
-#include "Types.hh"
+#include "TLorentzVector.h"
 
 class SimpleBox;
 
 class Track {
 
 public:
-  Track(ThreeVector pos, FourMomentum mom, float cha)
+  TLorentzVector position;
+  TLorentzVector momentum;
+  float charge;
+
+  Track(TLorentzVector pos, TLorentzVector mom, float cha)
       : position(pos), momentum(mom) {
     charge = cha;
   }
-  float x() { return position.x; }
-  float y() { return position.y; }
-  float z() { return position.z; }
-  float px() { return momentum.px(); }
-  float py() { return momentum.py(); }
-  float pz() { return momentum.pz(); }
-  FourMomentum P() { return momentum; }
-  float q() { return charge; }
-  float E() { return momentum.E(); }
-  void timestep(float dt) {
-    position.x += dt * px();
-    position.y += dt * py();
-    position.z += dt * pz();
-  }
 
-private:
-  ThreeVector position;
-  FourMomentum momentum;
-  float charge;
-  friend class SimpleBox;
+  double x() { return position[0]; }
+  double y() { return position[1]; }
+  double z() { return position[2]; }
+  double t() { return position[3]; }
+  double px() { return momentum[0]; }
+  double py() { return momentum[1]; }
+  double pz() { return momentum[2]; }
+  double E() { return momentum[3]; }
+  double q() { return charge; }
 
 };
 

@@ -27,9 +27,10 @@ namespace na63 {
     public:
       // Allow parameters to be altered freely
       SimulatorPars pars;
+      Geometry *geometry;
 
       Simulator(void);
-      Simulator(SimulatorDevice device, bool debug, unsigned N);
+      Simulator(Geometry *geometry);
       ~Simulator();
 
       void set_pars(SimulatorPars p) {
@@ -49,8 +50,9 @@ namespace na63 {
     private:
       Track *tracks_;
       bool external_tracks;
-      Geometry geometry;
+      bool external_geometry;
 
+      int GenerateParticleIndices(int start, int end);
       void DeleteTracks();
 
   };

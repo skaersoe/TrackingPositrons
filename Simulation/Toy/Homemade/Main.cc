@@ -16,7 +16,7 @@ float Gamma(float v) {
 
 void Propagate(Track *track, Geometry *geometry) {
   while (geometry->InBounds(track)) {
-    track->timestep(0.01);
+    track->step(0.01);
     if (geometry->BoundaryDetection(track) != NULL) {
       hits++;
       return;

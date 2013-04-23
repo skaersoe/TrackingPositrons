@@ -3,8 +3,6 @@
 
 namespace na63 {
 
-  #define VOLUME_PARAMETER_SIZE 128 - 3*sizeof(int)
-
   #if __cplusplus == 201103
   #define RUNNING_CPP11
   #endif
@@ -19,6 +17,7 @@ namespace na63 {
     float x, y, z;
   } ThreeVector;
 
+  #define VOLUME_PARAMETER_SIZE 128 - 3*sizeof(int)
   typedef struct {
     // Generic fields
     int function_index;

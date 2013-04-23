@@ -12,6 +12,9 @@
 #include "Geometry/Volume.hh"
 #include "Geometry/Types.hh"
 
+// Allow for easy inclusion
+#include "Geometry/Sphere.hh"
+
 namespace na63 {
 
   typedef struct {
@@ -38,6 +41,7 @@ namespace na63 {
      * generated.
      */
     void GenerateParameterArrays();
+    int GetParticleIndex(int id);
     int materials_size() const { return materials.size(); }
     int particles_size() const { return particles.size(); }
     int volumes_size()   const { return volumes.size();   }

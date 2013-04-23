@@ -2,6 +2,7 @@
 #include "Geometry/Types.hh"
 #include "Geometry/Geometry.hh"
 #include "Geometry/Sphere.hh"
+#include "Simulation/Simulator.hh"
 
 using namespace na63;
 

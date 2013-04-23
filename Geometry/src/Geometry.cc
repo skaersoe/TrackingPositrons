@@ -59,6 +59,15 @@ namespace na63 {
     return -1;
   }
 
+  int Geometry::GetParticleIndex(int id) {
+    for (int i=0;i<particles.size();i++) {
+      if (particles[i].id() == id) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   MaterialPars* Geometry::material_arr() {
     if (material_arr_ == nullptr) {
       GenerateMaterialArray();
@@ -96,20 +105,20 @@ namespace na63 {
   }
 
   template <class VectorType, class ArrayType>
-  void ParameterVectorToArray(VectorType *vec, ArrayType *arr) {
+  void ParameterVectorToArray(VectorType *vec, ArrayType **arr) {
     int size = vec->size();
-    arr = new ArrayType[size];
+    *arr = new ArrayType[size];
     for (int i=0;i<size;i++) {
-      arr[i] = (*vec)[i].pars();
+      (*arr)[i] = (*vec)[i].pars();
     }
   }
 
   void Geometry::GenerateMaterialArray() {
-    ParameterVectorToArray(&materials,material_arr_);
+    ParameterVectorToArray(&materials,&material_arr_);
   }
 
   void Geometry::GenerateParticleArray() {
-    ParameterVectorToArray(&particles,particle_arr_);
+    ParameterVectorToArray(&particles,&particle_arr_);
   }
 
   void Geometry::GenerateVolumeTypeArray() {

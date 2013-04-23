@@ -1,8 +1,9 @@
 #include <iostream>
 #include <time.h>
+#include <cassert>
 
 #include "Simulation/Simulator.hh"
-#include "Simulation/Track.hh"
+#include "Geometry/Geometry.hh"
 
 using namespace na63;
 
@@ -12,6 +13,17 @@ int main(int argc,char *argv[]) {
   SimulatorDevice device = GPU;
   bool debug = false;
   unsigned N = 0;
+
+  // Create geometry
+  Geometry geometry;
+  geometry.AddMaterial(Material("vacuum",0.0));
+  geometry.AddMaterial(Material("solid",1.0));
+  geometry.AddVolume(Sphere("solid",{0,0,0},5));
+  geometry.AddVolume(Sphere("vacuum",{0,0,0},100));
+  geometry.AddParticle(Particle("electron",11,-1,0.510998910));
+
+  // Create Simulator object
+  Simulator *sim = new Simulator(&geometry);
 
   // Parse input
   if (argc < 2) {
@@ -31,10 +43,11 @@ int main(int argc,char *argv[]) {
     }
   } // Finished parsing input arguments
 
-  std::cout << "Simulator starting." << std::endl;
+  sim->pars.device = device;
+  sim->pars.debug = debug;
+  sim->pars.N = N;
 
-  // Create Simulator object
-  Simulator *sim = new Simulator(device, debug, N);
+  std::cout << "Simulator starting." << std::endl;
 
   // Populate
   clock_t timer = clock();

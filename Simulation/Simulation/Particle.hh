@@ -6,11 +6,11 @@
 namespace na63 {
 
   typedef struct {
-    int id; // According to the Monte Carlo Particle Numbering Scheme
-    int charge;
+    int id;
+    float charge;
     float mass;
     // Align to 32 bytes
-    char padding[24];
+    char padding[20];
   } ParticlePars;
 
   class Particle {

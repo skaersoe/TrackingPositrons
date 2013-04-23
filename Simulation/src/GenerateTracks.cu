@@ -20,7 +20,6 @@ namespace na63 {
     t->r[1] = 0;
     t->r[2] = 0;
     t->particle_id = 11; // Electron
-    t->particle_index = -1;
   }
 
   __host__

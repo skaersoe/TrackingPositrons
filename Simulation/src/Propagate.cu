@@ -86,9 +86,9 @@ namespace na63 {
       kernel_args.dt = 0.001;
 
       // Launch kernel
-      PropagateKernel<<<blocksPerGrid,threadsPerBlock>>>(devptr_tracks,devptr_keys,kernel_args);
-      cudaDeviceSynchronize();
       thrust::sort_by_key(devptr_thrust_keys, devptr_thrust_keys + args.N, devptr_thrust_tracks);
+      cudaDeviceSynchronize();
+      PropagateKernel<<<blocksPerGrid,threadsPerBlock>>>(devptr_tracks,devptr_keys,kernel_args);
 
     } // End kernel launch loop
 
