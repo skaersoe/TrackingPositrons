@@ -2,33 +2,12 @@
 #define NA63_GEOMETRY_VOLUME_H
 
 #include <cstring>
+#include <vector>
+#include "Geometry/Types.hh"
 #include "Geometry/Material.hh"
-
-#define VOLUME_PARAMETER_SIZE 128 - sizeof(KernelIndex) - sizeof(int)
+#include "Geometry/Geometry.hh"
 
 namespace na63 {
-
-  // This should probably be defined elsewhere
-  typedef struct {
-    float x, y, z;
-  } ThreeVector;
-
-  // All volumes must be defined here
-  typedef enum {
-    SPHERE,
-    BOX
-  } KernelIndex;
-
-  // All derived classes must pad to this size
-  typedef struct {
-    // Generic fields
-    KernelIndex kernel_index;
-    int material_index;
-    // Volume-specific fields
-    char specific[VOLUME_PARAMETER_SIZE];
-  } VolumePars;
-
-  typedef bool (*InsideKernel)(ThreeVector,void*);
 
   /**
    * Abstract class. Derived classes must override Inside()
@@ -36,31 +15,38 @@ namespace na63 {
   class Volume {
 
   public:
-    Volume(Material *material, KernelIndex kernel_index) {
-      material_ = material;
-      pars_.kernel_index = kernel_index;
+    Volume(const char* mat_name, VolumeType vol_type)
+        : material_name_(mat_name) {
+      volume_type_ = vol_type;
+    }
+    Volume(const Volume& other) {
+      material_name_ = other.material_name_;
+      volume_type_ = other.volume_type_;
+      pars_ = other.pars_;
     }
     ~Volume() {}
 
     VolumePars pars() { return pars_; }
 
     virtual bool Inside(ThreeVector point) const =0;
-    /**
-     * Should return the static function pointer to the kernel function of the
-     * given volume type.
-     */
-    virtual InsideKernel inside_kernel() const =0;
 
   protected:
     void* SpecificParameters() {
       return (void*)&pars_.specific;
     }
+    friend class Geometry;
+    std::string material_name() { return material_name_; }
+    VolumeType volume_type() { return volume_type_; }
+    void SetIndices(int mat_idx, int vol_idx) {
+      pars_.material_index = mat_idx;
+      pars_.volume_index = vol_idx;
+    }
+    virtual InsideFunction inside_function() const =0;
 
   private:
-    Material *material_;
+    std::string material_name_;
+    VolumeType volume_type_;
     VolumePars pars_;
-
-    Material *material() const { return material_; };
 
   };
 

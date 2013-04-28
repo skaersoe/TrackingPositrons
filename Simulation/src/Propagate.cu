@@ -6,7 +6,7 @@
 
 namespace na63 {
 
-  /** Forward declaration */
+  /** Forward declarations */
   __host__ void PropagateGPU(Track *t, SimulatorPars args);
   __host__ void PropagateCPU(Track *t, SimulatorPars args);
   __host__ __device__ void Timestep(Track *t, float dt);
@@ -39,7 +39,7 @@ namespace na63 {
     if (args.debug) for (int i=0;i<5;i++) PrintLocation(t,i);
   }
 
-  /** Regular CPU version for comparison and debugging. */
+  /** NYI: Regular CPU version for comparison and debugging. */
   __host__
   void PropagateCPU(Track *t, SimulatorPars args) {
     // Not currently implemented
@@ -78,15 +78,18 @@ namespace na63 {
       std::cout << "Copied " << args.N << " instances of size " << sizeof(Track) + sizeof(float) << " bytes each, resulting in a total of " << size_total << " bytes of data on the device." << std::endl;
       std::cout << "About to initialize " << blocksPerGrid << " blocks of " << threadsPerBlock << " each, resulting in a total of " << blocksPerGrid * threadsPerBlock << " threads." << std::endl;
     }
-    // Launch kernel
+    
     for (int i=0; i<10; i++) {
+
       // Should be dynamic //
       kernel_args.steps = 100;
       kernel_args.dt = 0.001;
-      // ----------------- //
-      PropagateKernel<<<blocksPerGrid,threadsPerBlock>>>(devptr_tracks,devptr_keys,kernel_args);
-      cudaDeviceSynchronize();
+
+      // Launch kernel
       thrust::sort_by_key(devptr_thrust_keys, devptr_thrust_keys + args.N, devptr_thrust_tracks);
+      cudaDeviceSynchronize();
+      PropagateKernel<<<blocksPerGrid,threadsPerBlock>>>(devptr_tracks,devptr_keys,kernel_args);
+
     } // End kernel launch loop
 
     // Copy back and free memory
@@ -96,6 +99,10 @@ namespace na63 {
 
   }
 
+  /**
+   * Frees memory of all geometry copied to the GPU.
+   * @return CUDA error code for first failed instruction, otherwise cudaSuccess.
+   */
   __host__
   cudaError_t FreeGeometry(KernelPars *p) {
     cudaError_t err;
@@ -104,6 +111,10 @@ namespace na63 {
     if ((err = cudaFree(p->volume_arr))   != cudaSuccess) return err;
     return cudaSuccess;
   }
+  /**
+   * Attempts to allocate room and copy all geometry information to the device.
+   * @return CUDA error code for first failed instruction, otherwise cudaSuccess.
+   */
   __host__
   cudaError_t AllocateGeometry(Geometry *geometry, KernelPars *p) {
     cudaError_t err;

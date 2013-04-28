@@ -1,0 +1,749 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 34.76      2.20     2.20 143549893     0.00     0.00  SimpleBox::Inside(ThreeVector*)
+ 11.72      2.94     0.74 143549641     0.00     0.00  std::vector<SimpleBox, std::allocator<SimpleBox> >::size() const
+ 11.72      3.68     0.74 71774899     0.00     0.00  Track::timestep(float)
+  6.18      4.07     0.39 71774899     0.00     0.00  Geometry::BoundaryDetection(Track*)
+  5.94      4.44     0.38 143549893     0.00     0.00  SimpleBox::Inside(Track*)
+  4.75      4.74     0.30 71774899     0.00     0.00  FourMomentum::py()
+  4.28      5.01     0.27 71774899     0.00     0.00  FourMomentum::pz()
+  3.33      5.22     0.21 71774899     0.00     0.00  Track::py()
+  3.17      5.42     0.20 71774899     0.00     0.00  FourMomentum::px()
+  3.17      5.62     0.20 71774899     0.00     0.00  Track::pz()
+  2.69      5.79     0.17 71774899     0.00     0.00  Track::px()
+  2.53      5.95     0.16 71775060     0.00     0.00  std::vector<SimpleBox, std::allocator<SimpleBox> >::operator[](unsigned long)
+  1.90      6.07     0.12      256     0.47    24.10  Propagate(Track*, Geometry*)
+  1.50      6.17     0.10 71774994     0.00     0.00  Geometry::InBounds(Track*)
+  1.11      6.24     0.07        1    70.05    70.05  std::vector<SimpleBox, std::allocator<SimpleBox> >::push_back(SimpleBox const&)
+  0.48      6.27     0.03                             Track::z()
+  0.32      6.29     0.02        2    10.01    10.01  SimpleBox::SimpleBox(ThreeVector, ThreeVector)
+  0.16      6.30     0.01      256     0.04     0.04  FourMomentum::FourMomentum(ThreeVector, float)
+  0.08      6.30     0.01        1     5.00    75.05  Geometry::AddBox(SimpleBox)
+  0.00      6.30     0.00     1798     0.00     0.00  ThreeVector::ThreeVector(ThreeVector const&)
+  0.00      6.30     0.00      767     0.00     0.00  FourMomentum::FourMomentum(FourMomentum const&)
+  0.00      6.30     0.00      516     0.00     0.00  ThreeVector::ThreeVector(float, float, float)
+  0.00      6.30     0.00      513     0.00     0.00  Gamma(float)
+  0.00      6.30     0.00      513     0.00     0.00  std::pow(float, int)
+  0.00      6.30     0.00      513     0.00     0.00  std::sqrt(float)
+  0.00      6.30     0.00      512     0.00     0.00  operator new(unsigned long, void*)
+  0.00      6.30     0.00      511     0.00     0.00  Track::Track(Track const&)
+  0.00      6.30     0.00      256     0.00     0.00  Track::Track(ThreeVector, FourMomentum, float)
+  0.00      6.30     0.00      256     0.00     0.00  __gnu_cxx::new_allocator<Track>::construct(Track*, Track const&)
+  0.00      6.30     0.00      256     0.00     0.00  std::vector<Track, std::allocator<Track> >::push_back(Track const&)
+  0.00      6.30     0.00      256     0.00     0.00  std::vector<Track, std::allocator<Track> >::operator[](unsigned long)
+  0.00      6.30     0.00      256     0.00     0.00  std::cos(float)
+  0.00      6.30     0.00      256     0.00     0.00  std::sin(float)
+  0.00      6.30     0.00      255     0.00     0.00  void std::_Construct<Track, Track>(Track*, Track const&)
+  0.00      6.30     0.00      255     0.00     0.00  Track* std::__addressof<Track>(Track&)
+  0.00      6.30     0.00       36     0.00     0.00  __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::base() const
+  0.00      6.30     0.00       36     0.00     0.00  std::vector<Track, std::allocator<Track> >::size() const
+  0.00      6.30     0.00       28     0.00     0.00  std::_Vector_base<Track, std::allocator<Track> >::_M_get_Tp_allocator()
+  0.00      6.30     0.00       27     0.00     0.00  __gnu_cxx::new_allocator<Track>::max_size() const
+  0.00      6.30     0.00       18     0.00     0.00  __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::__normal_iterator(Track* const&)
+  0.00      6.30     0.00       18     0.00     0.00  std::_Vector_base<Track, std::allocator<Track> >::_M_get_Tp_allocator() const
+  0.00      6.30     0.00       18     0.00     0.00  std::vector<Track, std::allocator<Track> >::max_size() const
+  0.00      6.30     0.00       18     0.00     0.00  Track* std::__uninitialized_copy<false>::__uninit_copy<Track*, Track*>(Track*, Track*, Track*)
+  0.00      6.30     0.00       18     0.00     0.00  Track* std::uninitialized_copy<Track*, Track*>(Track*, Track*, Track*)
+  0.00      6.30     0.00       18     0.00     0.00  Track* std::__uninitialized_copy_a<Track*, Track*, Track>(Track*, Track*, Track*, std::allocator<Track>&)
+  0.00      6.30     0.00       18     0.00     0.00  Track* std::__uninitialized_move_a<Track*, Track*, std::allocator<Track> >(Track*, Track*, Track*, std::allocator<Track>&)
+  0.00      6.30     0.00       10     0.00     0.00  void std::_Destroy_aux<true>::__destroy<Track*>(Track*, Track*)
+  0.00      6.30     0.00       10     0.00     0.00  std::_Vector_base<Track, std::allocator<Track> >::_M_deallocate(Track*, unsigned long)
+  0.00      6.30     0.00       10     0.00     0.00  unsigned long const& std::max<unsigned long>(unsigned long const&, unsigned long const&)
+  0.00      6.30     0.00       10     0.00     0.00  void std::_Destroy<Track*>(Track*, Track*)
+  0.00      6.30     0.00       10     0.00     0.00  void std::_Destroy<Track*, Track>(Track*, Track*, std::allocator<Track>&)
+  0.00      6.30     0.00        9     0.00     0.00  __gnu_cxx::new_allocator<Track>::deallocate(Track*, unsigned long)
+  0.00      6.30     0.00        9     0.00     0.00  __gnu_cxx::new_allocator<Track>::allocate(unsigned long, void const*)
+  0.00      6.30     0.00        9     0.00     0.00  __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::difference_type __gnu_cxx::operator-<Track*, std::vector<Track, std::allocator<Track> > >(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > > const&, __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > > const&)
+  0.00      6.30     0.00        9     0.00     0.00  std::vector<Track, std::allocator<Track> >::_M_check_len(unsigned long, char const*) const
+  0.00      6.30     0.00        9     0.00     0.00  std::_Vector_base<Track, std::allocator<Track> >::_M_allocate(unsigned long)
+  0.00      6.30     0.00        9     0.00     0.00  std::vector<Track, std::allocator<Track> >::_M_insert_aux(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >, Track const&)
+  0.00      6.30     0.00        9     0.00     0.00  std::vector<Track, std::allocator<Track> >::end()
+  0.00      6.30     0.00        9     0.00     0.00  std::vector<Track, std::allocator<Track> >::begin()
+  0.00      6.30     0.00        4     0.00     0.00  __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::base() const
+  0.00      6.30     0.00        4     0.00     0.00  std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_get_Tp_allocator()
+  0.00      6.30     0.00        3     0.00     0.00  __gnu_cxx::new_allocator<SimpleBox>::max_size() const
+  0.00      6.30     0.00        2     0.00     0.00  SimpleBox::SimpleBox(SimpleBox const&)
+  0.00      6.30     0.00        2     0.00     0.00  __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::__normal_iterator(SimpleBox* const&)
+  0.00      6.30     0.00        2     0.00     0.00  std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_get_Tp_allocator() const
+  0.00      6.30     0.00        2     0.00     0.00  std::vector<SimpleBox, std::allocator<SimpleBox> >::max_size() const
+  0.00      6.30     0.00        2     0.00     0.00  void std::_Destroy_aux<true>::__destroy<SimpleBox*>(SimpleBox*, SimpleBox*)
+  0.00      6.30     0.00        2     0.00     0.00  std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_deallocate(SimpleBox*, unsigned long)
+  0.00      6.30     0.00        2     0.00     0.00  SimpleBox* std::__uninitialized_copy<false>::__uninit_copy<SimpleBox*, SimpleBox*>(SimpleBox*, SimpleBox*, SimpleBox*)
+  0.00      6.30     0.00        2     0.00     0.00  SimpleBox* std::uninitialized_copy<SimpleBox*, SimpleBox*>(SimpleBox*, SimpleBox*, SimpleBox*)
+  0.00      6.30     0.00        2     0.00     0.00  SimpleBox* std::__uninitialized_copy_a<SimpleBox*, SimpleBox*, SimpleBox>(SimpleBox*, SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&)
+  0.00      6.30     0.00        2     0.00     0.00  SimpleBox* std::__uninitialized_move_a<SimpleBox*, SimpleBox*, std::allocator<SimpleBox> >(SimpleBox*, SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&)
+  0.00      6.30     0.00        2     0.00     0.00  void std::_Destroy<SimpleBox*>(SimpleBox*, SimpleBox*)
+  0.00      6.30     0.00        2     0.00     0.00  void std::_Destroy<SimpleBox*, SimpleBox>(SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&)
+  0.00      6.30     0.00        1     0.00     0.00  _GLOBAL__sub_I_hits
+  0.00      6.30     0.00        1     0.00     0.00  __static_initialization_and_destruction_0(int, int)
+  0.00      6.30     0.00        1     0.00     0.00  Geometry::Geometry(SimpleBox)
+  0.00      6.30     0.00        1     0.00     0.00  Geometry::~Geometry()
+  0.00      6.30     0.00        1     0.00     0.00  __gnu_cxx::new_allocator<Track>::new_allocator()
+  0.00      6.30     0.00        1     0.00     0.00  __gnu_cxx::new_allocator<Track>::~new_allocator()
+  0.00      6.30     0.00        1     0.00     0.00  __gnu_cxx::new_allocator<SimpleBox>::deallocate(SimpleBox*, unsigned long)
+  0.00      6.30     0.00        1     0.00     0.00  __gnu_cxx::new_allocator<SimpleBox>::allocate(unsigned long, void const*)
+  0.00      6.30     0.00        1     0.00     0.00  __gnu_cxx::new_allocator<SimpleBox>::construct(SimpleBox*, SimpleBox const&)
+  0.00      6.30     0.00        1     0.00     0.00  __gnu_cxx::new_allocator<SimpleBox>::new_allocator()
+  0.00      6.30     0.00        1     0.00     0.00  __gnu_cxx::new_allocator<SimpleBox>::~new_allocator()
+  0.00      6.30     0.00        1     0.00     0.00  __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::difference_type __gnu_cxx::operator-<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > > const&, __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > > const&)
+  0.00      6.30     0.00        1     0.00     0.00  std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_check_len(unsigned long, char const*) const
+  0.00      6.30     0.00        1     0.00     0.00  std::allocator<Track>::allocator()
+  0.00      6.30     0.00        1     0.00     0.00  std::allocator<Track>::~allocator()
+  0.00      6.30     0.00        1     0.00     0.00  std::allocator<SimpleBox>::allocator()
+  0.00      6.30     0.00        1     0.00     0.00  std::allocator<SimpleBox>::~allocator()
+  0.00      6.30     0.00        1     0.00     0.00  std::_Vector_base<Track, std::allocator<Track> >::_Vector_impl::_Vector_impl()
+  0.00      6.30     0.00        1     0.00     0.00  std::_Vector_base<Track, std::allocator<Track> >::_Vector_impl::~_Vector_impl()
+  0.00      6.30     0.00        1     0.00     0.00  std::_Vector_base<Track, std::allocator<Track> >::_Vector_base()
+  0.00      6.30     0.00        1     0.00     0.00  std::_Vector_base<Track, std::allocator<Track> >::~_Vector_base()
+  0.00      6.30     0.00        1     0.00     0.00  std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_allocate(unsigned long)
+  0.00      6.30     0.00        1     0.00     0.00  std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_impl::_Vector_impl()
+  0.00      6.30     0.00        1     0.00     0.00  std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_impl::~_Vector_impl()
+  0.00      6.30     0.00        1     0.00     0.00  std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_base()
+  0.00      6.30     0.00        1     0.00     0.00  std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::~_Vector_base()
+  0.00      6.30     0.00        1     0.00     0.00  std::vector<Track, std::allocator<Track> >::vector()
+  0.00      6.30     0.00        1     0.00     0.00  std::vector<Track, std::allocator<Track> >::~vector()
+  0.00      6.30     0.00        1     0.00     0.00  std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_insert_aux(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >, SimpleBox const&)
+  0.00      6.30     0.00        1     0.00     0.00  std::vector<SimpleBox, std::allocator<SimpleBox> >::end()
+  0.00      6.30     0.00        1     0.00     0.00  std::vector<SimpleBox, std::allocator<SimpleBox> >::begin()
+  0.00      6.30     0.00        1     0.00     0.00  std::vector<SimpleBox, std::allocator<SimpleBox> >::vector()
+  0.00      6.30     0.00        1     0.00     0.00  std::vector<SimpleBox, std::allocator<SimpleBox> >::~vector()
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+ 
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this 
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 2 byte(s) for 0.16% of 6.30 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     99.5    0.00    6.27                 main [1]
+                0.12    6.05     256/256         Propagate(Track*, Geometry*) [2]
+                0.01    0.07       1/1           Geometry::AddBox(SimpleBox) [16]
+                0.02    0.00       2/2           SimpleBox::SimpleBox(ThreeVector, ThreeVector) [19]
+                0.01    0.00     256/256         FourMomentum::FourMomentum(ThreeVector, float) [20]
+                0.00    0.00     516/516         ThreeVector::ThreeVector(float, float, float) [29]
+                0.00    0.00     513/513         Gamma(float) [30]
+                0.00    0.00     256/256         std::cos(float) [39]
+                0.00    0.00     256/256         std::sin(float) [40]
+                0.00    0.00     256/256         Track::Track(ThreeVector, FourMomentum, float) [35]
+                0.00    0.00     256/256         std::vector<Track, std::allocator<Track> >::push_back(Track const&) [37]
+                0.00    0.00     256/256         std::vector<Track, std::allocator<Track> >::operator[](unsigned long) [38]
+                0.00    0.00       1/1           std::vector<Track, std::allocator<Track> >::vector() [107]
+                0.00    0.00       1/1           Geometry::Geometry(SimpleBox) [84]
+                0.00    0.00       1/1           Geometry::~Geometry() [85]
+                0.00    0.00       1/1           std::vector<Track, std::allocator<Track> >::~vector() [108]
+-----------------------------------------------
+                0.12    6.05     256/256         main [1]
+[2]     97.9    0.12    6.05     256         Propagate(Track*, Geometry*) [2]
+                0.39    2.19 71774899/71774899     Geometry::BoundaryDetection(Track*) [3]
+                0.74    1.35 71774899/71774899     Track::timestep(float) [6]
+                0.10    1.29 71774994/71774994     Geometry::InBounds(Track*) [7]
+-----------------------------------------------
+                0.39    2.19 71774899/71774899     Propagate(Track*, Geometry*) [2]
+[3]     40.9    0.39    2.19 71774899         Geometry::BoundaryDetection(Track*) [3]
+                0.19    1.10 71774899/143549893     SimpleBox::Inside(Track*) [4]
+                0.74    0.00 143549637/143549641     std::vector<SimpleBox, std::allocator<SimpleBox> >::size() const [8]
+                0.16    0.00 71775060/71775060     std::vector<SimpleBox, std::allocator<SimpleBox> >::operator[](unsigned long) [15]
+-----------------------------------------------
+                0.19    1.10 71774899/143549893     Geometry::BoundaryDetection(Track*) [3]
+                0.19    1.10 71774994/143549893     Geometry::InBounds(Track*) [7]
+[4]     40.8    0.38    2.20 143549893         SimpleBox::Inside(Track*) [4]
+                2.20    0.00 143549893/143549893     SimpleBox::Inside(ThreeVector*) [5]
+-----------------------------------------------
+                2.20    0.00 143549893/143549893     SimpleBox::Inside(Track*) [4]
+[5]     34.8    2.20    0.00 143549893         SimpleBox::Inside(ThreeVector*) [5]
+-----------------------------------------------
+                0.74    1.35 71774899/71774899     Propagate(Track*, Geometry*) [2]
+[6]     33.2    0.74    1.35 71774899         Track::timestep(float) [6]
+                0.21    0.30 71774899/71774899     Track::py() [9]
+                0.20    0.27 71774899/71774899     Track::pz() [10]
+                0.17    0.20 71774899/71774899     Track::px() [11]
+-----------------------------------------------
+                0.10    1.29 71774994/71774994     Propagate(Track*, Geometry*) [2]
+[7]     21.9    0.10    1.29 71774994         Geometry::InBounds(Track*) [7]
+                0.19    1.10 71774994/143549893     SimpleBox::Inside(Track*) [4]
+-----------------------------------------------
+                0.00    0.00       4/143549641     std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_check_len(unsigned long, char const*) const [21]
+                0.74    0.00 143549637/143549641     Geometry::BoundaryDetection(Track*) [3]
+[8]     11.7    0.74    0.00 143549641         std::vector<SimpleBox, std::allocator<SimpleBox> >::size() const [8]
+-----------------------------------------------
+                0.21    0.30 71774899/71774899     Track::timestep(float) [6]
+[9]      8.1    0.21    0.30 71774899         Track::py() [9]
+                0.30    0.00 71774899/71774899     FourMomentum::py() [12]
+-----------------------------------------------
+                0.20    0.27 71774899/71774899     Track::timestep(float) [6]
+[10]     7.5    0.20    0.27 71774899         Track::pz() [10]
+                0.27    0.00 71774899/71774899     FourMomentum::pz() [13]
+-----------------------------------------------
+                0.17    0.20 71774899/71774899     Track::timestep(float) [6]
+[11]     5.9    0.17    0.20 71774899         Track::px() [11]
+                0.20    0.00 71774899/71774899     FourMomentum::px() [14]
+-----------------------------------------------
+                0.30    0.00 71774899/71774899     Track::py() [9]
+[12]     4.8    0.30    0.00 71774899         FourMomentum::py() [12]
+-----------------------------------------------
+                0.27    0.00 71774899/71774899     Track::pz() [10]
+[13]     4.3    0.27    0.00 71774899         FourMomentum::pz() [13]
+-----------------------------------------------
+                0.20    0.00 71774899/71774899     Track::px() [11]
+[14]     3.2    0.20    0.00 71774899         FourMomentum::px() [14]
+-----------------------------------------------
+                0.16    0.00 71775060/71775060     Geometry::BoundaryDetection(Track*) [3]
+[15]     2.5    0.16    0.00 71775060         std::vector<SimpleBox, std::allocator<SimpleBox> >::operator[](unsigned long) [15]
+-----------------------------------------------
+                0.01    0.07       1/1           main [1]
+[16]     1.2    0.01    0.07       1         Geometry::AddBox(SimpleBox) [16]
+                0.07    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::push_back(SimpleBox const&) [17]
+-----------------------------------------------
+                0.07    0.00       1/1           Geometry::AddBox(SimpleBox) [16]
+[17]     1.1    0.07    0.00       1         std::vector<SimpleBox, std::allocator<SimpleBox> >::push_back(SimpleBox const&) [17]
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_insert_aux(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >, SimpleBox const&) [22]
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::end() [109]
+-----------------------------------------------
+                                                 <spontaneous>
+[18]     0.5    0.03    0.00                 Track::z() [18]
+-----------------------------------------------
+                0.02    0.00       2/2           main [1]
+[19]     0.3    0.02    0.00       2         SimpleBox::SimpleBox(ThreeVector, ThreeVector) [19]
+                0.00    0.00       4/1798        ThreeVector::ThreeVector(ThreeVector const&) [27]
+-----------------------------------------------
+                0.01    0.00     256/256         main [1]
+[20]     0.2    0.01    0.00     256         FourMomentum::FourMomentum(ThreeVector, float) [20]
+                0.00    0.00     256/1798        ThreeVector::ThreeVector(ThreeVector const&) [27]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_insert_aux(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >, SimpleBox const&) [22]
+[21]     0.0    0.00    0.00       1         std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_check_len(unsigned long, char const*) const [21]
+                0.00    0.00       4/143549641     std::vector<SimpleBox, std::allocator<SimpleBox> >::size() const [8]
+                0.00    0.00       2/2           std::vector<SimpleBox, std::allocator<SimpleBox> >::max_size() const [73]
+                0.00    0.00       1/10          unsigned long const& std::max<unsigned long>(unsigned long const&, unsigned long const&) [56]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::push_back(SimpleBox const&) [17]
+[22]     0.0    0.00    0.00       1         std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_insert_aux(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >, SimpleBox const&) [22]
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_check_len(unsigned long, char const*) const [21]
+                0.00    0.00       3/4           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_get_Tp_allocator() [68]
+                0.00    0.00       2/4           __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::base() const [67]
+                0.00    0.00       2/2           SimpleBox* std::__uninitialized_move_a<SimpleBox*, SimpleBox*, std::allocator<SimpleBox> >(SimpleBox*, SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&) [79]
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::begin() [110]
+                0.00    0.00       1/1           __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::difference_type __gnu_cxx::operator-<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > > const&, __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > > const&) [93]
+                0.00    0.00       1/1           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_allocate(unsigned long) [102]
+                0.00    0.00       1/1           __gnu_cxx::new_allocator<SimpleBox>::construct(SimpleBox*, SimpleBox const&) [90]
+                0.00    0.00       1/2           void std::_Destroy<SimpleBox*, SimpleBox>(SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&) [81]
+                0.00    0.00       1/2           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_deallocate(SimpleBox*, unsigned long) [75]
+-----------------------------------------------
+                0.00    0.00       4/1798        SimpleBox::SimpleBox(ThreeVector, ThreeVector) [19]
+                0.00    0.00       4/1798        SimpleBox::SimpleBox(SimpleBox const&) [70]
+                0.00    0.00     256/1798        FourMomentum::FourMomentum(ThreeVector, float) [20]
+                0.00    0.00     256/1798        Track::Track(ThreeVector, FourMomentum, float) [35]
+                0.00    0.00     511/1798        Track::Track(Track const&) [34]
+                0.00    0.00     767/1798        FourMomentum::FourMomentum(FourMomentum const&) [28]
+[27]     0.0    0.00    0.00    1798         ThreeVector::ThreeVector(ThreeVector const&) [27]
+-----------------------------------------------
+                0.00    0.00     256/767         Track::Track(ThreeVector, FourMomentum, float) [35]
+                0.00    0.00     511/767         Track::Track(Track const&) [34]
+[28]     0.0    0.00    0.00     767         FourMomentum::FourMomentum(FourMomentum const&) [28]
+                0.00    0.00     767/1798        ThreeVector::ThreeVector(ThreeVector const&) [27]
+-----------------------------------------------
+                0.00    0.00     516/516         main [1]
+[29]     0.0    0.00    0.00     516         ThreeVector::ThreeVector(float, float, float) [29]
+-----------------------------------------------
+                0.00    0.00     513/513         main [1]
+[30]     0.0    0.00    0.00     513         Gamma(float) [30]
+                0.00    0.00     513/513         std::pow(float, int) [31]
+                0.00    0.00     513/513         std::sqrt(float) [32]
+-----------------------------------------------
+                0.00    0.00     513/513         Gamma(float) [30]
+[31]     0.0    0.00    0.00     513         std::pow(float, int) [31]
+-----------------------------------------------
+                0.00    0.00     513/513         Gamma(float) [30]
+[32]     0.0    0.00    0.00     513         std::sqrt(float) [32]
+-----------------------------------------------
+                0.00    0.00       1/512         __gnu_cxx::new_allocator<SimpleBox>::construct(SimpleBox*, SimpleBox const&) [90]
+                0.00    0.00     255/512         void std::_Construct<Track, Track>(Track*, Track const&) [41]
+                0.00    0.00     256/512         __gnu_cxx::new_allocator<Track>::construct(Track*, Track const&) [36]
+[33]     0.0    0.00    0.00     512         operator new(unsigned long, void*) [33]
+-----------------------------------------------
+                0.00    0.00     255/511         void std::_Construct<Track, Track>(Track*, Track const&) [41]
+                0.00    0.00     256/511         __gnu_cxx::new_allocator<Track>::construct(Track*, Track const&) [36]
+[34]     0.0    0.00    0.00     511         Track::Track(Track const&) [34]
+                0.00    0.00     511/1798        ThreeVector::ThreeVector(ThreeVector const&) [27]
+                0.00    0.00     511/767         FourMomentum::FourMomentum(FourMomentum const&) [28]
+-----------------------------------------------
+                0.00    0.00     256/256         main [1]
+[35]     0.0    0.00    0.00     256         Track::Track(ThreeVector, FourMomentum, float) [35]
+                0.00    0.00     256/1798        ThreeVector::ThreeVector(ThreeVector const&) [27]
+                0.00    0.00     256/767         FourMomentum::FourMomentum(FourMomentum const&) [28]
+-----------------------------------------------
+                0.00    0.00       9/256         std::vector<Track, std::allocator<Track> >::_M_insert_aux(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >, Track const&) [64]
+                0.00    0.00     247/256         std::vector<Track, std::allocator<Track> >::push_back(Track const&) [37]
+[36]     0.0    0.00    0.00     256         __gnu_cxx::new_allocator<Track>::construct(Track*, Track const&) [36]
+                0.00    0.00     256/512         operator new(unsigned long, void*) [33]
+                0.00    0.00     256/511         Track::Track(Track const&) [34]
+-----------------------------------------------
+                0.00    0.00     256/256         main [1]
+[37]     0.0    0.00    0.00     256         std::vector<Track, std::allocator<Track> >::push_back(Track const&) [37]
+                0.00    0.00     247/256         __gnu_cxx::new_allocator<Track>::construct(Track*, Track const&) [36]
+                0.00    0.00       9/9           std::vector<Track, std::allocator<Track> >::end() [65]
+                0.00    0.00       9/9           std::vector<Track, std::allocator<Track> >::_M_insert_aux(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >, Track const&) [64]
+-----------------------------------------------
+                0.00    0.00     256/256         main [1]
+[38]     0.0    0.00    0.00     256         std::vector<Track, std::allocator<Track> >::operator[](unsigned long) [38]
+-----------------------------------------------
+                0.00    0.00     256/256         main [1]
+[39]     0.0    0.00    0.00     256         std::cos(float) [39]
+-----------------------------------------------
+                0.00    0.00     256/256         main [1]
+[40]     0.0    0.00    0.00     256         std::sin(float) [40]
+-----------------------------------------------
+                0.00    0.00     255/255         Track* std::__uninitialized_copy<false>::__uninit_copy<Track*, Track*>(Track*, Track*, Track*) [50]
+[41]     0.0    0.00    0.00     255         void std::_Construct<Track, Track>(Track*, Track const&) [41]
+                0.00    0.00     255/512         operator new(unsigned long, void*) [33]
+                0.00    0.00     255/511         Track::Track(Track const&) [34]
+-----------------------------------------------
+                0.00    0.00     255/255         Track* std::__uninitialized_copy<false>::__uninit_copy<Track*, Track*>(Track*, Track*, Track*) [50]
+[42]     0.0    0.00    0.00     255         Track* std::__addressof<Track>(Track&) [42]
+-----------------------------------------------
+                0.00    0.00      18/36          std::vector<Track, std::allocator<Track> >::_M_insert_aux(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >, Track const&) [64]
+                0.00    0.00      18/36          __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::difference_type __gnu_cxx::operator-<Track*, std::vector<Track, std::allocator<Track> > >(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > > const&, __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > > const&) [61]
+[43]     0.0    0.00    0.00      36         __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::base() const [43]
+-----------------------------------------------
+                0.00    0.00      36/36          std::vector<Track, std::allocator<Track> >::_M_check_len(unsigned long, char const*) const [62]
+[44]     0.0    0.00    0.00      36         std::vector<Track, std::allocator<Track> >::size() const [44]
+-----------------------------------------------
+                0.00    0.00       1/28          std::vector<Track, std::allocator<Track> >::~vector() [108]
+                0.00    0.00      27/28          std::vector<Track, std::allocator<Track> >::_M_insert_aux(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >, Track const&) [64]
+[45]     0.0    0.00    0.00      28         std::_Vector_base<Track, std::allocator<Track> >::_M_get_Tp_allocator() [45]
+-----------------------------------------------
+                0.00    0.00       9/27          __gnu_cxx::new_allocator<Track>::allocate(unsigned long, void const*) [60]
+                0.00    0.00      18/27          std::vector<Track, std::allocator<Track> >::max_size() const [49]
+[46]     0.0    0.00    0.00      27         __gnu_cxx::new_allocator<Track>::max_size() const [46]
+-----------------------------------------------
+                0.00    0.00       9/18          std::vector<Track, std::allocator<Track> >::end() [65]
+                0.00    0.00       9/18          std::vector<Track, std::allocator<Track> >::begin() [66]
+[47]     0.0    0.00    0.00      18         __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::__normal_iterator(Track* const&) [47]
+-----------------------------------------------
+                0.00    0.00      18/18          std::vector<Track, std::allocator<Track> >::max_size() const [49]
+[48]     0.0    0.00    0.00      18         std::_Vector_base<Track, std::allocator<Track> >::_M_get_Tp_allocator() const [48]
+-----------------------------------------------
+                0.00    0.00      18/18          std::vector<Track, std::allocator<Track> >::_M_check_len(unsigned long, char const*) const [62]
+[49]     0.0    0.00    0.00      18         std::vector<Track, std::allocator<Track> >::max_size() const [49]
+                0.00    0.00      18/27          __gnu_cxx::new_allocator<Track>::max_size() const [46]
+                0.00    0.00      18/18          std::_Vector_base<Track, std::allocator<Track> >::_M_get_Tp_allocator() const [48]
+-----------------------------------------------
+                0.00    0.00      18/18          Track* std::uninitialized_copy<Track*, Track*>(Track*, Track*, Track*) [51]
+[50]     0.0    0.00    0.00      18         Track* std::__uninitialized_copy<false>::__uninit_copy<Track*, Track*>(Track*, Track*, Track*) [50]
+                0.00    0.00     255/255         Track* std::__addressof<Track>(Track&) [42]
+                0.00    0.00     255/255         void std::_Construct<Track, Track>(Track*, Track const&) [41]
+-----------------------------------------------
+                0.00    0.00      18/18          Track* std::__uninitialized_copy_a<Track*, Track*, Track>(Track*, Track*, Track*, std::allocator<Track>&) [52]
+[51]     0.0    0.00    0.00      18         Track* std::uninitialized_copy<Track*, Track*>(Track*, Track*, Track*) [51]
+                0.00    0.00      18/18          Track* std::__uninitialized_copy<false>::__uninit_copy<Track*, Track*>(Track*, Track*, Track*) [50]
+-----------------------------------------------
+                0.00    0.00      18/18          Track* std::__uninitialized_move_a<Track*, Track*, std::allocator<Track> >(Track*, Track*, Track*, std::allocator<Track>&) [53]
+[52]     0.0    0.00    0.00      18         Track* std::__uninitialized_copy_a<Track*, Track*, Track>(Track*, Track*, Track*, std::allocator<Track>&) [52]
+                0.00    0.00      18/18          Track* std::uninitialized_copy<Track*, Track*>(Track*, Track*, Track*) [51]
+-----------------------------------------------
+                0.00    0.00      18/18          std::vector<Track, std::allocator<Track> >::_M_insert_aux(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >, Track const&) [64]
+[53]     0.0    0.00    0.00      18         Track* std::__uninitialized_move_a<Track*, Track*, std::allocator<Track> >(Track*, Track*, Track*, std::allocator<Track>&) [53]
+                0.00    0.00      18/18          Track* std::__uninitialized_copy_a<Track*, Track*, Track>(Track*, Track*, Track*, std::allocator<Track>&) [52]
+-----------------------------------------------
+                0.00    0.00      10/10          void std::_Destroy<Track*>(Track*, Track*) [57]
+[54]     0.0    0.00    0.00      10         void std::_Destroy_aux<true>::__destroy<Track*>(Track*, Track*) [54]
+-----------------------------------------------
+                0.00    0.00       1/10          std::_Vector_base<Track, std::allocator<Track> >::~_Vector_base() [101]
+                0.00    0.00       9/10          std::vector<Track, std::allocator<Track> >::_M_insert_aux(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >, Track const&) [64]
+[55]     0.0    0.00    0.00      10         std::_Vector_base<Track, std::allocator<Track> >::_M_deallocate(Track*, unsigned long) [55]
+                0.00    0.00       9/9           __gnu_cxx::new_allocator<Track>::deallocate(Track*, unsigned long) [59]
+-----------------------------------------------
+                0.00    0.00       1/10          std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_check_len(unsigned long, char const*) const [21]
+                0.00    0.00       9/10          std::vector<Track, std::allocator<Track> >::_M_check_len(unsigned long, char const*) const [62]
+[56]     0.0    0.00    0.00      10         unsigned long const& std::max<unsigned long>(unsigned long const&, unsigned long const&) [56]
+-----------------------------------------------
+                0.00    0.00      10/10          void std::_Destroy<Track*, Track>(Track*, Track*, std::allocator<Track>&) [58]
+[57]     0.0    0.00    0.00      10         void std::_Destroy<Track*>(Track*, Track*) [57]
+                0.00    0.00      10/10          void std::_Destroy_aux<true>::__destroy<Track*>(Track*, Track*) [54]
+-----------------------------------------------
+                0.00    0.00       1/10          std::vector<Track, std::allocator<Track> >::~vector() [108]
+                0.00    0.00       9/10          std::vector<Track, std::allocator<Track> >::_M_insert_aux(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >, Track const&) [64]
+[58]     0.0    0.00    0.00      10         void std::_Destroy<Track*, Track>(Track*, Track*, std::allocator<Track>&) [58]
+                0.00    0.00      10/10          void std::_Destroy<Track*>(Track*, Track*) [57]
+-----------------------------------------------
+                0.00    0.00       9/9           std::_Vector_base<Track, std::allocator<Track> >::_M_deallocate(Track*, unsigned long) [55]
+[59]     0.0    0.00    0.00       9         __gnu_cxx::new_allocator<Track>::deallocate(Track*, unsigned long) [59]
+-----------------------------------------------
+                0.00    0.00       9/9           std::_Vector_base<Track, std::allocator<Track> >::_M_allocate(unsigned long) [63]
+[60]     0.0    0.00    0.00       9         __gnu_cxx::new_allocator<Track>::allocate(unsigned long, void const*) [60]
+                0.00    0.00       9/27          __gnu_cxx::new_allocator<Track>::max_size() const [46]
+-----------------------------------------------
+                0.00    0.00       9/9           std::vector<Track, std::allocator<Track> >::_M_insert_aux(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >, Track const&) [64]
+[61]     0.0    0.00    0.00       9         __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::difference_type __gnu_cxx::operator-<Track*, std::vector<Track, std::allocator<Track> > >(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > > const&, __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > > const&) [61]
+                0.00    0.00      18/36          __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::base() const [43]
+-----------------------------------------------
+                0.00    0.00       9/9           std::vector<Track, std::allocator<Track> >::_M_insert_aux(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >, Track const&) [64]
+[62]     0.0    0.00    0.00       9         std::vector<Track, std::allocator<Track> >::_M_check_len(unsigned long, char const*) const [62]
+                0.00    0.00      36/36          std::vector<Track, std::allocator<Track> >::size() const [44]
+                0.00    0.00      18/18          std::vector<Track, std::allocator<Track> >::max_size() const [49]
+                0.00    0.00       9/10          unsigned long const& std::max<unsigned long>(unsigned long const&, unsigned long const&) [56]
+-----------------------------------------------
+                0.00    0.00       9/9           std::vector<Track, std::allocator<Track> >::_M_insert_aux(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >, Track const&) [64]
+[63]     0.0    0.00    0.00       9         std::_Vector_base<Track, std::allocator<Track> >::_M_allocate(unsigned long) [63]
+                0.00    0.00       9/9           __gnu_cxx::new_allocator<Track>::allocate(unsigned long, void const*) [60]
+-----------------------------------------------
+                0.00    0.00       9/9           std::vector<Track, std::allocator<Track> >::push_back(Track const&) [37]
+[64]     0.0    0.00    0.00       9         std::vector<Track, std::allocator<Track> >::_M_insert_aux(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >, Track const&) [64]
+                0.00    0.00      27/28          std::_Vector_base<Track, std::allocator<Track> >::_M_get_Tp_allocator() [45]
+                0.00    0.00      18/36          __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::base() const [43]
+                0.00    0.00      18/18          Track* std::__uninitialized_move_a<Track*, Track*, std::allocator<Track> >(Track*, Track*, Track*, std::allocator<Track>&) [53]
+                0.00    0.00       9/9           std::vector<Track, std::allocator<Track> >::_M_check_len(unsigned long, char const*) const [62]
+                0.00    0.00       9/9           std::vector<Track, std::allocator<Track> >::begin() [66]
+                0.00    0.00       9/9           __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::difference_type __gnu_cxx::operator-<Track*, std::vector<Track, std::allocator<Track> > >(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > > const&, __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > > const&) [61]
+                0.00    0.00       9/9           std::_Vector_base<Track, std::allocator<Track> >::_M_allocate(unsigned long) [63]
+                0.00    0.00       9/256         __gnu_cxx::new_allocator<Track>::construct(Track*, Track const&) [36]
+                0.00    0.00       9/10          void std::_Destroy<Track*, Track>(Track*, Track*, std::allocator<Track>&) [58]
+                0.00    0.00       9/10          std::_Vector_base<Track, std::allocator<Track> >::_M_deallocate(Track*, unsigned long) [55]
+-----------------------------------------------
+                0.00    0.00       9/9           std::vector<Track, std::allocator<Track> >::push_back(Track const&) [37]
+[65]     0.0    0.00    0.00       9         std::vector<Track, std::allocator<Track> >::end() [65]
+                0.00    0.00       9/18          __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::__normal_iterator(Track* const&) [47]
+-----------------------------------------------
+                0.00    0.00       9/9           std::vector<Track, std::allocator<Track> >::_M_insert_aux(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >, Track const&) [64]
+[66]     0.0    0.00    0.00       9         std::vector<Track, std::allocator<Track> >::begin() [66]
+                0.00    0.00       9/18          __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::__normal_iterator(Track* const&) [47]
+-----------------------------------------------
+                0.00    0.00       2/4           std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_insert_aux(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >, SimpleBox const&) [22]
+                0.00    0.00       2/4           __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::difference_type __gnu_cxx::operator-<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > > const&, __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > > const&) [93]
+[67]     0.0    0.00    0.00       4         __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::base() const [67]
+-----------------------------------------------
+                0.00    0.00       1/4           std::vector<SimpleBox, std::allocator<SimpleBox> >::~vector() [112]
+                0.00    0.00       3/4           std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_insert_aux(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >, SimpleBox const&) [22]
+[68]     0.0    0.00    0.00       4         std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_get_Tp_allocator() [68]
+-----------------------------------------------
+                0.00    0.00       1/3           __gnu_cxx::new_allocator<SimpleBox>::allocate(unsigned long, void const*) [89]
+                0.00    0.00       2/3           std::vector<SimpleBox, std::allocator<SimpleBox> >::max_size() const [73]
+[69]     0.0    0.00    0.00       3         __gnu_cxx::new_allocator<SimpleBox>::max_size() const [69]
+-----------------------------------------------
+                0.00    0.00       1/2           Geometry::Geometry(SimpleBox) [84]
+                0.00    0.00       1/2           __gnu_cxx::new_allocator<SimpleBox>::construct(SimpleBox*, SimpleBox const&) [90]
+[70]     0.0    0.00    0.00       2         SimpleBox::SimpleBox(SimpleBox const&) [70]
+                0.00    0.00       4/1798        ThreeVector::ThreeVector(ThreeVector const&) [27]
+-----------------------------------------------
+                0.00    0.00       1/2           std::vector<SimpleBox, std::allocator<SimpleBox> >::end() [109]
+                0.00    0.00       1/2           std::vector<SimpleBox, std::allocator<SimpleBox> >::begin() [110]
+[71]     0.0    0.00    0.00       2         __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::__normal_iterator(SimpleBox* const&) [71]
+-----------------------------------------------
+                0.00    0.00       2/2           std::vector<SimpleBox, std::allocator<SimpleBox> >::max_size() const [73]
+[72]     0.0    0.00    0.00       2         std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_get_Tp_allocator() const [72]
+-----------------------------------------------
+                0.00    0.00       2/2           std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_check_len(unsigned long, char const*) const [21]
+[73]     0.0    0.00    0.00       2         std::vector<SimpleBox, std::allocator<SimpleBox> >::max_size() const [73]
+                0.00    0.00       2/3           __gnu_cxx::new_allocator<SimpleBox>::max_size() const [69]
+                0.00    0.00       2/2           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_get_Tp_allocator() const [72]
+-----------------------------------------------
+                0.00    0.00       2/2           void std::_Destroy<SimpleBox*>(SimpleBox*, SimpleBox*) [80]
+[74]     0.0    0.00    0.00       2         void std::_Destroy_aux<true>::__destroy<SimpleBox*>(SimpleBox*, SimpleBox*) [74]
+-----------------------------------------------
+                0.00    0.00       1/2           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::~_Vector_base() [106]
+                0.00    0.00       1/2           std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_insert_aux(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >, SimpleBox const&) [22]
+[75]     0.0    0.00    0.00       2         std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_deallocate(SimpleBox*, unsigned long) [75]
+                0.00    0.00       1/1           __gnu_cxx::new_allocator<SimpleBox>::deallocate(SimpleBox*, unsigned long) [88]
+-----------------------------------------------
+                0.00    0.00       2/2           SimpleBox* std::uninitialized_copy<SimpleBox*, SimpleBox*>(SimpleBox*, SimpleBox*, SimpleBox*) [77]
+[76]     0.0    0.00    0.00       2         SimpleBox* std::__uninitialized_copy<false>::__uninit_copy<SimpleBox*, SimpleBox*>(SimpleBox*, SimpleBox*, SimpleBox*) [76]
+-----------------------------------------------
+                0.00    0.00       2/2           SimpleBox* std::__uninitialized_copy_a<SimpleBox*, SimpleBox*, SimpleBox>(SimpleBox*, SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&) [78]
+[77]     0.0    0.00    0.00       2         SimpleBox* std::uninitialized_copy<SimpleBox*, SimpleBox*>(SimpleBox*, SimpleBox*, SimpleBox*) [77]
+                0.00    0.00       2/2           SimpleBox* std::__uninitialized_copy<false>::__uninit_copy<SimpleBox*, SimpleBox*>(SimpleBox*, SimpleBox*, SimpleBox*) [76]
+-----------------------------------------------
+                0.00    0.00       2/2           SimpleBox* std::__uninitialized_move_a<SimpleBox*, SimpleBox*, std::allocator<SimpleBox> >(SimpleBox*, SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&) [79]
+[78]     0.0    0.00    0.00       2         SimpleBox* std::__uninitialized_copy_a<SimpleBox*, SimpleBox*, SimpleBox>(SimpleBox*, SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&) [78]
+                0.00    0.00       2/2           SimpleBox* std::uninitialized_copy<SimpleBox*, SimpleBox*>(SimpleBox*, SimpleBox*, SimpleBox*) [77]
+-----------------------------------------------
+                0.00    0.00       2/2           std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_insert_aux(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >, SimpleBox const&) [22]
+[79]     0.0    0.00    0.00       2         SimpleBox* std::__uninitialized_move_a<SimpleBox*, SimpleBox*, std::allocator<SimpleBox> >(SimpleBox*, SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&) [79]
+                0.00    0.00       2/2           SimpleBox* std::__uninitialized_copy_a<SimpleBox*, SimpleBox*, SimpleBox>(SimpleBox*, SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&) [78]
+-----------------------------------------------
+                0.00    0.00       2/2           void std::_Destroy<SimpleBox*, SimpleBox>(SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&) [81]
+[80]     0.0    0.00    0.00       2         void std::_Destroy<SimpleBox*>(SimpleBox*, SimpleBox*) [80]
+                0.00    0.00       2/2           void std::_Destroy_aux<true>::__destroy<SimpleBox*>(SimpleBox*, SimpleBox*) [74]
+-----------------------------------------------
+                0.00    0.00       1/2           std::vector<SimpleBox, std::allocator<SimpleBox> >::~vector() [112]
+                0.00    0.00       1/2           std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_insert_aux(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >, SimpleBox const&) [22]
+[81]     0.0    0.00    0.00       2         void std::_Destroy<SimpleBox*, SimpleBox>(SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&) [81]
+                0.00    0.00       2/2           void std::_Destroy<SimpleBox*>(SimpleBox*, SimpleBox*) [80]
+-----------------------------------------------
+                0.00    0.00       1/1           __libc_csu_init [148]
+[82]     0.0    0.00    0.00       1         _GLOBAL__sub_I_hits [82]
+                0.00    0.00       1/1           __static_initialization_and_destruction_0(int, int) [83]
+-----------------------------------------------
+                0.00    0.00       1/1           _GLOBAL__sub_I_hits [82]
+[83]     0.0    0.00    0.00       1         __static_initialization_and_destruction_0(int, int) [83]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[84]     0.0    0.00    0.00       1         Geometry::Geometry(SimpleBox) [84]
+                0.00    0.00       1/2           SimpleBox::SimpleBox(SimpleBox const&) [70]
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::vector() [111]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[85]     0.0    0.00    0.00       1         Geometry::~Geometry() [85]
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::~vector() [112]
+-----------------------------------------------
+                0.00    0.00       1/1           std::allocator<Track>::allocator() [94]
+[86]     0.0    0.00    0.00       1         __gnu_cxx::new_allocator<Track>::new_allocator() [86]
+-----------------------------------------------
+                0.00    0.00       1/1           std::allocator<Track>::~allocator() [95]
+[87]     0.0    0.00    0.00       1         __gnu_cxx::new_allocator<Track>::~new_allocator() [87]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_deallocate(SimpleBox*, unsigned long) [75]
+[88]     0.0    0.00    0.00       1         __gnu_cxx::new_allocator<SimpleBox>::deallocate(SimpleBox*, unsigned long) [88]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_allocate(unsigned long) [102]
+[89]     0.0    0.00    0.00       1         __gnu_cxx::new_allocator<SimpleBox>::allocate(unsigned long, void const*) [89]
+                0.00    0.00       1/3           __gnu_cxx::new_allocator<SimpleBox>::max_size() const [69]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_insert_aux(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >, SimpleBox const&) [22]
+[90]     0.0    0.00    0.00       1         __gnu_cxx::new_allocator<SimpleBox>::construct(SimpleBox*, SimpleBox const&) [90]
+                0.00    0.00       1/512         operator new(unsigned long, void*) [33]
+                0.00    0.00       1/2           SimpleBox::SimpleBox(SimpleBox const&) [70]
+-----------------------------------------------
+                0.00    0.00       1/1           std::allocator<SimpleBox>::allocator() [96]
+[91]     0.0    0.00    0.00       1         __gnu_cxx::new_allocator<SimpleBox>::new_allocator() [91]
+-----------------------------------------------
+                0.00    0.00       1/1           std::allocator<SimpleBox>::~allocator() [97]
+[92]     0.0    0.00    0.00       1         __gnu_cxx::new_allocator<SimpleBox>::~new_allocator() [92]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_insert_aux(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >, SimpleBox const&) [22]
+[93]     0.0    0.00    0.00       1         __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::difference_type __gnu_cxx::operator-<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > > const&, __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > > const&) [93]
+                0.00    0.00       2/4           __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::base() const [67]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<Track, std::allocator<Track> >::_Vector_impl::_Vector_impl() [98]
+[94]     0.0    0.00    0.00       1         std::allocator<Track>::allocator() [94]
+                0.00    0.00       1/1           __gnu_cxx::new_allocator<Track>::new_allocator() [86]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<Track, std::allocator<Track> >::_Vector_impl::~_Vector_impl() [99]
+[95]     0.0    0.00    0.00       1         std::allocator<Track>::~allocator() [95]
+                0.00    0.00       1/1           __gnu_cxx::new_allocator<Track>::~new_allocator() [87]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_impl::_Vector_impl() [103]
+[96]     0.0    0.00    0.00       1         std::allocator<SimpleBox>::allocator() [96]
+                0.00    0.00       1/1           __gnu_cxx::new_allocator<SimpleBox>::new_allocator() [91]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_impl::~_Vector_impl() [104]
+[97]     0.0    0.00    0.00       1         std::allocator<SimpleBox>::~allocator() [97]
+                0.00    0.00       1/1           __gnu_cxx::new_allocator<SimpleBox>::~new_allocator() [92]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<Track, std::allocator<Track> >::_Vector_base() [100]
+[98]     0.0    0.00    0.00       1         std::_Vector_base<Track, std::allocator<Track> >::_Vector_impl::_Vector_impl() [98]
+                0.00    0.00       1/1           std::allocator<Track>::allocator() [94]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<Track, std::allocator<Track> >::~_Vector_base() [101]
+[99]     0.0    0.00    0.00       1         std::_Vector_base<Track, std::allocator<Track> >::_Vector_impl::~_Vector_impl() [99]
+                0.00    0.00       1/1           std::allocator<Track>::~allocator() [95]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<Track, std::allocator<Track> >::vector() [107]
+[100]    0.0    0.00    0.00       1         std::_Vector_base<Track, std::allocator<Track> >::_Vector_base() [100]
+                0.00    0.00       1/1           std::_Vector_base<Track, std::allocator<Track> >::_Vector_impl::_Vector_impl() [98]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<Track, std::allocator<Track> >::~vector() [108]
+[101]    0.0    0.00    0.00       1         std::_Vector_base<Track, std::allocator<Track> >::~_Vector_base() [101]
+                0.00    0.00       1/10          std::_Vector_base<Track, std::allocator<Track> >::_M_deallocate(Track*, unsigned long) [55]
+                0.00    0.00       1/1           std::_Vector_base<Track, std::allocator<Track> >::_Vector_impl::~_Vector_impl() [99]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_insert_aux(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >, SimpleBox const&) [22]
+[102]    0.0    0.00    0.00       1         std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_allocate(unsigned long) [102]
+                0.00    0.00       1/1           __gnu_cxx::new_allocator<SimpleBox>::allocate(unsigned long, void const*) [89]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_base() [105]
+[103]    0.0    0.00    0.00       1         std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_impl::_Vector_impl() [103]
+                0.00    0.00       1/1           std::allocator<SimpleBox>::allocator() [96]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::~_Vector_base() [106]
+[104]    0.0    0.00    0.00       1         std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_impl::~_Vector_impl() [104]
+                0.00    0.00       1/1           std::allocator<SimpleBox>::~allocator() [97]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::vector() [111]
+[105]    0.0    0.00    0.00       1         std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_base() [105]
+                0.00    0.00       1/1           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_impl::_Vector_impl() [103]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::~vector() [112]
+[106]    0.0    0.00    0.00       1         std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::~_Vector_base() [106]
+                0.00    0.00       1/1           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_impl::~_Vector_impl() [104]
+                0.00    0.00       1/2           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_deallocate(SimpleBox*, unsigned long) [75]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[107]    0.0    0.00    0.00       1         std::vector<Track, std::allocator<Track> >::vector() [107]
+                0.00    0.00       1/1           std::_Vector_base<Track, std::allocator<Track> >::_Vector_base() [100]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[108]    0.0    0.00    0.00       1         std::vector<Track, std::allocator<Track> >::~vector() [108]
+                0.00    0.00       1/28          std::_Vector_base<Track, std::allocator<Track> >::_M_get_Tp_allocator() [45]
+                0.00    0.00       1/1           std::_Vector_base<Track, std::allocator<Track> >::~_Vector_base() [101]
+                0.00    0.00       1/10          void std::_Destroy<Track*, Track>(Track*, Track*, std::allocator<Track>&) [58]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::push_back(SimpleBox const&) [17]
+[109]    0.0    0.00    0.00       1         std::vector<SimpleBox, std::allocator<SimpleBox> >::end() [109]
+                0.00    0.00       1/2           __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::__normal_iterator(SimpleBox* const&) [71]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_insert_aux(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >, SimpleBox const&) [22]
+[110]    0.0    0.00    0.00       1         std::vector<SimpleBox, std::allocator<SimpleBox> >::begin() [110]
+                0.00    0.00       1/2           __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::__normal_iterator(SimpleBox* const&) [71]
+-----------------------------------------------
+                0.00    0.00       1/1           Geometry::Geometry(SimpleBox) [84]
+[111]    0.0    0.00    0.00       1         std::vector<SimpleBox, std::allocator<SimpleBox> >::vector() [111]
+                0.00    0.00       1/1           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_base() [105]
+-----------------------------------------------
+                0.00    0.00       1/1           Geometry::~Geometry() [85]
+[112]    0.0    0.00    0.00       1         std::vector<SimpleBox, std::allocator<SimpleBox> >::~vector() [112]
+                0.00    0.00       1/4           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_get_Tp_allocator() [68]
+                0.00    0.00       1/1           std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::~_Vector_base() [106]
+                0.00    0.00       1/2           void std::_Destroy<SimpleBox*, SimpleBox>(SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&) [81]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+
+Index by function name
+
+  [82] _GLOBAL__sub_I_hits    [92] __gnu_cxx::new_allocator<SimpleBox>::~new_allocator() [106] std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::~_Vector_base()
+  [83] __static_initialization_and_destruction_0(int, int) [47] __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::__normal_iterator(Track* const&) [50] Track* std::__uninitialized_copy<false>::__uninit_copy<Track*, Track*>(Track*, Track*, Track*)
+  [30] Gamma(float)           [71] __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::__normal_iterator(SimpleBox* const&) [76] SimpleBox* std::__uninitialized_copy<false>::__uninit_copy<SimpleBox*, SimpleBox*>(SimpleBox*, SimpleBox*, SimpleBox*)
+   [2] Propagate(Track*, Geometry*) [61] __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::difference_type __gnu_cxx::operator-<Track*, std::vector<Track, std::allocator<Track> > >(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > > const&, __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > > const&) [64] std::vector<Track, std::allocator<Track> >::_M_insert_aux(__gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >, Track const&)
+  [29] ThreeVector::ThreeVector(float, float, float) [93] __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::difference_type __gnu_cxx::operator-<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > > const&, __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > > const&) [65] std::vector<Track, std::allocator<Track> >::end()
+  [27] ThreeVector::ThreeVector(ThreeVector const&) [46] __gnu_cxx::new_allocator<Track>::max_size() const [66] std::vector<Track, std::allocator<Track> >::begin()
+  [14] FourMomentum::px()     [69] __gnu_cxx::new_allocator<SimpleBox>::max_size() const [37] std::vector<Track, std::allocator<Track> >::push_back(Track const&)
+  [12] FourMomentum::py()     [43] __gnu_cxx::__normal_iterator<Track*, std::vector<Track, std::allocator<Track> > >::base() const [107] std::vector<Track, std::allocator<Track> >::vector()
+  [13] FourMomentum::pz()     [67] __gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >::base() const [108] std::vector<Track, std::allocator<Track> >::~vector()
+  [20] FourMomentum::FourMomentum(ThreeVector, float) [48] std::_Vector_base<Track, std::allocator<Track> >::_M_get_Tp_allocator() const [38] std::vector<Track, std::allocator<Track> >::operator[](unsigned long)
+  [28] FourMomentum::FourMomentum(FourMomentum const&) [72] std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_get_Tp_allocator() const [22] std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_insert_aux(__gnu_cxx::__normal_iterator<SimpleBox*, std::vector<SimpleBox, std::allocator<SimpleBox> > >, SimpleBox const&)
+  [18] Track::z()             [62] std::vector<Track, std::allocator<Track> >::_M_check_len(unsigned long, char const*) const [109] std::vector<SimpleBox, std::allocator<SimpleBox> >::end()
+  [11] Track::px()            [44] std::vector<Track, std::allocator<Track> >::size() const [110] std::vector<SimpleBox, std::allocator<SimpleBox> >::begin()
+   [9] Track::py()            [49] std::vector<Track, std::allocator<Track> >::max_size() const [17] std::vector<SimpleBox, std::allocator<SimpleBox> >::push_back(SimpleBox const&)
+  [10] Track::pz()            [21] std::vector<SimpleBox, std::allocator<SimpleBox> >::_M_check_len(unsigned long, char const*) const [111] std::vector<SimpleBox, std::allocator<SimpleBox> >::vector()
+   [6] Track::timestep(float)  [8] std::vector<SimpleBox, std::allocator<SimpleBox> >::size() const [112] std::vector<SimpleBox, std::allocator<SimpleBox> >::~vector()
+  [35] Track::Track(ThreeVector, FourMomentum, float) [73] std::vector<SimpleBox, std::allocator<SimpleBox> >::max_size() const [15] std::vector<SimpleBox, std::allocator<SimpleBox> >::operator[](unsigned long)
+  [34] Track::Track(Track const&) [94] std::allocator<Track>::allocator() [41] void std::_Construct<Track, Track>(Track*, Track const&)
+   [3] Geometry::BoundaryDetection(Track*) [95] std::allocator<Track>::~allocator() [42] Track* std::__addressof<Track>(Track&)
+  [16] Geometry::AddBox(SimpleBox) [96] std::allocator<SimpleBox>::allocator() [51] Track* std::uninitialized_copy<Track*, Track*>(Track*, Track*, Track*)
+   [7] Geometry::InBounds(Track*) [97] std::allocator<SimpleBox>::~allocator() [77] SimpleBox* std::uninitialized_copy<SimpleBox*, SimpleBox*>(SimpleBox*, SimpleBox*, SimpleBox*)
+  [84] Geometry::Geometry(SimpleBox) [54] void std::_Destroy_aux<true>::__destroy<Track*>(Track*, Track*) [52] Track* std::__uninitialized_copy_a<Track*, Track*, Track>(Track*, Track*, Track*, std::allocator<Track>&)
+  [85] Geometry::~Geometry()  [74] void std::_Destroy_aux<true>::__destroy<SimpleBox*>(SimpleBox*, SimpleBox*) [78] SimpleBox* std::__uninitialized_copy_a<SimpleBox*, SimpleBox*, SimpleBox>(SimpleBox*, SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&)
+   [5] SimpleBox::Inside(ThreeVector*) [63] std::_Vector_base<Track, std::allocator<Track> >::_M_allocate(unsigned long) [53] Track* std::__uninitialized_move_a<Track*, Track*, std::allocator<Track> >(Track*, Track*, Track*, std::allocator<Track>&)
+   [4] SimpleBox::Inside(Track*) [98] std::_Vector_base<Track, std::allocator<Track> >::_Vector_impl::_Vector_impl() [79] SimpleBox* std::__uninitialized_move_a<SimpleBox*, SimpleBox*, std::allocator<SimpleBox> >(SimpleBox*, SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&)
+  [19] SimpleBox::SimpleBox(ThreeVector, ThreeVector) [99] std::_Vector_base<Track, std::allocator<Track> >::_Vector_impl::~_Vector_impl() [39] std::cos(float)
+  [70] SimpleBox::SimpleBox(SimpleBox const&) [55] std::_Vector_base<Track, std::allocator<Track> >::_M_deallocate(Track*, unsigned long) [56] unsigned long const& std::max<unsigned long>(unsigned long const&, unsigned long const&)
+  [59] __gnu_cxx::new_allocator<Track>::deallocate(Track*, unsigned long) [45] std::_Vector_base<Track, std::allocator<Track> >::_M_get_Tp_allocator() [31] std::pow(float, int)
+  [60] __gnu_cxx::new_allocator<Track>::allocate(unsigned long, void const*) [100] std::_Vector_base<Track, std::allocator<Track> >::_Vector_base() [40] std::sin(float)
+  [36] __gnu_cxx::new_allocator<Track>::construct(Track*, Track const&) [101] std::_Vector_base<Track, std::allocator<Track> >::~_Vector_base() [32] std::sqrt(float)
+  [86] __gnu_cxx::new_allocator<Track>::new_allocator() [102] std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_allocate(unsigned long) [57] void std::_Destroy<Track*>(Track*, Track*)
+  [87] __gnu_cxx::new_allocator<Track>::~new_allocator() [103] std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_impl::_Vector_impl() [58] void std::_Destroy<Track*, Track>(Track*, Track*, std::allocator<Track>&)
+  [88] __gnu_cxx::new_allocator<SimpleBox>::deallocate(SimpleBox*, unsigned long) [104] std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_impl::~_Vector_impl() [80] void std::_Destroy<SimpleBox*>(SimpleBox*, SimpleBox*)
+  [89] __gnu_cxx::new_allocator<SimpleBox>::allocate(unsigned long, void const*) [75] std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_deallocate(SimpleBox*, unsigned long) [81] void std::_Destroy<SimpleBox*, SimpleBox>(SimpleBox*, SimpleBox*, std::allocator<SimpleBox>&)
+  [90] __gnu_cxx::new_allocator<SimpleBox>::construct(SimpleBox*, SimpleBox const&) [68] std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_M_get_Tp_allocator() [33] operator new(unsigned long, void*)
+  [91] __gnu_cxx::new_allocator<SimpleBox>::new_allocator() [105] std::_Vector_base<SimpleBox, std::allocator<SimpleBox> >::_Vector_base()

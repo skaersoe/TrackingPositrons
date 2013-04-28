@@ -1,13 +1,26 @@
 #ifndef NA63_GEOMETRY_GEOMETRY_H
 #define NA63_GEOMETRY_GEOMETRY_H
 
+#include <iostream>
 #include <vector>
+#ifdef RUNNING_CPP11
+#include <type_traits>
+#endif /* RUNNING_CPP11 */
 
 #include "Geometry/Material.hh"
-#include "Geometry/Volume.hh"
 #include "Simulation/Particle.hh"
+#include "Geometry/Volume.hh"
+#include "Geometry/Types.hh"
+
+// Allow for easy inclusion
+#include "Geometry/Sphere.hh"
 
 namespace na63 {
+
+  typedef struct {
+    VolumeType type;
+    InsideFunction function;
+  } VolumeTypeFunction;
 
   class Geometry {
 
@@ -17,13 +30,10 @@ namespace na63 {
 
     // For now, assume there's no reason to remove instances
     void AddMaterial(Material m) {
-      materials_.push_back(m);
+      materials.push_back(m);
     }
     void AddParticle(Particle p) {
-      particles_.push_back(p);
-    }
-    void AddVolume(Volume *v) {
-      volumes_.push_back(v);
+      particles.push_back(p);
     }
     /**
      * Should be called explicitly before requesting parameter arrays, but the
@@ -31,26 +41,52 @@ namespace na63 {
      * generated.
      */
     void GenerateParameterArrays();
-    int materials_size() const { return materials_.size(); }
-    int particles_size() const { return particles_.size(); }
-    int volumes_size()   const { return volumes_.size(); }
-    MaterialPars *material_arr();
-    ParticlePars *particle_arr();
-    VolumePars   *volume_arr();
+    int GetParticleIndex(int id);
+    int materials_size() const { return materials.size(); }
+    int particles_size() const { return particles.size(); }
+    int volumes_size()   const { return volumes.size();   }
+    MaterialPars   *material_arr();
+    ParticlePars   *particle_arr();
+    VolumePars     *volume_arr();
+    InsideFunction *volume_type_arr();
+    /**
+     * For debugging purposes.
+     */
+    void PrintContent();
 
   private:
-    std::vector<Material> materials_;
-    std::vector<Particle> particles_;
+    std::vector<Material> materials;
+    std::vector<Particle> particles;
     // Since volume is abstract, only pointers can be maintained here
-    std::vector<Volume*>  volumes_;
-    MaterialPars *material_arr_;
-    ParticlePars *particle_arr_;
-    VolumePars   *volume_arr_;
+    std::vector<Volume*>  volumes;
+    std::vector<VolumeTypeFunction> volume_types;
+    MaterialPars   *material_arr_;
+    ParticlePars   *particle_arr_;
+    VolumePars     *volume_arr_;
+    InsideFunction *volume_type_arr_;
 
     void GenerateMaterialArray();
     void GenerateParticleArray();
     void GenerateVolumeArray();
+    void GenerateVolumeTypeArray();
     void DeleteParameterArrays();
+    int GetVolumeIndex(VolumeType type);
+    int GetMaterialIndex(std::string material);
+    int AddVolumeType(VolumeType type, InsideFunction function);
+    int AddVolumeGeneric(Volume *volume);
+
+  public:
+    template <class VolumeType>
+    void AddVolume(VolumeType volume) {
+      #ifdef RUNNING_CPP11
+      if (!std::is_base_of<Volume,VolumeType>::value) {
+        std::cerr << "Volume type must derive from Volume." << std::endl;
+        return;
+      }
+      #endif
+      if (AddVolumeGeneric((Volume*)&volume) != 0) return;
+      volumes.push_back(new VolumeType(volume));
+    }
 
   };
 

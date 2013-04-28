@@ -8,8 +8,8 @@ INCLUDE=-I../Geometry -I../Simulation -I$(SRC) $(INCLUDE_CUDA)
 
 all: geometry
 
-test: geometry Main.cc
-	$(CC) $(CCFLAGS) $(INCLUDE) *.o Main.cc -o bin/Geometry
+test: geometry simulation Main.cc
+	$(CC) $(CCFLAGS) $(INCLUDE) *.o ../Simulation/*.o Main.cc -o bin/Geometry
 
 geometry: ccobjects nvccobjects
 
@@ -18,6 +18,9 @@ ccobjects:
 
 nvccobjects:
 	$(NVCC) $(NVCCFLAGS) $(INCLUDE) -c $(SRC)/*.cu
+
+simulation:
+	make -C ../Simulation
 
 clean:
 	rm ./*.o

@@ -1,6 +1,5 @@
 #include "Geometry/Box.hh"
 #include <cmath>
-#include <Eigen/Core>
 
 namespace na63 {
 
