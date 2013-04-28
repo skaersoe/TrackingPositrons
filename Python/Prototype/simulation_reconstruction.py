@@ -10,7 +10,7 @@ from pprint import pprint
 import copy
 
 # Check out git clone https://github.com/mdj/NexDet.git and point sys.path to that place
-sys.path.append("/Users/mdj/Dropbox/Research/NexDet")
+sys.path.append("/home/philip/Documents/bachelor/kode/")
 from NexDet.KalmanFilters import UncentedKalmanFilter,UKF
 from NexDet.PhysicsObjects import TruthParticle, TruthTrack, Detector, Measurement, Event, RecoTrack
 
@@ -761,7 +761,7 @@ def main():
 
         detector_hits = TGraph2D()
 
-        print "Particle %d (q/p = %d/%2.2f GeV) running..." % (ipart, q, np.linalg.norm(p))
+        print("Particle %d (q/p = %d/%2.2f GeV) running" % (ipart, q, np.linalg.norm(p)))
 
         # Initial track parameters
         e = p / np.linalg.norm(p)
@@ -772,8 +772,8 @@ def main():
         ty = dy/dz
         r = np.array([x[0],x[1],tx,ty,(q/np.linalg.norm(p))])
         z = x[2]
-        print "Initial r\n", r
-        print "Initial z", z
+        print("Initial r\n", r)
+        print("Initial z", z)
         tru_part = TruthParticle(pdgId, x, p, q, spin )
         tru_track = TruthTrack()
         tru_track.r = r
@@ -782,7 +782,7 @@ def main():
         evt.true_particles.append(tru_part)
         
         
-        print x_diamond
+        print(x_diamond)
         hit_xz_hough_in.Fill(x_diamond[2],x_diamond[0])
 
         
@@ -873,7 +873,7 @@ def main():
                 tru_track.measurements.append(m) # link back to measurement from truth track
                 evt.detectors[hit[3]].hits.append(m)
                 evt.hits.append(pixelized_hit)
-                print pixelized_hit
+                print(pixelized_hit)
                 hit_xz_hough_in.Fill(pixelized_hit[2],pixelized_hit[0])
 
             for hitf in detector_plane_hits_exit:
@@ -897,7 +897,7 @@ def main():
             if iflag == 0:  # if we are told to break by the above stuff, do so..
                 break
         
-        print "Integrated field: %f kG*cm ~   (nominal: %f kG*cm) (l=%f cm)" % (magnet_integrated, FIELD_MAGNET_INTEGRATED, magfield_length)
+        print("Integrated field: %f kG*cm ~   (nominal: %f kG*cm) (l=%f cm)" % (magnet_integrated, FIELD_MAGNET_INTEGRATED, magfield_length))
         # Draw Event
         gEve.AddElement(xes);
         for intersecter in intersects_entry:
@@ -913,16 +913,16 @@ def main():
     if doHough:
         
         xz = np.zeros([hit_xz_hough_in.GetNbinsX(), hit_xz_hough_in.GetNbinsY()])
-        print xz.shape
+        print(xz.shape)
         # z_bounds = 
 
         for x in xrange(1,hit_xz_hough_in.GetNbinsX()):
             for y in xrange(1,hit_xz_hough_in.GetNbinsY()):
                 xz[x,y] = hit_xz_hough_in.GetBinContent(x,y)
         rho, theta, H = hough_transform(xz)
-        print rho
-        print theta
-        print H
+        print(rho)
+        print(theta)
+        print(H)
 
         hit_xz_hough_out = TH2D("meg","meg", len(theta), theta[0], theta[-1], len(rho), rho[0], rho[-1])
         for x in xrange(1,hit_xz_hough_out.GetNbinsX()):
@@ -1153,10 +1153,10 @@ def main():
                             tmp.SetPoint(tmp.GetN(), evt.ip0[2], evt.ip0[0])
                             tmp.Fit(f,"Q")
                             hl0chi = f.GetChisquare()
-                            print "prob, ",f.GetProb(), "chi2", f.GetChisquare()
+                            print("prob, ",f.GetProb(), "chi2", f.GetChisquare())
                             
                             if f.GetProb() > 0.999 and f.GetChisquare() < 0.0004:
-                                print "selecteded"
+                                print("selecteded")
                                 trk_seed_l0 = TrackSeedHit(hl0)
                                 trk_seed_l0.parent = trk_seed_l1 # current hit
                                 trk_seed_l0.fit_with_parent_prob = f.GetProb()
@@ -1234,12 +1234,12 @@ def main():
         
     for iii,track in enumerate(track_seeds_inside_out):
         proto_tracks =  track.self_parent()
-        print proto_tracks
+        print(proto_tracks)
         gtx = TGraph()
         gty = TGraph()
 
         if len(proto_tracks) == 4:
-            print 20*"+"
+            print(20*"+")
 
             # Before magnet
             p0 = np.array(proto_tracks[0].hit.position[0:3])
@@ -1268,10 +1268,10 @@ def main():
             # . nikhef.nl at <http://www.nikhef.nl/pub/services/biblio/theses_pdf/thesis_E_Bos.pdf>
             # page 70.
             
-            print "pg: %10.10f" % poverq
+            print("pg: %10.10f" % poverq)
             ptrue = np.linalg.norm(proto_tracks[0].hit.true_particle.p)
             qtrue = proto_tracks[0].hit.true_particle.charge
-            print "tru p %10.10f, q = %d" % (ptrue, qtrue) 
+            print("tru p %10.10f, q = %d" % (ptrue, qtrue)) 
             dRdp.Fill(ptrue, abs(poverq)/ptrue)
             pBias.Fill(ptrue - abs(poverq))
 
@@ -1310,7 +1310,7 @@ def main():
             ukf = UKF() # Unscented Kalamn filter instance
             for det_idx in xrange(n_det_hits):
                     ## Kalman stuff below
-                    print "Propagating from %f to %f" %(track.z, proto_tracks[det_idx].hit.position[2])
+                    print("Propagating from %f to %f" %(track.z, proto_tracks[det_idx].hit.position[2]))
                     
                     # Prediction
                     f_param = {"z" : track.z, "zf" : proto_tracks[det_idx].hit.position[2]}
@@ -1318,10 +1318,10 @@ def main():
                     
                     # Convert to measurement frame
                     m,P,K0,MU0,S0,LH0 = ukf.update1(copy.deepcopy(m),copy.deepcopy(P),np.array([[proto_tracks[det_idx].hit.position[0], proto_tracks[det_idx].hit.position[1]]]).T, measurement_func,track.R)
-                    print "True r", proto_tracks[det_idx].hit.true_parameters_at_surface
-                    print "Estimated", m.T
+                    print("True r", proto_tracks[det_idx].hit.true_parameters_at_surface)
+                    print("Estimated", m.T)
                     # Use this for track rejection at some point
-                    print "\nLH0 %f %f\n" % (LH0[0], LH0[1]), "match", track.match
+                    print("\nLH0 %f %f\n" % (LH0[0], LH0[1]), "match", track.match)
                     
                     # Save for smoothing
                     MM[:,det_idx+1] = m.T
@@ -1338,22 +1338,22 @@ def main():
             f_param_smo.reverse()
             # track.Q = np.diag([0,0,0,0,0])
             for par in f_param_smo:
-                print par
+                print(par)
             SM,SP,D = ukf.smooth1(copy.deepcopy(MM),copy.deepcopy(PP),predictor_func,track.Q, f_param_smo,same_p=False)
 
             # Smoothed vs fitted but unsmoothed
-            print "MM\n",MM
-            print "SM\n",SM
-            print "ZZ\n", ZZ
+            print("MM\n",MM)
+            print("SM\n",SM)
+            print("ZZ\n", ZZ)
             track.r = np.array([SM[:,0]]).T
                         
-            print "Initial track guess"
-            print track.r0
-            print "Final track fit"
-            print track.r[:,0]
+            print("Initial track guess")
+            print(track.r0)
+            print("Final track fit")
+            print(track.r[:,0])
             
             for ii in SP:
-                print ii
+                print(ii)
             
             color_charge = [kRed, kGreen]
                         
@@ -1366,7 +1366,7 @@ def main():
 
             
             gEve.Redraw3D()
-            print "final momentum estimate after smoothing %f GeV" % (abs(1.0/track.r[4,0]))
+            print("final momentum estimate after smoothing %f GeV" % (abs(1.0/track.r[4,0])))
         for seedhit in proto_tracks:
             gty.SetPoint(gty.GetN(), seedhit.hit.position[2], seedhit.hit.position[1])            
             gtx.SetPoint(gtx.GetN(), seedhit.hit.position[2], seedhit.hit.position[0])            

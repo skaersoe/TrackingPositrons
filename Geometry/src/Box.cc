@@ -4,8 +4,14 @@
 
 namespace na63 {
 
-Box::Box(float x_dim, float y_dim, float z_dim,
-    float x_pos, float y_pos, float z_pos) {
+// Some extra safety to shield against human errors
+// Put here and not in header to allow header inclusion in CUDA files.
+static_assert(sizeof(BoxPars) == VOLUME_PARAMETER_SIZE,
+    "Incorrect parameter size of class derived from Volume");
+
+Box::Box(Material *material, float x_dim, float y_dim, float z_dim,
+    float x_pos, float y_pos, float z_pos)
+    : Volume(material, BOX) {
 
   // Initialize position and dimensions as well as the vectors describing the box.
 
@@ -16,6 +22,22 @@ Box::Box(float x_dim, float y_dim, float z_dim,
   dim.x = x_dim;
   dim.y = y_dim;
   dim.z = z_dim;
+
+  pars = (BoxPars*)SpecificParameters();
+
+  pars -> center = pos;
+
+  pars -> x_vector.x = 0.5*dim.x;
+  pars -> x_vector.y = 0;
+  pars -> x_vector.z = 0;
+
+  pars -> x_vector.x = 0;
+  pars -> x_vector.y = 0.5*dim.y;
+  pars -> x_vector.z = 0;
+
+  pars -> x_vector.x = 0;
+  pars -> x_vector.y = 0;
+  pars -> x_vector.z = 0.5*dim.z;
 
   pos_vector[0] = pos.x;
   pos_vector[1] = pos.y;
@@ -44,7 +66,7 @@ Box::Box(float x_dim, float y_dim, float z_dim,
   z_rotation(2,2) = 1;
 }
 
-bool Box::inside(point particle_position) {
+bool Box::inside(ThreeVector particle_position) {
 
   Eigen::Vector3f particle_vector;
 
@@ -132,8 +154,6 @@ bool Box::inside(point particle_position) {
   if (y_top_sign == y_bottom_sign)
     return false;
 
-
-
   // Check if the particle is between the two edges normal to the z_vector.
   // if not, return false.
 
@@ -172,6 +192,18 @@ void Box::rotate(float x_deg, float y_deg, float z_deg) {
   x_vector = total_rotation * x_vector;
   y_vector = total_rotation * y_vector;
   z_vector = total_rotation * z_vector;
+
+  pars -> x_vector.x = x_vector[0];
+  pars -> x_vector.y = x_vector[1];
+  pars -> x_vector.z = x_vector[2];
+
+  pars -> y_vector.x = y_vector[0];
+  pars -> y_vector.y = y_vector[1];
+  pars -> y_vector.z = y_vector[2];
+
+  pars -> z_vector.x = z_vector[0];
+  pars -> z_vector.y = z_vector[1];
+  pars -> z_vector.z = z_vector[2];
 
   return;
 

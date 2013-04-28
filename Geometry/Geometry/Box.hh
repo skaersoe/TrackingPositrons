@@ -1,23 +1,29 @@
 #include <Eigen/Core>
+#include "../Geometry/Volume.hh"
 
 #ifndef NA63_BOX_H
 #define NA63_BOX_H
 
 namespace na63 {
 
-// Define a point in 3-dimensions.
-
 typedef struct {
-	float x;
-	float y;
-	float z;
-} point;
+  ThreeVector center;
+  ThreeVector x_vector;
+  ThreeVector y_vector;
+  ThreeVector z_vector;
+  // Pad to volume parameter size
+  char padding[(int)(
+    VOLUME_PARAMETER_SIZE
+    - 4*sizeof(ThreeVector)
+  )];
+} BoxPars;
 
 class Box {
 
 private:
-	point pos; // Position and dimension as 3-dimensional points.
-	point dim; //
+	ThreeVector pos; // Position and dimension as 3-dimensional points.
+	ThreeVector dim; //
+	BoxPars *pars;
 
 	float bsphere; // Radius of the bounding sphere.
 
@@ -38,15 +44,15 @@ public:
 
 	~Box(); // Destructor.
 
-	point getDimension() { return dim ;} // Return the size of the box, independent of coordinates (length, width, height).
+	ThreeVector getDimension() { return dim ;} // Return the size of the box, independent of coordinates (length, width, height).
 
-	point getPosition() {return pos ;} // Return the position of the box center point.
+	ThreeVector getPosition() {return pos ;} // Return the position of the box center point.
 
 	Eigen::Vector3f getx() {return x_vector ;} //
 	Eigen::Vector3f gety() {return y_vector ;} // Returns the box vectors.
 	Eigen::Vector3f getz() {return z_vector ;} //
 
-	bool inside(point particle_position); // Returns 1 if the given point is inside the box, 0 otherwise.
+	bool inside(ThreeVector particle_position); // Returns 1 if the given point is inside the box, 0 otherwise.
 
 	void rotate(float x_deg, float y_deg, float z_deg); // Rotates the box around each axis with the given degrees for each axis.
 
