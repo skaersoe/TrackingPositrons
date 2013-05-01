@@ -3,7 +3,7 @@
 
 #include <cstring>
 #include <vector>
-#include "Geometry/Types.hh"
+#include "Geometry/Library.hh"
 #include "Geometry/Material.hh"
 #include "Geometry/Geometry.hh"
 
@@ -26,14 +26,15 @@ namespace na63 {
     }
     ~Volume() {}
 
-    VolumePars pars() { return pars_; }
+    VolumePars GPU() {
+      SetSpecificParameters((void*)pars_.specific);
+      return pars_;
+    }
 
     virtual bool Inside(ThreeVector point) const =0;
 
   protected:
-    void* SpecificParameters() {
-      return (void*)&pars_.specific;
-    }
+    virtual void SetSpecificParameters(void* parameters) =0;
     friend class Geometry;
     std::string material_name() { return material_name_; }
     VolumeType volume_type() { return volume_type_; }

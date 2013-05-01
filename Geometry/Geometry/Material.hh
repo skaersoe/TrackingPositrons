@@ -2,28 +2,43 @@
 #define NA63_GEOMETRY_MATERIAL_H
 
 #include <string>
+#include "Geometry/Library.hh"
 
 namespace na63 {
 
+// Z_FE = 26
+// m_e = 0.51098892 MeV
+// I_FE = 286
   typedef struct {
-    float density;
+    Float atomic_number;
+    Float mean_excitation_potential;
+    // char padding[0 - 2*sizeof(Float)];
   } MaterialPars;
 
   class Material {
 
   public:
-    Material(const char* n, float density) : name_(n) {
-      pars_.density = density;
+    Material(const char* n, Float atomic_number,
+        Float mean_excitation_potential) : name_(n) {
+      atomic_number_ = atomic_number;
+      mean_excitation_potential_ = mean_excitation_potential;
     }
     ~Material() {}
 
-    float density() const { return pars_.density; }
     std::string name() { return name_; }
-    MaterialPars pars() const { return pars_; }
+    Float atomic_number() { return atomic_number_; }
+    Float mean_excitation_potential() { return mean_excitation_potential_; }
+    MaterialPars GPU() const {
+      MaterialPars retval;
+      retval.atomic_number = atomic_number_;
+      retval.mean_excitation_potential = mean_excitation_potential_;
+      return retval;
+    }
 
   private:
-    MaterialPars pars_;
     std::string name_;
+    Float atomic_number_;
+    Float mean_excitation_potential_;
 
   };
 

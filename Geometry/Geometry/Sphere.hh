@@ -5,40 +5,47 @@
 
 namespace na63 {
 
-  typedef struct {
-    ThreeVector center;
-    float radius_squared;
-    // Pad to volume parameter size
-    char padding[(int)(
-      VOLUME_PARAMETER_SIZE
-      - sizeof(ThreeVector)
-      - sizeof(float)
-    )];
-  } SpherePars;
+typedef struct {
+  GPUThreeVector center;
+  Float radius_squared;
+  // Pad to volume parameter size
+  char padding[(int)(
+    VOLUME_PARAMETER_SIZE
+    - sizeof(GPUThreeVector)
+    - sizeof(Float)
+  )];
+} SpherePars;
 
-  /**
-   * Very simple geometric object to test inheritance and parameter
-   * functionality. Might be nice to keep.
-   */
-  class Sphere : public Volume {
+#ifdef RUNNING_CPP11
+// Some extra safety to shield against human errors
+static_assert(sizeof(SpherePars) == VOLUME_PARAMETER_SIZE,
+    "Incorrect parameter size of class derived from Volume");
+#endif
 
-  public:
-    Sphere(const char* n, ThreeVector center, float radius);
-    Sphere(const Sphere& other);
-    ~Sphere() {}
+/**
+ * Very simple geometric object to test inheritance and parameter
+ * functionality. Might be nice to keep.
+ */
+class Sphere : public Volume {
 
-    virtual bool Inside(ThreeVector point) const;
+public:
+  Sphere(const char* n, ThreeVector center, Float radius);
+  Sphere(const Sphere& other);
+  ~Sphere() {}
 
-  protected:
-    virtual InsideFunction inside_function() const { return inside_function_; }
+  virtual bool Inside(ThreeVector point) const;
 
-  private:
-    static InsideFunction inside_function_;
+protected:
+  virtual void SetSpecificParameters(void *parameters);
+  virtual InsideFunction inside_function() const { return inside_function_; }
 
-    SpherePars *sphere_pars;
+private:
+  ThreeVector center;
+  Float radius;
+  static InsideFunction inside_function_;
 
-  };
+};
 
-}
+} // End namespace na63
 
 #endif /* NA63_GEOMETRY_SPHERE_H */

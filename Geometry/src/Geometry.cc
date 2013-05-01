@@ -68,6 +68,12 @@ namespace na63 {
     return -1;
   }
 
+  Particle* Geometry::GetParticle(int id) {
+    int index = GetParticleIndex(id);
+    if (index == -1) return nullptr;
+    return &particles[GetParticleIndex(id)];
+  }
+
   MaterialPars* Geometry::material_arr() {
     if (material_arr_ == nullptr) {
       GenerateMaterialArray();
@@ -109,8 +115,16 @@ namespace na63 {
     int size = vec->size();
     *arr = new ArrayType[size];
     for (int i=0;i<size;i++) {
-      (*arr)[i] = (*vec)[i].pars();
+      (*arr)[i] = (*vec)[i].GPU();
     }
+  }
+
+  bool Geometry::InBounds(Track *t) {
+    return false;
+  }
+
+  void Geometry::Query(Track *t) {
+    return;
   }
 
   void Geometry::GenerateMaterialArray() {
@@ -133,7 +147,7 @@ namespace na63 {
     int size = volumes.size();
     volume_arr_ = new VolumePars[size];
     for (int i=0;i<size;i++) {
-      volume_arr_[i] = volumes[i]->pars();
+      volume_arr_[i] = volumes[i]->GPU();
     }
   }
 

@@ -9,48 +9,43 @@
 
 namespace na63 {
 
-  typedef enum {
-    CPU,
-    GPU
-  } SimulatorDevice;
-
-  typedef struct {
-    SimulatorDevice device; // Run on CPU or GPU
-    bool debug;             // Display debugging messages
-    bool render;            // Render visually (NYI)
-    unsigned N;             // Number of tracks
-    Geometry *geometry;     // Pointer to associated geometry
-  } SimulatorPars;
+  enum Device {CPU,GPU};
 
   class Simulator {
 
     public:
-      // Allow parameters to be altered freely
-      SimulatorPars pars;
+      // Allow these parameters to be altered freely
+      Device device;
+      bool debug;
       Geometry *geometry;
 
       Simulator(void);
       Simulator(Geometry *geometry);
       ~Simulator();
 
-      void set_pars(SimulatorPars p) {
-        pars = p;
-      }
-      void SetTracks(Track *t, const unsigned N);
+      Track GetTrack(unsigned index);
+      int SetTracks(Track *t, const unsigned N);
+      unsigned n_tracks() { return n_tracks_; }
+      Float step_size() { return step_size_; }
+      GPUTrack* GPUTracks();
+      void CopyBackTracks();
 
       /**
        * Generates some hardcoded electrons.
        */
-      void GenerateTracks();
+      // void GenerateTracks();
       /**
        * Runs the propagation.
        */
       void Propagate();
 
     private:
-      Track *tracks_;
+      Track *tracks;
+      GPUTrack *gpu_tracks;
       bool external_tracks;
       bool external_geometry;
+      unsigned n_tracks_;
+      Float step_size_;
 
       int GenerateParticleIndices(int start, int end);
       void DeleteTracks();

@@ -1,26 +1,17 @@
-#include "Geometry/Sphere.cuh"
+#include "Geometry/Sphere.hh"
 
 namespace na63 {
 
-  __host__ __device__ inline
-  bool Sphere_Inside(ThreeVector point, const SpherePars sphere) {
-    point.x -= sphere.center.x;
-    point.y -= sphere.center.y;
-    point.z -= sphere.center.z;
-    return point.x*point.x + point.y*point.y + point.z*point.z
-           < sphere.radius_squared;
-  }
-
-  __device__
-  bool Sphere_InsideKernel(ThreeVector point, void* pars) {
-    return Sphere_Inside(point,*(SpherePars*)pars);
-  }
-
-  __host__
-  bool Sphere_InsideWrapper(ThreeVector point, const SpherePars sphere) {
-    return Sphere_Inside(point,sphere);
-  }
-
-  InsideFunction Sphere::inside_function_ = Sphere_InsideKernel;
-
+__device__
+bool Sphere_Inside(GPUThreeVector point, void* parameters) {
+  SpherePars *sphere = (SpherePars*)parameters;
+  point[0] -= sphere->center[0];
+  point[1] -= sphere->center[1];
+  point[2] -= sphere->center[2];
+  return point[0]*point[0] + point[1]*point[1] + point[2]*point[2]
+         < sphere->radius_squared;
 }
+
+InsideFunction Sphere::inside_function_ = Sphere_Inside;
+
+} // End namespace na63

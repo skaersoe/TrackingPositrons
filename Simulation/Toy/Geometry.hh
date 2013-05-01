@@ -1,7 +1,7 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include "Types.hh"
+#include "Library.hh"
 #include "SimpleBox.hh"
 #include <vector>
 

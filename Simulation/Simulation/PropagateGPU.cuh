@@ -11,13 +11,15 @@ namespace na63 {
   typedef struct {
     unsigned N;
     unsigned steps;
-    float dt;
-    MaterialPars *material_arr;
-    ParticlePars *particle_arr;
-    VolumePars   *volume_arr;
+    Float dl;
+    GPUTrack *tracks;
+    int *keys;
+    MaterialPars *materials;
+    ParticlePars *particles;
+    VolumePars   *volumes;
   } KernelPars;
 
-  void Propagate(Track *t, SimulatorPars args);
+  void PropagateGPU(Simulator *simulator);
 
 }
 

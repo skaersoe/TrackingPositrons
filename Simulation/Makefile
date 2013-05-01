@@ -8,7 +8,7 @@ INCLUDE=-I../Geometry -I../Simulation -I$(SRC) $(INCLUDE_CUDA)
 
 all: simulator
 
-standalone: simulator
+test: simulator
 	$(CC) $(CCFLAGS) $(INCLUDE) ./*.o ../Geometry/*.o ./Main.cc -o bin/simulator
 
 simulator: ccobjects nvccobjects geometry
