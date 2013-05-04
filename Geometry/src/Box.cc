@@ -3,56 +3,26 @@
 
 namespace na63 {
 
-// Some extra safety to shield against human errors
-// Put here and not in header to allow header inclusion in CUDA files.
-static_assert(sizeof(BoxPars) == VOLUME_PARAMETER_SIZE,
-    "Incorrect parameter size of class derived from Volume");
-
-Box::Box(Material *material, float x_dim, float y_dim, float z_dim,
-    float x_pos, float y_pos, float z_pos)
-    : Volume(material, BOX) {
+Box::Box(const char* n, const ThreeVector pos,
+    const ThreeVector dim) : Volume(n, BOX) {
 
   // Initialize position and dimensions as well as the vectors describing the box.
 
-  pos.x = x_pos;
-  pos.y = y_pos;
-  pos.z = z_pos;
+  pos_vector[0] = pos[0];
+  pos_vector[1] = pos[1];
+  pos_vector[2] = pos[2];
 
-  dim.x = x_dim;
-  dim.y = y_dim;
-  dim.z = z_dim;
-
-  pars = (BoxPars*)SpecificParameters();
-
-  pars -> center = pos;
-
-  pars -> x_vector.x = 0.5*dim.x;
-  pars -> x_vector.y = 0;
-  pars -> x_vector.z = 0;
-
-  pars -> x_vector.x = 0;
-  pars -> x_vector.y = 0.5*dim.y;
-  pars -> x_vector.z = 0;
-
-  pars -> x_vector.x = 0;
-  pars -> x_vector.y = 0;
-  pars -> x_vector.z = 0.5*dim.z;
-
-  pos_vector[0] = pos.x;
-  pos_vector[1] = pos.y;
-  pos_vector[2] = pos.z;
-
-  x_vector[0] = 0.5*x_dim;
+  x_vector[0] = 0.5*dim[0];
   x_vector[1] = 0.0;
   x_vector[2] = 0.0;
 
   y_vector[0] = 0.0;
-  y_vector[1] = 0.5*y_dim;
+  y_vector[1] = 0.5*dim[1];
   y_vector[2] = 0.0;
 
   z_vector[0] = 0.0;
   z_vector[1] = 0.0;
-  z_vector[2] = 0.5*z_dim;
+  z_vector[2] = 0.5*dim[2];
 
   // Initialize constant elements of the rotation matrices.
 
@@ -65,13 +35,13 @@ Box::Box(Material *material, float x_dim, float y_dim, float z_dim,
   z_rotation(2,2) = 1;
 }
 
-bool Box::inside(ThreeVector particle_position) {
+bool Box::Inside(const FourVector& particle_position) const {
 
   Eigen::Vector3f particle_vector;
 
-  particle_vector[0] = particle_position.x;
-  particle_vector[1] = particle_position.y;
-  particle_vector[2] = particle_position.z;
+  particle_vector[0] = particle_position[0];
+  particle_vector[1] = particle_position[0];
+  particle_vector[2] = particle_position[0];
 
   Eigen::Vector3f x_top;
   Eigen::Vector3f x_bottom;
@@ -182,33 +152,19 @@ bool Box::inside(ThreeVector particle_position) {
 
 }
 
-void Box::rotate(float x_deg, float y_deg, float z_deg) {
+void Box::Rotate(Float x_deg, Float y_deg, Float z_deg) {
 
   // Set the rotation matrices and execute the rotation on the box vectors.
 
-  setRotation(x_deg, y_deg, z_deg);
+  SetRotation(x_deg, y_deg, z_deg);
 
   x_vector = total_rotation * x_vector;
   y_vector = total_rotation * y_vector;
   z_vector = total_rotation * z_vector;
 
-  pars -> x_vector.x = x_vector[0];
-  pars -> x_vector.y = x_vector[1];
-  pars -> x_vector.z = x_vector[2];
-
-  pars -> y_vector.x = y_vector[0];
-  pars -> y_vector.y = y_vector[1];
-  pars -> y_vector.z = y_vector[2];
-
-  pars -> z_vector.x = z_vector[0];
-  pars -> z_vector.y = z_vector[1];
-  pars -> z_vector.z = z_vector[2];
-
-  return;
-
 }
 
-void Box::setRotation(float x_deg, float y_deg, float z_deg) {
+void Box::SetRotation(Float x_deg, Float y_deg, Float z_deg) {
 
   // Set the rotation matrices with the given rotations and calculate the total rotation matrix.
 
@@ -232,4 +188,25 @@ void Box::setRotation(float x_deg, float y_deg, float z_deg) {
   return;
 }
 
+void Box::SetSpecificParameters(void *parameters) {
+  BoxPars* box = (BoxPars*)parameters;
+
+  box->center[0] = pos_vector[0];
+  box->center[1] = pos_vector[1];
+  box->center[2] = pos_vector[2];
+
+  box->x_vector[0] = x_vector[0];
+  box->x_vector[1] = x_vector[1];
+  box->x_vector[2] = x_vector[2];
+
+  box->y_vector[0] = y_vector[0];
+  box->y_vector[1] = y_vector[1];
+  box->y_vector[2] = y_vector[2];
+
+  box->z_vector[0] = z_vector[0];
+  box->z_vector[1] = z_vector[1];
+  box->z_vector[2] = z_vector[2];
+
 }
+
+} // End namespace na63

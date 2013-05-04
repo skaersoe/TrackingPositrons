@@ -26,11 +26,12 @@ class Track {
 
 private:
   int particle_id;
-  FourVector position;
   FourVector momentum;
+  FourVector position;
   Particle *particle;
   Volume *volume;
   friend class Simulator;
+  friend class Geometry;
 
 public:
   Track(int particle_id, FourVector pos, FourVector mom) 
@@ -83,8 +84,12 @@ public:
   }
 
   friend std::ostream& operator<<(std::ostream& os, const Track& t) {
-    os << t.particle->name() << ", "
-       << t.position << ", "
+    if (t.particle != NULL) {
+      os << t.particle->name();
+    } else {
+      os << t.particle_id;
+    }
+    os << ", " << t.position << ", "
        << t.momentum;
     return os;
   }

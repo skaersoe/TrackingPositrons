@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Geometry/Library.hh"
 #include "Geometry/Geometry.hh"
+#include "Geometry/Box.hh"
 #include "Geometry/Sphere.hh"
 #include "Simulation/Simulator.hh"
 
@@ -10,13 +11,16 @@ int main(void) {
 
   // Create some geometry
   Geometry geometry;
-  geometry.AddMaterial(Material("iron",0,0));
-  geometry.AddVolume(Sphere("solid",{0,0,0},5));
-  geometry.AddVolume(Sphere("vacuum",{0,0,0},100));
-  geometry.AddParticle(Particle("electron",11,-1,0.510998910));
-  geometry.PrintContent();
+  geometry.AddMaterial(Material("iron",1,1));
+  Box box = Box("iron",ThreeVector(0,0,0),ThreeVector(2e2,2e2,2e2));
+  Sphere sphere = Sphere("iron",ThreeVector(0,0,0),2e2);
+  geometry.AddVolume(box);
+  geometry.AddVolume(sphere);
 
+  Track t = Track(11,FourVector(1,1,1,1),FourVector(0,0,0,0));
 
+  std::cout << "Track inside: " << box.Inside(t.position) << std::endl;
+  std::cout << "Track inside: " << sphere.Inside(t.position) << std::endl;
 
   return 0;
 }

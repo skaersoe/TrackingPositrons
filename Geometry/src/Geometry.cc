@@ -3,6 +3,8 @@
 namespace na63 {
 
   Geometry::Geometry(void) {
+    volumes.push_back(nullptr);
+    bounds = volumes[0];
     material_arr_    = nullptr;
     particle_arr_    = nullptr;
     volume_arr_      = nullptr;
@@ -119,12 +121,21 @@ namespace na63 {
     }
   }
 
-  bool Geometry::InBounds(Track *t) {
-    return false;
+  bool Geometry::InBounds(const Track& track) {
+    return bounds->Inside(track.position);
   }
 
-  void Geometry::Query(Track *t) {
-    return;
+  void Geometry::Query(Track& track) {
+    if (track.volume != nullptr) {
+      if (track.volume->Inside(track.position)) return;
+    }
+    // Index 0 is bounds, so start from 1
+    for (int i=1;i<volumes.size();i++) {
+      if (volumes[i]->Inside(track.position)) {
+        track.volume = volumes[i];
+        return;
+      }
+    }
   }
 
   void Geometry::GenerateMaterialArray() {
@@ -146,7 +157,7 @@ namespace na63 {
   void Geometry::GenerateVolumeArray() {
     int size = volumes.size();
     volume_arr_ = new VolumePars[size];
-    for (int i=0;i<size;i++) {
+    for (int i=1;i<size;i++) {
       volume_arr_[i] = volumes[i]->GPU();
     }
   }

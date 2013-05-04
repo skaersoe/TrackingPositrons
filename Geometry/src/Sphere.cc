@@ -15,11 +15,10 @@ Sphere::Sphere(const Sphere& other) : Volume(other) {
   this->radius = other.radius;
 }
 
-bool Sphere::Inside(ThreeVector point) const {
-  point -= center;
-  return pow(point[0],2) +
-         pow(point[1],2) +
-         pow(point[2],2)
+bool Sphere::Inside(const FourVector& position) const {
+  return pow(position[0] - center[0],2) +
+         pow(position[1] - center[1],2) +
+         pow(position[2] - center[2],2)
          < pow(radius,2);
 }
 

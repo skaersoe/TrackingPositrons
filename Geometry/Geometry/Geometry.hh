@@ -13,8 +13,11 @@
 #include "Geometry/Volume.hh"
 #include "Geometry/Library.hh"
 
+/*
 // Allow for easy inclusion
 #include "Geometry/Sphere.hh"
+#include "Geometry/Box.hh"
+*/
 
 namespace na63 {
 
@@ -53,10 +56,11 @@ public:
   InsideFunction *volume_type_arr();
   /** For debugging purposes. */
   void PrintContent();
-  bool InBounds(Track *t);
-  void Query(Track *t);
+  bool InBounds(const Track& t);
+  void Query(Track& t);
 
 private:
+  Volume* bounds;
   std::vector<Material> materials;
   std::vector<Particle> particles;
   // Since volume is abstract, only pointers can be maintained here
@@ -88,6 +92,17 @@ public:
     #endif
     if (AddVolumeGeneric((Volume*)&volume) != 0) return;
     volumes.push_back(new VolumeType(volume));
+  }
+  template <class VolumeType>
+  void SetBounds(VolumeType volume) {
+    #ifdef RUNNING_CPP11
+    if (!std::is_base_of<Volume,VolumeType>::value) {
+      std::cerr << "Volume type must derive from Volume." << std::endl;
+      return;
+    }
+    #endif
+    if (AddVolumeGeneric((Volume*)&volume) != 0) return;
+    bounds = new VolumeType(volume);
   }
 
 };

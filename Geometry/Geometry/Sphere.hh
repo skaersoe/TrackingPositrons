@@ -33,7 +33,7 @@ public:
   Sphere(const Sphere& other);
   ~Sphere() {}
 
-  virtual bool Inside(ThreeVector point) const;
+  virtual bool Inside(const FourVector& position) const;
 
 protected:
   virtual void SetSpecificParameters(void *parameters);

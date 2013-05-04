@@ -16,12 +16,17 @@ __host__ cudaError_t DeviceFree(KernelPars *p);
 __host__
 void PropagateGPU(Simulator* simulator) {
 
-  if (simulator->debug)
-    for (int i=0;i<5;i++)
-      std::cout << simulator->GetTrack(i) << std::endl;
+  if (simulator->debug) {
+    for (int i=0;i<5;i++) {
+      Track t = simulator->GetTrack(i);
+      std::cout << t << std::endl;
+    }
+  }
+
+  if (simulator->debug) std::cout << "Propagating on GPU..." << std::endl;
 
   // CUDA Parameters
-  int N = simulator->n_tracks();
+  int N = simulator->TrackSize();
   int threadsPerBlock = 256;
   int blocksPerGrid = (N - 1) / threadsPerBlock + 1;
 
@@ -36,15 +41,18 @@ void PropagateGPU(Simulator* simulator) {
 
   // Allocate memory on device and copy data
   GPUTrack *tracks = simulator->GPUTracks();
+  if (simulator->debug) std::cout << "Generated GPU tracks." << std::endl;
   const unsigned size_tracks = N*sizeof(GPUTrack);
   const unsigned size_keys = N*sizeof(int);
   if (CudaError(cudaMalloc((void**)&kernel_args.tracks,size_tracks))) return;
   if (CudaError(cudaMalloc((void**)&kernel_args.keys,size_keys))) return;
   if (CudaError(cudaMemcpy(kernel_args.tracks,tracks,size_tracks,cudaMemcpyHostToDevice))) return;
+  if (simulator->debug) std::cout << "Copied tracks and keys." << std::endl;
   // Thrust wrappers
   thrust::device_ptr<GPUTrack> devptr_thrust_tracks(kernel_args.tracks);
   thrust::device_ptr<int>      devptr_thrust_keys(kernel_args.keys);
   if (CudaError(DeviceAllocation(simulator, &kernel_args))) return;
+  if (simulator->debug) std::cout << "Copied geometry." << std::endl;
 
 
   if (simulator->debug) {

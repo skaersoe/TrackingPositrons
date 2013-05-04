@@ -21,6 +21,14 @@ typedef enum {
   BOX
 } VolumeType;
 
+template <class A, class B>
+inline
+void Copy3D(A& a, B& b) {
+  b[0] = a[0];
+  b[1] = a[1];
+  b[2] = b[2];
+}
+
 inline Float ElementaryChargeToCoulomb(const Float e) {
   return 1.602176565e-19 * e;
 }
@@ -63,6 +71,10 @@ public:
     return vector[i];
   }
 
+  Float operator[] (const int i) const {
+    return vector[i];
+  }
+
   friend std::ostream& operator<<(std::ostream& os, const ThreeVector& tv) {
     os << "(" << tv.vector[0]
        << "," << tv.vector[1]
@@ -100,12 +112,15 @@ private:
   Float vector[4];
 
 public:
+
   Float& operator[] (const int i) {
     return vector[i];
   }
+
   Float operator[] (const int i) const {
     return vector[i];
   }
+
   FourVector(const Float a, const Float b, const Float c, const Float d) {
     vector[0] = a;
     vector[1] = b;
@@ -179,7 +194,7 @@ typedef struct {
   char specific[VOLUME_PARAMETER_SIZE];
 } VolumePars;
 
-typedef bool (*InsideFunction)(GPUThreeVector,void*);
+typedef bool (*InsideFunction)(const GPUFourVector&,const void*);
 
 class Geometry;
 class Volume;

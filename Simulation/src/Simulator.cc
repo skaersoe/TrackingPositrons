@@ -15,54 +15,46 @@ namespace na63 {
     geometry = g;
     device = GPU;
     debug = false;
-    n_tracks_ = 0;
     external_tracks = true;
     external_geometry = true;
     step_size_ = 0.1;
   }
   Simulator::~Simulator() {
     if (!external_geometry) delete geometry;
-    DeleteTracks();
-  }
-  
-  void Simulator::DeleteTracks() {
-    if (!external_tracks) {
-      delete tracks;
-      n_tracks_ = 0;
-    }
   }
 
-  int Simulator::SetTracks(Track *t, const unsigned N) {
-    DeleteTracks();
-    n_tracks_ = N;
+  /*void Simulator::SetTracks(std::vector<Track> t) {
     tracks = t;
-    for (int i=0;i<N;i++) {
-      tracks[i].particle = geometry->GetParticle(tracks[i].particle_id);
-      if (tracks[i].particle == nullptr) {
-        std::cerr << "Particle with id " << tracks[i].particle_id
-                  << " not found." << std::endl;
-        return -1;
-      }
+  }*/
+
+  void Simulator::AddTracks(Track t, const int N) {
+    if ((t.particle = geometry->GetParticle(t.particle_id)) == nullptr) {
+      std::cerr << "Particle with id " << t.particle_id
+                << " not found. Tracks were not added." << std::endl;
     }
-    return 0;
+    for (int i=0;i<N;i++) {
+      tracks.push_back(t);
+    }
+    std::cout << "Tracks added. New size is " << tracks.size() 
+              << "." << std::endl;
   }
 
-  Track Simulator::GetTrack(unsigned index) {
+  Track Simulator::GetTrack(int index) const {
     return tracks[index];
   }
 
   GPUTrack* Simulator::GPUTracks() {
     if (gpu_tracks != nullptr) delete gpu_tracks;
-    gpu_tracks = new GPUTrack[n_tracks_];
-    for (int i=0;i<n_tracks_;i++) {
+    gpu_tracks = new GPUTrack[tracks.size()];
+    for (int i=0;i<tracks.size();i++) {
       gpu_tracks[i] = tracks[i].GPU();
     }
-    GenerateParticleIndices(0,n_tracks_);
+    GenerateParticleIndices(0,tracks.size());
     return gpu_tracks;
   }
 
   void Simulator::CopyBackTracks() {
-    for (int i=0;i<n_tracks_;i++) {
+    for (int i=0;i<tracks.size();i++) {
       tracks[i] = gpu_tracks[i];
     }
     delete gpu_tracks;
@@ -93,17 +85,23 @@ namespace na63 {
 
     // Propagate on GPU
     if (device == GPU) {
+      if (debug) std::cout << "Generating parameter arrays...";
       geometry->GenerateParameterArrays();
+      if (debug) std::cout << " OK" << std::endl;
       na63::PropagateGPU(this);
       return;
     }
 
     // Propagate on CPU
-    for (int i=0;i<n_tracks_;i++) {
-      Track *t = &tracks[i];
-      while (geometry->InBounds(t)) {
-        t->Step(step_size_);
-        geometry->Query(t);
+    for (int i=0;i<tracks.size();i++) {
+      std::cout << tracks[i] << std::endl;
+      while (geometry->InBounds(tracks[i])) {
+        tracks[i].Step(step_size_);
+        geometry->Query(tracks[i]);
+        if (tracks[i].volume != nullptr) {
+          std::cout << "Particle " << i << " hit something." << std::endl;
+          continue;
+        }
       }
     }
 

@@ -4,6 +4,7 @@
 
 #include "Simulation/Simulator.hh"
 #include "Geometry/Geometry.hh"
+#include "Geometry/Box.hh"
 
 using namespace na63;
 
@@ -11,8 +12,11 @@ int main(int argc,char *argv[]) {
 
   // Create geometry
   Geometry geometry;
+  geometry.AddMaterial(Material("vacuum",0,0));
   geometry.AddMaterial(Material("iron",26,286));
   geometry.AddParticle(Particle("electron",11,-1,0.510998910));
+  geometry.SetBounds(Box("vacuum",ThreeVector(2e2,0,0),ThreeVector(4e2,4e2,4e2)));
+  geometry.AddVolume(Box("iron",ThreeVector(2e2,0,0),ThreeVector(1e2,1e2,1e2)));
 
   // Create Simulator object
   Simulator sim = Simulator(&geometry);
@@ -43,8 +47,8 @@ int main(int argc,char *argv[]) {
   std::cout << "Simulator starting." << std::endl;
 
   // Populate
-  Track t[5] = Track(11,FourVector(1,2,3,4),FourVector(5,6,7,8));
-  sim.SetTracks(&t[0],5);
+  Track t = Track(11,FourVector(),FourVector(1,0,0,0));
+  sim.AddTracks(t,N);
 
   // Propagate
   clock_t timer = clock();

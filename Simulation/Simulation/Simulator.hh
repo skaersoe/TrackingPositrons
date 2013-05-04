@@ -1,7 +1,7 @@
 #ifndef NA63_SIMULATION_SIMULATOR_H
 #define NA63_SIMULATION_SIMULATOR_H
 
-#include <thrust/host_vector.h>
+#include <vector>
 
 #include "Simulation/Track.hh"
 #include "Simulation/Particle.hh"
@@ -23,9 +23,10 @@ namespace na63 {
       Simulator(Geometry *geometry);
       ~Simulator();
 
-      Track GetTrack(unsigned index);
-      int SetTracks(Track *t, const unsigned N);
-      unsigned n_tracks() { return n_tracks_; }
+      Track GetTrack(int index) const;
+      void AddTracks(Track t, const int N);
+      //void SetTracks(std::vector<Track> t);
+      unsigned TrackSize() { return tracks.size(); }
       Float step_size() { return step_size_; }
       GPUTrack* GPUTracks();
       void CopyBackTracks();
@@ -40,11 +41,10 @@ namespace na63 {
       void Propagate();
 
     private:
-      Track *tracks;
+      std::vector<Track> tracks;
       GPUTrack *gpu_tracks;
       bool external_tracks;
       bool external_geometry;
-      unsigned n_tracks_;
       Float step_size_;
 
       int GenerateParticleIndices(int start, int end);
