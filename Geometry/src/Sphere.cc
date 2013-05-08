@@ -10,11 +10,6 @@ Sphere::Sphere(const char* n, ThreeVector center, Float radius)
   this->radius = radius;
 }
 
-Sphere::Sphere(const Sphere& other) : Volume(other) {
-  this->center = other.center;
-  this->radius = other.radius;
-}
-
 bool Sphere::Inside(const FourVector& position) const {
   return pow(position[0] - center[0],2) +
          pow(position[1] - center[1],2) +

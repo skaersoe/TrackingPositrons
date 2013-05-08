@@ -40,8 +40,8 @@ bool Box::Inside(const FourVector& particle_position) const {
   Eigen::Vector3f particle_vector;
 
   particle_vector[0] = particle_position[0];
-  particle_vector[1] = particle_position[0];
-  particle_vector[2] = particle_position[0];
+  particle_vector[1] = particle_position[1];
+  particle_vector[2] = particle_position[2];
 
   Eigen::Vector3f x_top;
   Eigen::Vector3f x_bottom;
@@ -95,7 +95,7 @@ bool Box::Inside(const FourVector& particle_position) const {
   else
     x_bottom_sign = -1;
 
-  if (x_top_sign == x_bottom_sign)
+  if (x_top_sign != x_bottom_sign)
     return false;
 
   // Check if the particle is between the two edges normal to the y_vector.
@@ -120,7 +120,7 @@ bool Box::Inside(const FourVector& particle_position) const {
   else
     y_bottom_sign = -1;
 
-  if (y_top_sign == y_bottom_sign)
+  if (y_top_sign != y_bottom_sign)
     return false;
 
   // Check if the particle is between the two edges normal to the z_vector.
@@ -145,7 +145,7 @@ bool Box::Inside(const FourVector& particle_position) const {
   else
     z_bottom_sign = -1;
 
-  if (z_top_sign == z_bottom_sign)
+  if (z_top_sign != z_bottom_sign)
     return false;
 
   return true;

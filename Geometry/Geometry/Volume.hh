@@ -15,16 +15,15 @@ namespace na63 {
 class Volume {
 
 public:
+  Material *material;
+
   Volume(const char* mat_name, VolumeType vol_type)
       : material_name_(mat_name) {
     volume_type_ = vol_type;
   }
-  Volume(const Volume& other) {
-    material_name_ = other.material_name_;
-    volume_type_ = other.volume_type_;
-    pars_ = other.pars_;
-  }
   ~Volume() {}
+
+  std::string material_name() { return material_name_; }
 
   VolumePars GPU() {
     SetSpecificParameters((void*)pars_.specific);
@@ -36,7 +35,6 @@ public:
 protected:
   virtual void SetSpecificParameters(void* parameters) =0;
   friend class Geometry;
-  std::string material_name() { return material_name_; }
   VolumeType volume_type() { return volume_type_; }
   void SetIndices(int mat_idx, int vol_idx) {
     pars_.material_index = mat_idx;

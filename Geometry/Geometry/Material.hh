@@ -25,9 +25,9 @@ namespace na63 {
     }
     ~Material() {}
 
-    std::string name() { return name_; }
-    Float atomic_number() { return atomic_number_; }
-    Float mean_excitation_potential() { return mean_excitation_potential_; }
+    std::string name() const { return name_; }
+    Float atomic_number() const { return atomic_number_; }
+    Float mean_excitation_potential() const { return mean_excitation_potential_; }
     MaterialPars GPU() const {
       MaterialPars retval;
       retval.atomic_number = atomic_number_;

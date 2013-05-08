@@ -33,11 +33,12 @@ void PropagateGPU(Simulator* simulator) {
   // Initialize arguments
   KernelPars kernel_args;
   kernel_args.N = N;
-  kernel_args.tracks = NULL;
-  kernel_args.keys = NULL;
-  kernel_args.materials = NULL;
-  kernel_args.particles = NULL;
-  kernel_args.volumes   = NULL;
+  kernel_args.tracks = nullptr;
+  kernel_args.keys = nullptr;
+  kernel_args.materials = nullptr;
+  kernel_args.particles = nullptr;
+  kernel_args.volume_types = nullptr;
+  kernel_args.volumes   = nullptr;
 
   // Allocate memory on device and copy data
   GPUTrack *tracks = simulator->GPUTracks();
@@ -86,17 +87,18 @@ void PropagateGPU(Simulator* simulator) {
 }
 
 /**
- * Frees memory of all geometry copied to the GPU.
+ * Frees used memory on the GPU.
  * @return CUDA error code for first failed instruction, otherwise cudaSuccess.
  */
 __host__
 cudaError_t DeviceFree(KernelPars *p) {
   cudaError_t err;
-  if ((err = cudaFree(p->tracks))    != cudaSuccess) return err;
-  if ((err = cudaFree(p->keys))      != cudaSuccess) return err;
-  if ((err = cudaFree(p->materials)) != cudaSuccess) return err;
-  if ((err = cudaFree(p->particles)) != cudaSuccess) return err;
-  if ((err = cudaFree(p->volumes))   != cudaSuccess) return err;
+  if ((err = cudaFree(p->tracks))       != cudaSuccess) return err;
+  if ((err = cudaFree(p->keys))         != cudaSuccess) return err;
+  if ((err = cudaFree(p->materials))    != cudaSuccess) return err;
+  if ((err = cudaFree(p->particles))    != cudaSuccess) return err;
+  if ((err = cudaFree(p->volume_types)) != cudaSuccess) return err;
+  if ((err = cudaFree(p->volumes))      != cudaSuccess) return err;
   return cudaSuccess;
 }
 /**
@@ -110,25 +112,32 @@ cudaError_t DeviceAllocation(Simulator *simulator, KernelPars *p) {
   Geometry *geometry = simulator->geometry;
 
   // Free previously allocated memory
-  if (p->materials != NULL) {
+  if (p->materials != nullptr) {
     if ((err = cudaFree(p->materials)) != cudaSuccess) return err;
   }
-  if (p->particles != NULL) {
+  if (p->particles != nullptr) {
     if ((err = cudaFree(p->particles)) != cudaSuccess) return err;
   }
-  if (p->volumes != NULL) {
+  if (p->volume_types != nullptr) {
+    if ((err = cudaFree(p->volume_types)) != cudaSuccess) return err;
+  }
+  if (p->volumes != nullptr) {
     if ((err = cudaFree(p->volumes)) != cudaSuccess) return err;
   }
 
   // Allocate space
   const unsigned size_material = geometry->materials_size()*sizeof(MaterialPars);
-  const unsigned size_particle = geometry->particles_size()*sizeof(ParticlePars);
+  const unsigned size_particle = simulator->particles_size()*sizeof(ParticlePars);
+  const unsigned size_volume_type = geometry->volume_types_size()*sizeof(InsideFunction);
   const unsigned size_volume   = geometry->volumes_size()*sizeof(VolumePars);
   err = cudaMalloc((void**)&p->materials,
                    size_material);
   if (err != cudaSuccess) return err;
   err = cudaMalloc((void**)&p->particles,
                    size_particle);
+  if (err != cudaSuccess) return err;
+  err = cudaMalloc((void**)&p->volume_types,
+                   size_volume_type);
   if (err != cudaSuccess) return err;
   err = cudaMalloc((void**)&p->volumes,
                    size_volume);
@@ -141,8 +150,13 @@ cudaError_t DeviceAllocation(Simulator *simulator, KernelPars *p) {
                    cudaMemcpyHostToDevice);
   if (err != cudaSuccess) return err;
   err = cudaMemcpy(p->particles,
-                   geometry->particle_arr(),
+                   simulator->particle_arr(),
                    size_particle,
+                   cudaMemcpyHostToDevice);
+  if (err != cudaSuccess) return err;
+  err = cudaMemcpy(p->volume_types,
+                   geometry->volume_type_arr(),
+                   size_volume_type,
                    cudaMemcpyHostToDevice);
   if (err != cudaSuccess) return err;
   err = cudaMemcpy(p->volumes,

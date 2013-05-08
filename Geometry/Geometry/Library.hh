@@ -10,10 +10,16 @@ namespace na63 {
 #define RUNNING_CPP11
 #endif
 
+// Define nullptr for <C++11
+#ifndef nullptr
+#define nullptr NULL
+#endif
+
 typedef float Float;
 
-const Float c = 299792458;
-const Float pi = 3.14159265;
+const Float kC = 2.99792458e8;
+const Float kPi = 3.14159265;
+const Float kElectronMass = 5.10998910e-1; // MeV
 
 // All volumes must be defined here
 typedef enum {
@@ -47,6 +53,14 @@ inline Float CartesianToSpherical_Theta(const Float x, const Float y, const Floa
 
 inline Float CartesianToSpherical_Phi(const Float x, const Float y) {
   return atan(y/x);
+}
+
+inline Float Gamma(const Float& v) {
+  return 1/sqrt(1-pow(v,2));
+}
+
+inline Float Gamma(const Float& energy, const Float& mass) {
+  return energy / mass;
 }
 
 typedef Float GPUThreeVector[3];
@@ -199,6 +213,15 @@ typedef bool (*InsideFunction)(const GPUFourVector&,const void*);
 class Geometry;
 class Volume;
 class Material;
+
+template <class VectorType, class ArrayType>
+void ParameterVectorToArray(VectorType *vec, ArrayType **arr) {
+  int size = vec->size();
+  *arr = new ArrayType[size];
+  for (int i=0;i<size;i++) {
+    (*arr)[i] = (*vec)[i].GPU();
+  }
+}
 
 } // End namespace na63
 

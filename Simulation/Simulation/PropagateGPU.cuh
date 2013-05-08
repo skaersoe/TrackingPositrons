@@ -16,6 +16,7 @@ namespace na63 {
     int *keys;
     MaterialPars *materials;
     ParticlePars *particles;
+    InsideFunction *volume_types;
     VolumePars   *volumes;
   } KernelPars;
 

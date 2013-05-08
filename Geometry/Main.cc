@@ -17,10 +17,17 @@ int main(void) {
   geometry.AddVolume(box);
   geometry.AddVolume(sphere);
 
-  Track t = Track(11,FourVector(1,1,1,1),FourVector(0,0,0,0));
+  Track t = Track(11,FourVector(0,0,0,0),FourVector(0,0,0,0));
+  Track t2 = Track(11,FourVector(5e3,5e3,5e3,0),FourVector(0,0,0,0));
+  Track t3 = Track(11,FourVector(2e2,2e2,2e2,0),FourVector(0,0,0,0));
+  Track t4 = Track(11,FourVector(1e2,1e2,1e2,0),FourVector(0,0,0,0));
+  Track t5 = Track(11,FourVector(2e2,2e2,3e2,0),FourVector(0,0,0,0));
 
   std::cout << "Track inside: " << box.Inside(t.position) << std::endl;
-  std::cout << "Track inside: " << sphere.Inside(t.position) << std::endl;
+  std::cout << "Track inside: " << box.Inside(t2.position) << std::endl;
+  std::cout << "Track inside: " << box.Inside(t3.position) << std::endl;
+  std::cout << "Track inside: " << box.Inside(t4.position) << std::endl;
+  std::cout << "Track inside: " << box.Inside(t5.position) << std::endl;
 
   return 0;
 }

@@ -30,7 +30,6 @@ class Sphere : public Volume {
 
 public:
   Sphere(const char* n, ThreeVector center, Float radius);
-  Sphere(const Sphere& other);
   ~Sphere() {}
 
   virtual bool Inside(const FourVector& position) const;

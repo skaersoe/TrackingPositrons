@@ -24,25 +24,30 @@ typedef struct {
 
 class Track {
 
-private:
+public:
+  bool alive_;
   int particle_id;
   FourVector momentum;
   FourVector position;
   Particle *particle;
   Volume *volume;
-  friend class Simulator;
-  friend class Geometry;
 
-public:
+  void Kill() {
+    alive_ = false;
+  }
+
   Track(int particle_id, FourVector pos, FourVector mom) 
       : position(pos), momentum(mom) {
     this->particle_id = particle_id;
+    volume = nullptr;
+    alive_ = true;
   }
   #ifdef RUNNING_CPP11
   Track(int particle_id)
       : Track(particle_id,FourVector(0,0,0,0),FourVector(0,0,0,0)) {}
   #endif
 
+  bool alive() const { return alive_; }
   Float time() const { return position[3]; }
   Float energy() const { return momentum[3]; }
   Float charge() const { return particle->charge(); }
@@ -55,44 +60,23 @@ public:
     return sqrt((energy_squared - pow(mass(),2)) / energy_squared);
   }
   Float gamma() const {
-    return energy() / mass();
+    return Gamma(energy(),mass());
   }
 
   /* Propagates the track by dl */
-  void Step(const Float dl) {
-    ThreeVector change = SphericalToCartesian(
-        dl,momentum.Theta(),momentum.Phi());
-    position[0] += change[0];
-    position[1] += change[1];
-    position[2] += change[2];
-    position[3] += dl * (energy() / (momentum_magnitude() * c));
-  }
+  void Step(const Float dl);
 
   GPUTrack GPU() const {
     GPUTrack retval;
+    retval.particle_index = particle->index;
     retval.particle_id = particle_id;
     position.GPU(retval.position);
     momentum.GPU(retval.momentum);
     return retval;
   }
 
-  Track& operator=(const GPUTrack& gpu_track) {
-    particle_id = gpu_track.particle_id;
-    position = gpu_track.position;
-    momentum = gpu_track.momentum;
-    return *this;
-  }
-
-  friend std::ostream& operator<<(std::ostream& os, const Track& t) {
-    if (t.particle != NULL) {
-      os << t.particle->name();
-    } else {
-      os << t.particle_id;
-    }
-    os << ", " << t.position << ", "
-       << t.momentum;
-    return os;
-  }
+  Track& operator=(const GPUTrack& gpu_track);
+  friend std::ostream& operator<<(std::ostream& os, const Track& t);
 
 };
 

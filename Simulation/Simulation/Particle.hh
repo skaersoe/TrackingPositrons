@@ -2,21 +2,28 @@
 #define NA63_SIMULATION_PARTICLE_H
 
 #include <string>
+#include <vector>
 #include "Geometry/Library.hh"
 
 namespace na63 {
+
+  class Track; // Forward declaration
+  typedef void (*ProcessFunction)(Track& track,const Material& material,
+      const Float dl);
 
   typedef struct {
     int id;
     Float charge;
     Float mass;
     // Align to 32 bytes
-    char padding[20];
+    char padding[32 - sizeof(int) - 2*sizeof(Float)];
   } ParticlePars;
 
   class Particle {
 
   public:
+    int index; // For generation of GPU tracks
+
     Particle(const char* n, int id, Float charge, Float mass) : name_(n) {
       id_ = id;
       charge_ = charge;
@@ -36,11 +43,22 @@ namespace na63 {
       return retval;
     }
 
+    void RegisterProcess(ProcessFunction process) {
+      processes.push_back(process);
+    }
+
+    void Query(Track& track,const Material& material,const Float dl) const {
+      for (int i=0;i<processes.size();i++) {
+        processes[i](track,material,dl);
+      }
+    }
+
   private:
     std::string name_;
     int id_;
     Float mass_;
     Float charge_;
+    std::vector<ProcessFunction> processes;
 
   };  
 
