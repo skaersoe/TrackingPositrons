@@ -28,6 +28,7 @@ namespace na63 {
       id_ = id;
       charge_ = charge;
       mass_ = mass;
+      index = -1;
     }
     ~Particle() {}
 

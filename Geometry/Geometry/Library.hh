@@ -3,12 +3,15 @@
 
 #include <iostream>
 #include <cmath>
+#ifndef __CUDACC__
+#include <TRandom3.h>
+#endif /* __CUDACC__ */
 
 namespace na63 {
 
-#if __cplusplus == 201103
+#ifndef __CUDACC__
 #define RUNNING_CPP11
-#endif
+#endif /* __CUDACC__ */
 
 // Define nullptr for <C++11
 #ifndef nullptr
@@ -17,9 +20,10 @@ namespace na63 {
 
 typedef float Float;
 
-const Float kC = 2.99792458e8;
+const Float kC = 2.99792458e8; // m/s
 const Float kPi = 3.14159265;
 const Float kElectronMass = 5.10998910e-1; // MeV
+const Float kMuonMass = 1.056583715e2; // MeV
 
 // All volumes must be defined here
 typedef enum {
@@ -55,8 +59,8 @@ inline Float CartesianToSpherical_Phi(const Float x, const Float y) {
   return atan(y/x);
 }
 
-inline Float Gamma(const Float& v) {
-  return 1/sqrt(1-pow(v,2));
+inline Float Gamma(const Float& beta) {
+  return 1/sqrt(1-pow(beta,2));
 }
 
 inline Float Gamma(const Float& energy, const Float& mass) {
@@ -198,21 +202,11 @@ inline ThreeVector SphericalToCartesian(
                      r * cos(theta));           // z
 }
 
-#define VOLUME_PARAMETER_SIZE 128 - 3*sizeof(int)
-typedef struct {
-  // Generic fields
-  int function_index;
-  int volume_index;
-  int material_index;
-  // Volume-specific fields. Derived classes must pad parameters to this size
-  char specific[VOLUME_PARAMETER_SIZE];
-} VolumePars;
-
-typedef bool (*InsideFunction)(const GPUFourVector&,const void*);
-
 class Geometry;
 class Volume;
 class Material;
+
+typedef bool (*InsideFunction)(const GPUFourVector&,const void*);
 
 template <class VectorType, class ArrayType>
 void ParameterVectorToArray(VectorType *vec, ArrayType **arr) {
@@ -222,6 +216,15 @@ void ParameterVectorToArray(VectorType *vec, ArrayType **arr) {
     (*arr)[i] = (*vec)[i].GPU();
   }
 }
+
+#define VOLUME_PARAMETER_SIZE 128 - 3*sizeof(int)
+typedef struct {
+  // Generic fields
+  int function_index;
+  int material_index;
+  // Volume-specific fields. Derived classes must pad parameters to this size
+  char specific[VOLUME_PARAMETER_SIZE];
+} VolumePars;
 
 } // End namespace na63
 

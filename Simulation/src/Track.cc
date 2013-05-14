@@ -15,6 +15,7 @@ void Track::Step(const Float dl) {
 	if (volume != nullptr) {
     particle->Query(*this,*volume->material,dl);
   }
+  if (energy() < mass()) Kill();
 }
 
 Track& Track::operator=(const GPUTrack& gpu_track) {
@@ -25,7 +26,7 @@ Track& Track::operator=(const GPUTrack& gpu_track) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Track& t) {
-  if (t.particle != NULL) {
+  if (t.particle != nullptr) {
     os << t.particle->name();
   } else {
     os << t.particle_id;

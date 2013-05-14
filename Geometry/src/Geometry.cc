@@ -31,21 +31,27 @@ void Geometry::AddVolumeGeneric(Volume *volume) {
   // Material should already have been added
   int material_index = GetMaterialIndex(volume->material_name());
   if (material_index < 0) throw "Material doesn't exist.";
-  int volume_index = -1;
+  int function_index = -1;
   VolumeType volume_type = volume->volume_type();
   // See if volume type exists
   for (int i=0;i<volume_types.size();i++) {
     if (volume_types[i].type == volume_type) {
-      volume_index = i;
+      function_index = i;
     }
   }
-  if (volume_index == -1) {
+  if (function_index == -1) {
     // Add the type if it doesn't
-    volume_index = AddVolumeType(volume_type,volume->inside_function());
+    function_index = AddVolumeType(volume_type,volume->inside_function());
   }
   // Update volume parameters
+  if (material_index < 0 || material_index >= materials.size()) {
+    throw "Invalid index generated for volume material.";
+  }
+  if (function_index < 0 || function_index >= volume_types.size()) {
+    throw "Invalid index generated for volume type.";
+  }
   volume->material = &materials[material_index];
-  volume->SetIndices(material_index,volume_index);
+  volume->SetIndices(material_index,function_index);
 }
 
 int Geometry::GetMaterialIndex(std::string material_name) {

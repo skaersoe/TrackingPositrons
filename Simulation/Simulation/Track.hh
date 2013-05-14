@@ -14,13 +14,19 @@ namespace na63 {
  */
 typedef struct {
   // int particle_index;
+  int alive;
   int particle_id;    // According to Monte Carlo Particle Numbering Scheme
   int particle_index; // Set at propagation time for the GPU
+  int volume_index;   // Remembers which volume the particle is currently inside
   GPUFourVector position;
   GPUFourVector momentum;
   // Align to 64 bytes
-  char padding[64 - 2*sizeof(int) - 2*sizeof(GPUFourVector)];
+  char padding[64 - 4*sizeof(int) - 2*sizeof(GPUFourVector)];
 } GPUTrack;
+
+#ifdef RUNNING_CPP11
+static_assert(sizeof(GPUTrack) == 64,"Unaligned GPUTrack struct");
+#endif /* RUNNING_CPP11 */
 
 class Track {
 
@@ -45,11 +51,11 @@ public:
   #ifdef RUNNING_CPP11
   Track(int particle_id)
       : Track(particle_id,FourVector(0,0,0,0),FourVector(0,0,0,0)) {}
-  #endif
+  #endif /* RUNNING_CPP11 */
 
   bool alive() const { return alive_; }
   Float time() const { return position[3]; }
-  Float energy() const { return momentum[3]; }
+  Float energy() const { return kC*momentum[3]; }
   Float charge() const { return particle->charge(); }
   Float mass() const { return particle->mass(); }
   Float momentum_magnitude() const {
@@ -68,8 +74,13 @@ public:
 
   GPUTrack GPU() const {
     GPUTrack retval;
+    retval.alive = alive_;
+    if (particle == nullptr || particle->index < 0) {
+      throw "Particle not properly registered to track.";
+    }
     retval.particle_index = particle->index;
     retval.particle_id = particle_id;
+    retval.volume_index = -1;
     position.GPU(retval.position);
     momentum.GPU(retval.momentum);
     return retval;

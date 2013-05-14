@@ -20,6 +20,8 @@ public:
   Volume(const char* mat_name, VolumeType vol_type)
       : material_name_(mat_name) {
     volume_type_ = vol_type;
+    pars_.function_index = -1;
+    pars_.material_index = -1;
   }
   ~Volume() {}
 
@@ -36,9 +38,9 @@ protected:
   virtual void SetSpecificParameters(void* parameters) =0;
   friend class Geometry;
   VolumeType volume_type() { return volume_type_; }
-  void SetIndices(int mat_idx, int vol_idx) {
+  void SetIndices(int mat_idx, int fun_idx) {
     pars_.material_index = mat_idx;
-    pars_.volume_index = vol_idx;
+    pars_.function_index = fun_idx;
   }
   virtual InsideFunction inside_function() const =0;
 

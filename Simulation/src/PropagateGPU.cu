@@ -2,13 +2,13 @@
 #include <thrust/sort.h>
 
 #include "Simulation/PropagateGPU.cuh"
+#include "Simulation/TrackGPU.cuh"
 #include "Simulation/CudaHelper.hh"
 
 namespace na63 {
 
 /** Forward declarations */
 __host__ void PropagateGPU(Simulator* simulator);
-__host__ __device__ void Step(GPUTrack *t, Float dl);
 __global__ void PropagateKernel(KernelPars args);
 __host__ cudaError_t DeviceAllocation(Simulator *simulator, KernelPars *p);
 __host__ cudaError_t DeviceFree(KernelPars *p);
@@ -38,7 +38,8 @@ void PropagateGPU(Simulator* simulator) {
   kernel_args.materials = nullptr;
   kernel_args.particles = nullptr;
   kernel_args.volume_types = nullptr;
-  kernel_args.volumes   = nullptr;
+  kernel_args.volumes = nullptr;
+  // kernel_args.sort_function = nullptr;
 
   // Allocate memory on device and copy data
   GPUTrack *tracks = simulator->GPUTracks();
@@ -65,7 +66,7 @@ void PropagateGPU(Simulator* simulator) {
 
     // Should be dynamic
     kernel_args.steps = 100;
-    kernel_args.dl = simulator->step_size();
+    kernel_args.dl = simulator->step_size;
 
     // Launch kernel
     PropagateKernel<<<blocksPerGrid,threadsPerBlock>>>(kernel_args);
@@ -176,19 +177,19 @@ void PropagateKernel(KernelPars args) {
   if (index >= args.N) return;
 
   GPUTrack* t = &args.tracks[index];
+  ParticlePars* p = &args.particles[t->particle_index];
 
   for (int i=0;i<args.steps;i++) {
-    Step(t,args.dl);
+    t->volume_index = VolumeQuery(
+      t->position,args.volumes,args.volume_types,t->volume_index
+    );
+    if (t->volume_index < 0) break;
+    Step(*t,*p,args.dl);
   }
 
-  args.keys[index] = 0;
+  // Sort by position in x
+  args.keys[index] = (int)t->position[0];
 
-}
-
-/** Propagates the particle for one timestep, dt, applying relevant forces */
-__host__ __device__ inline
-void Step(GPUTrack* t, Float dl) {
-  return;
 }
 
 } // End namespace na63

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 
 #include "Simulation/Simulator.hh"
 #include "Simulation/PropagateGPU.cuh"
@@ -17,12 +18,16 @@ Simulator::Simulator(Geometry *g) {
   debug = false;
   external_tracks = true;
   external_geometry = true;
-  step_size_ = 0.1;
-  particle_arr_    = nullptr;
+  step_size = 0.1;
+  particle_arr_ = nullptr;
+  gpu_tracks = nullptr;
+  gpu_tracks_alive = false;
+  cpu_threads = 1;
 }
 Simulator::~Simulator() {
   if (!external_geometry) delete geometry;
-  delete particle_arr_;
+  if (particle_arr_ != nullptr) delete particle_arr_;
+  if (gpu_tracks_alive) delete gpu_tracks;
 }
 
 int Simulator::GetParticleIndex(int id) const {
@@ -73,8 +78,9 @@ Track Simulator::GetTrack(int index) const {
 }
 
 GPUTrack* Simulator::GPUTracks() {
-  if (gpu_tracks != nullptr) delete gpu_tracks;
+  if (gpu_tracks_alive) delete gpu_tracks;
   gpu_tracks = new GPUTrack[tracks.size()];
+  gpu_tracks_alive = true;
   for (int i=0;i<tracks.size();i++) {
     gpu_tracks[i] = tracks[i].GPU();
   }
@@ -82,10 +88,24 @@ GPUTrack* Simulator::GPUTracks() {
 }
 
 void Simulator::CopyBackTracks() {
+  if (!gpu_tracks_alive) throw "No GPU tracks allocated.";
   for (int i=0;i<tracks.size();i++) {
     tracks[i] = gpu_tracks[i];
   }
   delete gpu_tracks;
+  gpu_tracks_alive = false;
+}
+
+void PropagateTrack(Geometry &geometry, Track &track, const Float dl) {
+  bool hit = false;
+  while (track.alive() && geometry.InBounds(track)) {
+    track.Step(dl);
+    geometry.Query(track);
+    if (hit == false && track.volume != nullptr) {
+      hit = true;
+      // std::cout << "A particle hit the box." << std::endl;
+    }
+  }
 }
 
 void Simulator::Propagate() {
@@ -101,16 +121,26 @@ void Simulator::Propagate() {
   }
 
   // Propagate on CPU
-  for (int i=0;i<tracks.size();i++) {
-    bool hit = false;
-    // std::cout << tracks[i] << std::endl;
-    while (geometry->InBounds(tracks[i])) {
-      tracks[i].Step(step_size_);
-      geometry->Query(tracks[i]);
-      if (tracks[i].volume != nullptr && hit == false) {
-        hit = true;
-        std::cout << "Particle " << i << " hit something!" << std::endl;
+  if (cpu_threads > 1) {
+    if (debug) std::cout << "Running simulation on " << cpu_threads
+        << " threads." << std::endl;
+    int i=0;
+    int max=tracks.size();
+    std::thread threads[cpu_threads];
+    while (i < max) {
+      int j=0;
+      while (j < cpu_threads) {
+        threads[j++] = std::thread(na63::PropagateTrack,std::ref(*geometry),
+            std::ref(tracks[i]),step_size);
+        if (++i >= max) break;
       }
+      for (int k=0;k<j;k++) {
+        threads[k].join();
+      }
+    }
+  } else {
+    for (int i=0;i<tracks.size();i++) {
+      na63::PropagateTrack(*geometry,tracks[i],step_size);
     }
   }
 

@@ -1,13 +1,22 @@
 #include <iostream>
-#include <time.h>
 #include <cassert>
+
+// ROOT crap
+#include <TApplication.h>
+#include <TCanvas.h>
+#include <TGraph.h>
+#include "TRandom2.h"
+#include "TH1.h"
+#include "TH2.h"
 
 #include "Simulation/Simulator.hh"
 #include "Geometry/Geometry.hh"
 #include "Geometry/Box.hh"
 #include "Geometry/Sphere.hh"
+#include "Simulation/GetTime.hh"
 
 #include "Simulation/BetheEnergyLoss.hh"
+#include "Simulation/MultipleScattering.hh"
 
 using namespace na63;
 
@@ -26,10 +35,10 @@ int main(int argc,char *argv[]) {
   Simulator sim = Simulator(&geometry);
   Particle muon = Particle("muon",13,-1,105.6583715);
   muon.RegisterProcess(BetheEnergyLoss);
-  sim.AddParticle(Particle("electron",11,-1,0.510998910));
   sim.AddParticle(muon);
 
   // Set some default values
+  bool plot = false;
   sim.device = GPU;
   sim.debug = false;
   unsigned N = 0;
@@ -50,6 +59,15 @@ int main(int argc,char *argv[]) {
       sim.device = CPU;
     else if (token == "-debug")
       sim.debug = true;
+    else if (token == "-plot")
+      plot = true;
+    else if (token == "-threads") {
+      sscanf(argv[++i],"%d",&sim.cpu_threads);
+      if (sim.cpu_threads <= 0) {
+        std::cerr << "Invalid number of threads." << std::endl;
+        return -1;
+      }
+    }
     else {
       std::cout << "Unrecognized argument: " << token << std::endl;
       return -1;
@@ -63,24 +81,49 @@ int main(int argc,char *argv[]) {
   std::vector<Track> t;
   const Float arc = kPi/4;
   const Float v = 0.95; // % of c
-  const Float m = 105.6583715;
-  const Float E = Gamma(v) * m;
+  const Float kMuonMass = 105.6583715;
+  const Float E = Gamma(v) * kMuonMass;
+  Float angles[N];
+  TRandom3 rng((size_t)clock());
   for (int i=0;i<N;i++) {
-    Float angle = -arc + 2*arc * ((Float)i / (Float)N);
+    Float angle = arc * (rng.Gaus(0,1));
+    angles[i] = angle;
     Float vx = v * cos(angle);
     Float vy = v * sin(angle);
-    Float px = Gamma(vx) * m * vx;
-    Float py = Gamma(vy) * m * vy;
+    Float px = Gamma(vx) * kMuonMass * vx;
+    Float py = Gamma(vy) * kMuonMass * vy;
     Float pz = 0;
     t.push_back(Track(13,FourVector(),FourVector(px,py,pz,E)));
   }
   sim.AddTracks(t);
 
   // Propagate
-  clock_t timer = clock();
+  timespec before, after;
+  before = GetTime();
   sim.Propagate();
-  timer = clock() - timer;
-  std::cout << "Propagated in " << (float)timer/CLOCKS_PER_SEC << " seconds." << std::endl;
+  after = GetTime();
+  double elapsed = after.tv_sec - before.tv_sec;
+  std::cout << "Propagated in " << elapsed << " seconds." << std::endl;
+
+  // Do ROOT crap
+  if (plot) {
+    TApplication app("app",&argc,argv);
+    TCanvas canvas;
+    /*TH2F hist_final_position(
+      "Final position","Final position;x;y",
+      100,0,4e2+5,100,-2e2-5,2e2+5
+    );*/
+    TGraph graph_energy_angle;
+    for (int i=0;i<N;i++) {
+      Track t = sim.GetTrack(i);
+      // std::cout << "Died at " << t.position << std::endl;
+      //hist_final_position.Fill(t.position[0],t.position[1]);
+      graph_energy_angle.SetPoint(i,angles[i],t.energy());
+    }
+    //hist_final_position.Draw("COLZ");
+    graph_energy_angle.Draw("same ap");
+    gPad->WaitPrimitive();
+  }
 
   std::cout << "Simulator exiting." << std::endl;
   return 0;
