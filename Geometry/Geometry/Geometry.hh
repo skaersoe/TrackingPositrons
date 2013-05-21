@@ -53,7 +53,7 @@ public:
   void Query(Track& t);
 
 private:
-  Volume* bounds;
+  Volume** bounds;
   std::vector<Material> materials;
   // Since volume is abstract, only pointers can be maintained here
   std::vector<Volume*>  volumes;
@@ -92,7 +92,7 @@ public:
     }
     #endif
     AddVolumeGeneric((Volume*)&volume);
-    bounds = new VolumeType(volume);
+    *bounds = new VolumeType(volume);
   }
 
 };

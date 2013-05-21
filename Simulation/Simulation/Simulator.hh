@@ -35,6 +35,8 @@ public:
   ParticlePars *particle_arr();
 
   Track GetTrack(int index) const;
+  std::vector<Track> GetTracks() const;
+  void AddTrack(Track t);
   void AddTracks(std::vector<Track> t);
   void ClearTracks();
   //void SetTracks(std::vector<Track> t);

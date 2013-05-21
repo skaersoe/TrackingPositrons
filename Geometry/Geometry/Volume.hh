@@ -29,6 +29,8 @@ public:
 
   VolumePars GPU() {
     SetSpecificParameters((void*)pars_.specific);
+    if (pars_.function_index < 0) throw "Missing function index";
+    if (pars_.material_index < 0) throw "Missing material index";
     return pars_;
   }
 

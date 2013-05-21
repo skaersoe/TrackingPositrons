@@ -1,3 +1,6 @@
+#ifndef NA63_COMMON_GETTIME_H
+#define NA63_COMMON_GETTIME_H
+
 // Stolen from http://stackoverflow.com/questions/5167269/clock-gettime-alternative-in-mac-os-x
 
 #include <time.h>
@@ -32,3 +35,5 @@ timespec GetTime() {
 }
 
 } // End namespace na63
+
+#endif /* NA63_COMMON_GETTIME_H */

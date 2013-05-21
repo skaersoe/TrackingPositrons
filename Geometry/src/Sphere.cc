@@ -4,10 +4,10 @@
 
 namespace na63 {
 
-Sphere::Sphere(const char* n, ThreeVector center, Float radius)
+Sphere::Sphere(const char* n, ThreeVector c, Float r)
       : Volume(n,SPHERE) {
-  this->center = center;
-  this->radius = radius;
+  center = c;
+  radius = r;
 }
 
 bool Sphere::Inside(const FourVector& position) const {

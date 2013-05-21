@@ -1,4 +1,5 @@
 #include "Geometry/Sphere.hh"
+#include "Geometry/SphereCUDA.cuh"
 #include "Geometry/LibraryCUDA.cuh"
 
 namespace na63 {

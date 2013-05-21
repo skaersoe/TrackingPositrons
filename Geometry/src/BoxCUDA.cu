@@ -1,4 +1,5 @@
 #include "Geometry/Box.hh"
+#include "Geometry/BoxCUDA.cuh"
 #include "Geometry/LibraryCUDA.cuh"
 
 #define SIGN_MASK 1 << sizeof(Float)*8 - 1

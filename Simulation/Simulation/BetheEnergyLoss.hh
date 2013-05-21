@@ -7,8 +7,6 @@
 
 // K/A = 0.307075 MeV g^-1 cm^2
 
-TRandom3 rng;
-
 namespace na63 {
 
 typedef struct {
@@ -67,24 +65,7 @@ inline LandauParameters GetBetheLandauParameters(const Float beta,
 }
 
 void BetheEnergyLoss(Track& track, const Material& material,
-    const Float dl) {
-
-  rng.SetSeed((size_t)&track);
-
-  // Only treat particles with charge
-  if (track.charge() == 0) return;
-
-  // Get -<dE/dx> and sigma
-  LandauParameters p = GetSkewedLandauParameters(
-      track.beta(),track.mass(),track.charge(),material.atomic_number(),
-      material.mean_excitation_potential(),dl);
-
-  // Get random number from Landau distribution
-  Float energy_loss = rng.Landau(p.mean,p.sigma);
-
-  // Update track
-  track.momentum[3] -= (energy_loss * dl) / kC;
-}
+    const Float dl);
 
 } // End namespace na63
 

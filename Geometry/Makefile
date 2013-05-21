@@ -17,7 +17,7 @@ ccobjects:
 	$(CC) $(CCFLAGS) $(INCLUDE) -c $(SRC)/*.cc
 
 nvccobjects:
-	$(NVCC) $(NVCCFLAGS) $(INCLUDE_CUDA) -c $(SRC)/*.cu
+	$(NVCC) $(NVCCFLAGS) $(INCLUDE_CUDA) -dc $(SRC)/*.cu
 
 simulation:
 	make -C ../Simulation

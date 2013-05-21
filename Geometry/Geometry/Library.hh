@@ -19,6 +19,9 @@ namespace na63 {
 #endif
 
 typedef float Float;
+#ifndef Int_t
+typedef int Int_t;
+#endif
 
 const Float kC = 2.99792458e8; // m/s
 const Float kPi = 3.14159265;

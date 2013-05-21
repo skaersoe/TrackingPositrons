@@ -1,10 +1,11 @@
 #include "Geometry/Geometry.hh"
+#include "Geometry/Sphere.hh"
 
 namespace na63 {
 
 Geometry::Geometry(void) {
   volumes.push_back(nullptr);
-  bounds = volumes[0];
+  bounds = &volumes[0];
   material_arr_    = nullptr;
   volume_arr_      = nullptr;
   volume_type_arr_ = nullptr;
@@ -92,7 +93,7 @@ void Geometry::GenerateParameterArrays() {
 }
 
 bool Geometry::InBounds(const Track& track) {
-  return bounds->Inside(track.position);
+  return volumes[0]->Inside(track.position);
 }
 
 void Geometry::Query(Track& track) {
@@ -124,7 +125,7 @@ void Geometry::GenerateVolumeTypeArray() {
 void Geometry::GenerateVolumeArray() {
   int size = volumes.size();
   volume_arr_ = new VolumePars[size];
-  for (int i=1;i<size;i++) {
+  for (int i=0;i<size;i++) {
     volume_arr_[i] = volumes[i]->GPU();
   }
 }

@@ -6,6 +6,8 @@
 
 namespace na63 {
 
+#define MAX_INT_VALUE 2147483647
+
 template <typename A, typename B, typename C>
 __device__ inline
 void ThreeVector_Add(
@@ -55,8 +57,8 @@ Float CUDA_CartesianToSpherical_Phi(const Float x, const Float y) {
 }
 
 __device__ inline
-Float CUDA_Gamma(const Float& v) {
-  return 1/sqrt(1-pow(v,2));
+Float CUDA_Gamma(const Float& beta) {
+  return 1/sqrt(1-pow(beta,2));
 }
 
 __device__ inline

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <thread>
+#include <cassert>
 
 #include "Simulation/Simulator.hh"
 #include "Simulation/PropagateGPU.cuh"
@@ -56,15 +57,25 @@ void Simulator::GenerateParticleArray() {
   ParameterVectorToArray(&particles,&particle_arr_);
 }
 
+void Simulator::AddTrack(Track t) {
+  t.particle = GetParticle(t.particle_id);
+  assert(t.particle != nullptr);
+  t.simulator = this;
+  tracks.push_back(t);
+}
+
 void Simulator::AddTracks(std::vector<Track> t) {
   int previous_id = -1;
   Particle* previous_particle = nullptr;
   for (int i=0;i<t.size();i++) {
+    t[i].simulator = this;
+    t[i].initial_index = tracks.size() + i;
     int current_id = t[i].particle_id;
     if (current_id == previous_id && current_id != -1) {
       t[i].particle = previous_particle;
     } else {
       previous_particle = t[i].particle = GetParticle(current_id);
+      assert(t[i].particle != nullptr);
       previous_id = current_id;
     }
   }
@@ -77,12 +88,22 @@ Track Simulator::GetTrack(int index) const {
   return tracks[index];
 }
 
+std::vector<Track> Simulator::GetTracks() const {
+  return tracks;
+}
+
+void Simulator::ClearTracks() {
+  tracks.clear();
+  std::cout << "All tracks cleared." << std::endl;
+}
+
 GPUTrack* Simulator::GPUTracks() {
   if (gpu_tracks_alive) delete gpu_tracks;
   gpu_tracks = new GPUTrack[tracks.size()];
   gpu_tracks_alive = true;
   for (int i=0;i<tracks.size();i++) {
     gpu_tracks[i] = tracks[i].GPU();
+    gpu_tracks[i].initial_index = i;
   }
   return gpu_tracks;
 }
@@ -98,7 +119,7 @@ void Simulator::CopyBackTracks() {
 
 void PropagateTrack(Geometry &geometry, Track &track, const Float dl) {
   bool hit = false;
-  while (track.alive() && geometry.InBounds(track)) {
+  while (track.alive && geometry.InBounds(track)) {
     track.Step(dl);
     geometry.Query(track);
     if (hit == false && track.volume != nullptr) {
@@ -125,17 +146,22 @@ void Simulator::Propagate() {
     if (debug) std::cout << "Running simulation on " << cpu_threads
         << " threads." << std::endl;
     int i=0;
-    int max=tracks.size();
+    int progress = tracks.size()/10;
     std::thread threads[cpu_threads];
-    while (i < max) {
+    while (i < tracks.size()) {
       int j=0;
       while (j < cpu_threads) {
+        // std::cout << "Launching new thread" << std::endl;
         threads[j++] = std::thread(na63::PropagateTrack,std::ref(*geometry),
             std::ref(tracks[i]),step_size);
-        if (++i >= max) break;
+        if (++i >= tracks.size()) break;
       }
       for (int k=0;k<j;k++) {
         threads[k].join();
+      }
+      if (debug && i > progress) {
+        std::cout << "Propagated " << i << "/" << tracks.size() << " particles..." << std::endl;
+        progress += tracks.size()/10;
       }
     }
   } else {

@@ -5,6 +5,7 @@
 #include "Simulation/Simulator.hh"
 #include "Simulation/Particle.hh"
 #include "Geometry/Material.hh"
+#include <curand_kernel.h>
 
 namespace na63 {
 
@@ -14,11 +15,13 @@ typedef struct {
   Float dl;
   GPUTrack *tracks;
   int *keys;
+  int n_volumes;
   MaterialPars *materials;
   ParticlePars *particles;
   InsideFunction *volume_types;
   VolumePars   *volumes;
-  // SortFunction sort_function;
+  curandState *rng_states;
+  unsigned long rng_seed;
 } KernelPars;
 
 void PropagateGPU(Simulator *simulator);

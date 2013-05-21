@@ -1,0 +1,33 @@
+{
+//========= Macro generated from object: Bremsstrahlung/Bremsstrahlung
+//========= by ROOT version5.34/05
+   
+   TH1F *Bremsstrahlung = new TH1F("Bremsstrahlung","Bremsstrahlung",96,-0.785398,0.785398);
+   Bremsstrahlung->SetBinContent(23,3);
+   Bremsstrahlung->SetBinContent(26,2);
+   Bremsstrahlung->SetBinContent(54,1);
+   Bremsstrahlung->SetBinContent(55,1);
+   Bremsstrahlung->SetBinContent(57,2);
+   Bremsstrahlung->SetBinContent(66,2);
+   Bremsstrahlung->SetBinContent(69,3);
+   Bremsstrahlung->SetBinContent(70,2);
+   Bremsstrahlung->SetBinContent(72,1);
+   Bremsstrahlung->SetEntries(17);
+
+   Int_t ci;   // for color index setting
+   ci = TColor::GetColor("#000099");
+   Bremsstrahlung->SetLineColor(ci);
+   Bremsstrahlung->GetXaxis()->SetLabelFont(42);
+   Bremsstrahlung->GetXaxis()->SetLabelSize(0.035);
+   Bremsstrahlung->GetXaxis()->SetTitleSize(0.035);
+   Bremsstrahlung->GetXaxis()->SetTitleFont(42);
+   Bremsstrahlung->GetYaxis()->SetLabelFont(42);
+   Bremsstrahlung->GetYaxis()->SetLabelSize(0.035);
+   Bremsstrahlung->GetYaxis()->SetTitleSize(0.035);
+   Bremsstrahlung->GetYaxis()->SetTitleFont(42);
+   Bremsstrahlung->GetZaxis()->SetLabelFont(42);
+   Bremsstrahlung->GetZaxis()->SetLabelSize(0.035);
+   Bremsstrahlung->GetZaxis()->SetTitleSize(0.035);
+   Bremsstrahlung->GetZaxis()->SetTitleFont(42);
+   Bremsstrahlung->Draw("");
+}

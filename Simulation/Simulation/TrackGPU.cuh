@@ -8,11 +8,14 @@
 namespace na63 {
 
 __device__
-int VolumeQuery(const GPUFourVector& position, const VolumePars* volumes,
-    const InsideFunction* functions, const int volume_index);
+int VolumeQuery(const GPUTrack& track, const VolumePars* volumes,
+    const unsigned n_volumes);
 
 __device__
 void Step(GPUTrack& track, const ParticlePars& particle, const Float dl);
+
+__device__
+void CUDA_UpdateMomentum(GPUFourVector& momentum, const Float change);
 
 } // End namespace na63
 

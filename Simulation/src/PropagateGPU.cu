@@ -5,6 +5,8 @@
 #include "Simulation/TrackGPU.cuh"
 #include "Simulation/CudaHelper.hh"
 
+#include "Simulation/BetheEnergyLossCUDA.cuh"
+
 namespace na63 {
 
 /** Forward declarations */
@@ -17,7 +19,7 @@ __host__
 void PropagateGPU(Simulator* simulator) {
 
   if (simulator->debug) {
-    for (int i=0;i<5;i++) {
+    for (int i=0;i<8;i++) {
       Track t = simulator->GetTrack(i);
       std::cout << t << std::endl;
     }
@@ -33,13 +35,13 @@ void PropagateGPU(Simulator* simulator) {
   // Initialize arguments
   KernelPars kernel_args;
   kernel_args.N = N;
+  kernel_args.n_volumes = simulator->geometry->volumes_size();
   kernel_args.tracks = nullptr;
   kernel_args.keys = nullptr;
   kernel_args.materials = nullptr;
   kernel_args.particles = nullptr;
   kernel_args.volume_types = nullptr;
   kernel_args.volumes = nullptr;
-  // kernel_args.sort_function = nullptr;
 
   // Allocate memory on device and copy data
   GPUTrack *tracks = simulator->GPUTracks();
@@ -50,6 +52,8 @@ void PropagateGPU(Simulator* simulator) {
   if (CudaError(cudaMalloc((void**)&kernel_args.keys,size_keys))) return;
   if (CudaError(cudaMemcpy(kernel_args.tracks,tracks,size_tracks,cudaMemcpyHostToDevice))) return;
   if (simulator->debug) std::cout << "Copied tracks and keys." << std::endl;
+  // Random number generator states
+  if (CudaError(cudaMalloc(&kernel_args.rng_states,N*sizeof(curandState)))) return;
   // Thrust wrappers
   thrust::device_ptr<GPUTrack> devptr_thrust_tracks(kernel_args.tracks);
   thrust::device_ptr<int>      devptr_thrust_keys(kernel_args.keys);
@@ -62,18 +66,31 @@ void PropagateGPU(Simulator* simulator) {
     std::cout << "About to initialize " << blocksPerGrid << " blocks of " << threadsPerBlock << " threads each, resulting in a total of " << blocksPerGrid * threadsPerBlock << " threads." << std::endl;
   }
 
-  for (int i=0; i<10; i++) {
+  int kernel_launches = 0;
+
+  while (1) {
 
     // Should be dynamic
     kernel_args.steps = 100;
     kernel_args.dl = simulator->step_size;
+    kernel_args.rng_seed = kernel_launches;
 
     // Launch kernel
+    kernel_launches++;
     PropagateKernel<<<blocksPerGrid,threadsPerBlock>>>(kernel_args);
+    cudaDeviceSynchronize();
     thrust::sort_by_key(devptr_thrust_keys, devptr_thrust_keys + N, devptr_thrust_tracks);
     cudaDeviceSynchronize();
 
+    // Check if propagation is done
+    int done = 0;
+    if (CudaError(cudaMemcpy((void*)&done,kernel_args.keys,sizeof(int),cudaMemcpyDeviceToHost))) return;
+    if (done == MAX_INT_VALUE) break;
+
   } // End kernel launch loop
+
+  if (simulator->debug) std::cout << "Propagation kernel launched "
+      << kernel_launches << " times." << std::endl;
 
   // Copy back and free memory
   if (CudaError(cudaMemcpy(tracks,kernel_args.tracks,size_tracks,cudaMemcpyDeviceToHost))) return;
@@ -82,7 +99,7 @@ void PropagateGPU(Simulator* simulator) {
   simulator->CopyBackTracks();
 
   if (simulator->debug)
-    for (int i=0;i<5;i++)
+    for (int i=0;i<8;i++)
       std::cout << simulator->GetTrack(i) << std::endl;
 
 }
@@ -173,22 +190,54 @@ cudaError_t DeviceAllocation(Simulator *simulator, KernelPars *p) {
 __global__
 void PropagateKernel(KernelPars args) {
 
+  // Set and check thread index
   int index = threadIdx.x + blockDim.x * blockIdx.x;
   if (index >= args.N) return;
 
-  GPUTrack* t = &args.tracks[index];
-  ParticlePars* p = &args.particles[t->particle_index];
+  // Get memory pointers
+  GPUTrack* track = &args.tracks[index];
+  if (track->alive == 0) return;
+  ParticlePars* particle = &args.particles[track->particle_index];
 
+  // Initialize random number generator
+  curand_init(args.rng_seed,index,0,&args.rng_states[index]);
+
+  // Perform steps
   for (int i=0;i<args.steps;i++) {
-    t->volume_index = VolumeQuery(
-      t->position,args.volumes,args.volume_types,t->volume_index
-    );
-    if (t->volume_index < 0) break;
-    Step(*t,*p,args.dl);
+
+    // Update volume if necessary
+    track->volume_index = VolumeQuery(*track,args.volumes,args.n_volumes);
+    // If out of bounds or out of energy, break
+    if (track->volume_index < 0 || track->momentum[3] < particle->mass) {
+      track->alive = 0;
+      break;
+    }
+
+    __syncthreads();
+
+    // Propagate position
+    Step(*track,*particle,args.dl);
+
+    // Run physics
+    if (track->volume_index > 0) {
+      const int material_index = args.volumes[track->volume_index].material_index;
+      if (material_index >= 0) {
+        const MaterialPars *material = &args.materials[args.volumes[track->volume_index].material_index];
+        __syncthreads();
+        CUDA_BetheEnergyLoss(*track,*particle,*material,args.dl,&args.rng_states[index]);
+      }
+    }
+
   }
 
-  // Sort by position in x
-  args.keys[index] = (int)t->position[0];
+  __syncthreads();
+
+  // Set key to sort by
+  int key = MAX_INT_VALUE;
+  if (track->alive == 1) {
+    key = (int)track->position[0];
+  }
+  args.keys[index] = key;
 
 }
 

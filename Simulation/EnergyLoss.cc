@@ -1,6 +1,7 @@
 #include "Geometry/Library.hh"
 #include "Simulation/Track.hh"
 #include "Simulation/BetheEnergyLoss.hh"
+#include "Simulation/GetTime.hh"
 
 // ROOT crap
 #include <TApplication.h>
@@ -31,7 +32,7 @@ int main(int argc, char* argv[]) {
   const Float kMuonCharge = -1.0;
   const Float kIronAtomicNumber = 26.0;
   // http://www.physics.nist.gov/cgi-bin/Star/compos.pl?refer=ap&matno=026
-  const Float kIronMeanExcitationPotential = 286.0e-6; // eV
+  const Float kIronMeanExcitationPotential = 286.0; // eV
   const Float dl = 0.001; // cm
 
   const unsigned samples_per_energy = 200;
@@ -41,7 +42,7 @@ int main(int argc, char* argv[]) {
   do {
     i++;
 
-    Float beta = 1e-6 * i;
+    Float beta = 1e-4 * i;
     Float betagamma = beta * Gamma(beta);
 
     // Limits
@@ -56,8 +57,12 @@ int main(int argc, char* argv[]) {
     // Fill graph with mean
     graph.SetPoint(i,betagamma,p.mean);
 
+    TRandom3 rng;
+    rng.SetSeed(5);
+
     // Fill histogram with Landau samples
     for (int i=0;i<samples_per_energy;i++) {
+      rng.SetSeed(GetTime().tv_nsec);
       Float random = rng.Landau(p.mean,p.sigma);
       // hist_1d.Fill(random);
       hist_2d.Fill(betagamma,random);

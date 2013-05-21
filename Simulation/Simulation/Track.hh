@@ -18,49 +18,55 @@ typedef struct {
   int particle_id;    // According to Monte Carlo Particle Numbering Scheme
   int particle_index; // Set at propagation time for the GPU
   int volume_index;   // Remembers which volume the particle is currently inside
+  int initial_index;
   GPUFourVector position;
   GPUFourVector momentum;
   // Align to 64 bytes
-  char padding[64 - 4*sizeof(int) - 2*sizeof(GPUFourVector)];
+  char padding[64 - 5*sizeof(int) - 2*sizeof(GPUFourVector)];
 } GPUTrack;
 
 #ifdef RUNNING_CPP11
 static_assert(sizeof(GPUTrack) == 64,"Unaligned GPUTrack struct");
 #endif /* RUNNING_CPP11 */
 
+class Simulator;
+
 class Track {
 
 public:
-  bool alive_;
+  bool alive;
   int particle_id;
+  int initial_index;
   FourVector momentum;
   FourVector position;
+  Simulator *simulator;
   Particle *particle;
   Volume *volume;
+  Track *mother;
 
   void Kill() {
-    alive_ = false;
+    alive = false;
   }
 
-  Track(int particle_id, FourVector pos, FourVector mom) 
+  Track(const int particle_id, const FourVector pos, const FourVector mom) 
       : position(pos), momentum(mom) {
     this->particle_id = particle_id;
     volume = nullptr;
-    alive_ = true;
+    mother = nullptr;
+    alive = true;
   }
   #ifdef RUNNING_CPP11
-  Track(int particle_id)
+  Track(const int particle_id)
       : Track(particle_id,FourVector(0,0,0,0),FourVector(0,0,0,0)) {}
   #endif /* RUNNING_CPP11 */
 
-  bool alive() const { return alive_; }
   Float time() const { return position[3]; }
-  Float energy() const { return kC*momentum[3]; }
+  Float energy() const { return momentum[3]; }
   Float charge() const { return particle->charge(); }
   Float mass() const { return particle->mass(); }
   Float momentum_magnitude() const {
     return sqrt(pow(energy(),2) - pow(mass(),2));
-  } 
+  }
   Float beta() const {
     Float energy_squared = pow(energy(),2);
     return sqrt((energy_squared - pow(mass(),2)) / energy_squared);
@@ -69,12 +75,22 @@ public:
     return Gamma(energy(),mass());
   }
 
+  void SpawnChild(Track child);
+  void Boost(const Float bx, const Float by, const Float bz);
   /* Propagates the track by dl */
   void Step(const Float dl);
 
+  void UpdateMomentum(const Float change) {
+    Float length = CartesianToSpherical_R(momentum[0],momentum[1],momentum[2]);
+    momentum[0] += change * momentum[0] / length;
+    momentum[1] += change * momentum[1] / length;
+    momentum[2] += change * momentum[2] / length;
+    momentum[3] += change;
+  }
+
   GPUTrack GPU() const {
     GPUTrack retval;
-    retval.alive = alive_;
+    retval.alive = (alive) ? 1 : 0;
     if (particle == nullptr || particle->index < 0) {
       throw "Particle not properly registered to track.";
     }
