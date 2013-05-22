@@ -7,6 +7,8 @@
 
 namespace na63 {
 
+void InitializeBremsstrahlung();
+
 void Bremsstrahlung(Track& track, const Material& material,
     const Float dl);
 

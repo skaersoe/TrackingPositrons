@@ -18,11 +18,12 @@ typedef struct {
   int particle_id;    // According to Monte Carlo Particle Numbering Scheme
   int particle_index; // Set at propagation time for the GPU
   int volume_index;   // Remembers which volume the particle is currently inside
-  int initial_index;
+  int initial_index;  // For reconciliation with original indices
+  int charge;
   GPUFourVector position;
   GPUFourVector momentum;
   // Align to 64 bytes
-  char padding[64 - 5*sizeof(int) - 2*sizeof(GPUFourVector)];
+  char padding[64 - 6*sizeof(int) - 2*sizeof(GPUFourVector)];
 } GPUTrack;
 
 #ifdef RUNNING_CPP11
@@ -33,12 +34,18 @@ class Simulator;
 
 class Track {
 
+private:
+  FourVector vertex_;
+  int charge_;
+
 public:
   bool alive;
   int particle_id;
   int initial_index;
+
   FourVector momentum;
   FourVector position;
+
   Simulator *simulator;
   Particle *particle;
   Volume *volume;
@@ -48,21 +55,22 @@ public:
     alive = false;
   }
 
-  Track(const int particle_id, const FourVector pos, const FourVector mom) 
-      : position(pos), momentum(mom) {
+  Track(const int particle_id, const int c, const FourVector pos,
+      const FourVector mom) : position(pos), vertex_(pos), momentum(mom) {
     this->particle_id = particle_id;
+    charge_ = c;
     volume = nullptr;
     mother = nullptr;
     alive = true;
   }
   #ifdef RUNNING_CPP11
-  Track(const int particle_id)
-      : Track(particle_id,FourVector(0,0,0,0),FourVector(0,0,0,0)) {}
+  Track(const int particle_id, const int c)
+      : Track(particle_id,c,FourVector(0,0,0,0),FourVector(0,0,0,0)) {}
   #endif /* RUNNING_CPP11 */
 
   Float time() const { return position[3]; }
   Float energy() const { return momentum[3]; }
-  Float charge() const { return particle->charge(); }
+  Float charge() const { return charge_; }
   Float mass() const { return particle->mass(); }
   Float momentum_magnitude() const {
     return sqrt(pow(energy(),2) - pow(mass(),2));
@@ -71,12 +79,27 @@ public:
     Float energy_squared = pow(energy(),2);
     return sqrt((energy_squared - pow(mass(),2)) / energy_squared);
   }
+  ThreeVector beta_vector() const;
   Float gamma() const {
-    return Gamma(energy(),mass());
+    return Gamma(beta());
+  }
+  Float theta() const {
+    return momentum.Theta();
+  }
+  Float phi() const {
+    return momentum.Phi();
+  }
+  FourVector vertex() const {
+    return vertex_;
   }
 
   void SpawnChild(Track child);
   void Boost(const Float bx, const Float by, const Float bz);
+  #ifdef RUNNING_CPP11
+  void Boost(ThreeVector tv) {
+    Boost(tv[0],tv[1],tv[2]);
+  }
+  #endif
   /* Propagates the track by dl */
   void Step(const Float dl);
 

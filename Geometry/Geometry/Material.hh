@@ -12,6 +12,7 @@ namespace na63 {
   typedef struct {
     Float atomic_number;
     Float mean_excitation_potential;
+    Float radiation_length;
     // char padding[0 - 2*sizeof(Float)];
   } MaterialPars;
 
@@ -19,15 +20,17 @@ namespace na63 {
 
   public:
     Material(const char* n, Float atomic_number,
-        Float mean_excitation_potential) : name_(n) {
+        Float mean_excitation_potential, Float rl) : name_(n) {
       atomic_number_ = atomic_number;
       mean_excitation_potential_ = mean_excitation_potential;
+      radiation_length_ = rl;
     }
     ~Material() {}
 
     std::string name() const { return name_; }
     Float atomic_number() const { return atomic_number_; }
     Float mean_excitation_potential() const { return mean_excitation_potential_; }
+    Float radiation_length() const { return radiation_length_; }
     MaterialPars GPU() const {
       MaterialPars retval;
       retval.atomic_number = atomic_number_;
@@ -39,6 +42,7 @@ namespace na63 {
     std::string name_;
     Float atomic_number_;
     Float mean_excitation_potential_;
+    Float radiation_length_;
 
   };
 

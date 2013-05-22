@@ -73,6 +73,8 @@ inline Float Gamma(const Float& energy, const Float& mass) {
 typedef Float GPUThreeVector[3];
 typedef Float GPUFourVector[4];
 
+class FourVector;
+
 class ThreeVector {
 
 private:
@@ -96,6 +98,8 @@ public:
     return vector[i];
   }
 
+  ThreeVector& operator=(const FourVector& fv);
+
   friend std::ostream& operator<<(std::ostream& os, const ThreeVector& tv) {
     os << "(" << tv.vector[0]
        << "," << tv.vector[1]
@@ -116,6 +120,23 @@ public:
     vector[1] -= rhs.vector[1];
     vector[2] -= rhs.vector[2];
     return *this;
+  }
+
+  Float length() const {
+    return sqrt(vector[0]*vector[0] + vector[1]*vector[1] + vector[2]*vector[2]);
+  }
+
+  void Normalize() {
+    Float l = length();
+    vector[0] /= l;
+    vector[1] /= l;
+    vector[2] /= l;
+  }
+
+  void Extend(Float a) {
+    vector[0] *= a;
+    vector[1] *= a;
+    vector[2] *= a;
   }
 
   // Insert into GPU format (array)
@@ -172,6 +193,14 @@ public:
     return *this;
   }
 
+  FourVector& operator=(const ThreeVector& tv) {
+    vector[0] = tv[0];
+    vector[1] = tv[1];
+    vector[2] = tv[2];
+    vector[3] = 0;
+    return *this;
+  }
+
   friend std::ostream& operator<<(std::ostream& os, const FourVector& fv) {
     os << "(" << fv.vector[0]
        << "," << fv.vector[1]
@@ -187,6 +216,14 @@ public:
              lhs.vector[2] - rhs.vector[2],
              lhs.vector[3] - rhs.vector[3]
            );
+  }
+
+  FourVector& operator-=(const FourVector& rhs) {
+    vector[0] -= rhs.vector[0];
+    vector[1] -= rhs.vector[1];
+    vector[2] -= rhs.vector[2];
+    vector[3] -= rhs.vector[3];
+    return *this;
   }
 
   // Insert into GPU format (array)

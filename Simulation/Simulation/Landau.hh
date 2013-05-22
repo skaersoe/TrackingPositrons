@@ -1,12 +1,11 @@
-#ifndef NA63_SIMULATION_LANDAU_CUH
-#define NA63_SIMULATION_LANDAU_CUH
+#ifndef NA63_SIMULATION_LANDAU_H
+#define NA63_SIMULATION_LANDAU_H
 
 #include "Geometry/LibraryCUDA.cuh"
 
 namespace na63 {
 
-__device__ __constant__
-Float landau_array[977] = {
+const Float landau_array_host[977] = {
                                                    -2.244733,
   -2.204365,-2.168163,-2.135219,-2.104898,-2.076740,-2.050397,
   -2.025605,-2.002150,-1.979866,-1.958612,-1.938275,-1.918760,
@@ -186,8 +185,8 @@ Float landau_array[977] = {
 
 };
 
-__device__ inline
-Float RandomLandau(const Float x) {
+inline
+Float RandomLandauHost(const Float x) {
 
   // ranlan function from CERNLIB converted to C by
   // mr. Kristjan Gulbrandsen, NBI
@@ -218,15 +217,12 @@ Float RandomLandau(const Float x) {
   return ret;
 }
 
-
-__device__
-Float ThrowLandau(const Float mpv, const Float sigma,
+Float ThrowLandauHost(const Float mpv, const Float sigma,
     const Float random_uniform) {
   const Float xmpv = -0.22278298;
   return mpv+sigma*(RandomLandau(random_uniform)-xmpv);
 }
-
   
 } // End namespace na63
 
-#endif /* NA63_SIMULATION_LANDAU_CUH */
+#endif /* NA63_SIMULATION_LANDAU_H */

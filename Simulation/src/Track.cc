@@ -5,6 +5,14 @@
 
 namespace na63 {
 
+ThreeVector Track::beta_vector() const {
+  ThreeVector r;
+  r = momentum;
+  r.Normalize();
+  r.Extend(beta());
+  return r;
+}
+
 void Track::Boost(const Float bx, const Float by, const Float bz) {
 
   Float b2 = pow(bx,2) + pow(by,2) + pow(bz,2);

@@ -12,11 +12,11 @@ void CUDA_BetheEnergyLoss(GPUTrack& track, const ParticlePars& particle,
     const MaterialPars& material, const Float dl, curandState *rng_state) {
 
   // Only treat particles with charge
-  if (particle.charge == 0) return;
+  if (track.charge == 0) return;
 
   // Get -<dE/dx> and sigma
   const LandauParameters p = CUDA_GetSkewedLandauParameters(
-      CUDA_Beta(track.momentum[3],particle.mass),particle.mass,particle.charge,
+      CUDA_Beta(track.momentum[3],particle.mass),particle.mass,track.charge,
       material.atomic_number,material.mean_excitation_potential,dl);
 
   // Get random number from Landau distribution

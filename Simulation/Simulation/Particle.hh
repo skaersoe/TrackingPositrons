@@ -13,7 +13,6 @@ namespace na63 {
 
   typedef struct {
     int id;
-    Float charge;
     Float mass;
     // Align to 32 bytes
     char padding[32 - sizeof(int) - 2*sizeof(Float)];
@@ -24,9 +23,8 @@ namespace na63 {
   public:
     int index; // For generation of GPU tracks
 
-    Particle(const char* n, int id, Float charge, Float mass) : name_(n) {
+    Particle(const char* n, int id, Float mass) : name_(n) {
       id_ = id;
-      charge_ = charge;
       mass_ = mass;
       index = -1;
     }
@@ -34,12 +32,10 @@ namespace na63 {
 
     int id() const { return id_; }
     Float mass() const { return mass_; }
-    Float charge() const { return charge_; }
     std::string name() const { return name_; }
     ParticlePars GPU() const {
       ParticlePars retval;
       retval.id = id_;
-      retval.charge = charge_;
       retval.mass = mass_;
       return retval;
     }
@@ -58,7 +54,6 @@ namespace na63 {
     std::string name_;
     int id_;
     Float mass_;
-    Float charge_;
     std::vector<ProcessFunction> processes;
 
   };  

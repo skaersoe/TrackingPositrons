@@ -15,22 +15,24 @@ using namespace na63;
 
 int main(int argc,char *argv[]) {
 
-  const unsigned n_tracks = 512;
+  const unsigned n_tracks = 64;
 
   // Geometry
   Geometry geometry;
-  geometry.AddMaterial(Material("vacuum",0.0,0.0));
-  geometry.AddMaterial(Material("iron",26.0,286.0));
+  geometry.AddMaterial(Material("vacuum",0.0,0.0,0.0));
+  geometry.AddMaterial(Material("iron",26.0,286.0,13.84));
   geometry.SetBounds(Box("vacuum",ThreeVector(2e3,0,0),ThreeVector(4e3,4e3,4e3)));
   geometry.AddVolume(Box("iron",ThreeVector(2e3,0,0),ThreeVector(1e3,1e3,1e3)));
 
   // Simulator
   Simulator simulator(&geometry);
-  Particle electron = Particle("electron",11,-1,kElectronMass);
+  Particle electron("electron",11,kElectronMass);
+  Particle photon("photon",22,0);
   InitializeBremsstrahlung();
   electron.RegisterProcess(Bremsstrahlung);
+  photon.RegisterProcess(Bremsstrahlung);
   simulator.AddParticle(electron);
-  simulator.AddParticle(Particle("photon",22,0,0));
+  simulator.AddParticle(photon);
   simulator.step_size = 0.1;
 
   // Arguments
@@ -41,7 +43,7 @@ int main(int argc,char *argv[]) {
   // Tracks
   std::vector<Track> tracks;
   const Float arc = kPi/4;
-  const Float beta = 0.95;
+  const Float beta = 0.999;
   const Float E = Gamma(beta) * kElectronMass;
   Float angles[n_tracks];
   TRandom3 rng((size_t)clock());
@@ -53,7 +55,7 @@ int main(int argc,char *argv[]) {
     Float px = Gamma(bx) * kElectronMass * bx;
     Float py = Gamma(by) * kElectronMass * by;
     Float pz = 0;
-    tracks.push_back(Track(11,FourVector(),FourVector(px,py,pz,E)));
+    tracks.push_back(Track(11,-1,FourVector(),FourVector(px,py,pz,E)));
   }
   simulator.AddTracks(tracks);
 
