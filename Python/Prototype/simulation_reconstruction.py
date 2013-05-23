@@ -14,7 +14,6 @@ sys.path.append("/home/philip/Documents/bachelor/kode/")
 from NexDet.KalmanFilters import UncentedKalmanFilter,UKF
 from NexDet.PhysicsObjects import TruthParticle, TruthTrack, Detector, Measurement, Event, RecoTrack
 
-
 np.set_printoptions(edgeitems=3,infstr='Inf',linewidth=200, nanstr='NaN', precision=8, suppress=False, threshold=1000)
 
 ## NUmber of particles to simulate
@@ -482,8 +481,7 @@ def main():
     bfield_time = TGraph()
     det_time = TGraph()
 
-
-    
+        
     
 
     # def multiple_scattering(hit_in, hit_out, p0, p, q):
