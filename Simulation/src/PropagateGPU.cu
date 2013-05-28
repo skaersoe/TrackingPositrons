@@ -18,19 +18,25 @@ __host__ cudaError_t DeviceFree(KernelPars *p);
 __host__
 void PropagateGPU(Simulator* simulator) {
 
-  if (simulator->debug) {
+  /*if (simulator->debug) {
     for (int i=0;i<8;i++) {
       Track t = simulator->GetTrack(i);
       std::cout << t << std::endl;
     }
-  }
+  }*/
 
   if (simulator->debug) std::cout << "Propagating on GPU..." << std::endl;
 
   // CUDA Parameters
-  int N = simulator->TrackSize();
+  int n_tracks_initial = simulator->TrackSize();
+  // Use threads equal to the first power of two greater than or equal to the
+  // initial amount of tracks.
+  int threads = 1 << (int)(log(n_tracks_initial)/log(2));
+  if (threads < n_tracks_initial) threads = threads << 1;
   int threadsPerBlock = 256;
-  int blocksPerGrid = (N - 1) / threadsPerBlock + 1;
+  int blocksPerGrid = (threads - 1) / threadsPerBlock + 1;
+  // Actually allocate three times as much to allow for pair production
+  int N = 3 * n_tracks_initial;
 
   // Initialize arguments
   KernelPars kernel_args;
@@ -43,14 +49,22 @@ void PropagateGPU(Simulator* simulator) {
   kernel_args.volume_types = nullptr;
   kernel_args.volumes = nullptr;
 
-  // Allocate memory on device and copy data
-  GPUTrack *tracks = simulator->GPUTracks();
+  // Get track information from simulator
+  GPUTrack *tracks = new GPUTrack[N];
+  simulator->GPUTracks(tracks);
+  // Initialize free tracks
+  for (int i=n_tracks_initial;i<N;i++) {
+    tracks[i].state = STATE_FREE;
+  }
   if (simulator->debug) std::cout << "Generated GPU tracks." << std::endl;
+
+  // Allocate and copy to device
+  const unsigned size_tracks_initial = n_tracks_initial * sizeof(GPUTrack);
   const unsigned size_tracks = N*sizeof(GPUTrack);
   const unsigned size_keys = N*sizeof(int);
   if (CudaError(cudaMalloc((void**)&kernel_args.tracks,size_tracks))) return;
   if (CudaError(cudaMalloc((void**)&kernel_args.keys,size_keys))) return;
-  if (CudaError(cudaMemcpy(kernel_args.tracks,tracks,size_tracks,cudaMemcpyHostToDevice))) return;
+  if (CudaError(cudaMemcpy(kernel_args.tracks,tracks,size_tracks_initial,cudaMemcpyHostToDevice))) return;
   if (simulator->debug) std::cout << "Copied tracks and keys." << std::endl;
   // Random number generator states
   if (CudaError(cudaMalloc(&kernel_args.rng_states,N*sizeof(curandState)))) return;
@@ -62,8 +76,13 @@ void PropagateGPU(Simulator* simulator) {
 
 
   if (simulator->debug) {
-    std::cout << "Copied " << N << " tracks of size " << sizeof(GPUTrack) << " bytes each, resulting in a total of " << size_tracks << " bytes of data on the device." << std::endl;
-    std::cout << "About to initialize " << blocksPerGrid << " blocks of " << threadsPerBlock << " threads each, resulting in a total of " << blocksPerGrid * threadsPerBlock << " threads." << std::endl;
+    std::cout << "Copied " << N << " tracks of size " << sizeof(GPUTrack)
+              << " bytes each (of which " << n_tracks_initial 
+              << " are initially alive), resulting in a total of " << size_tracks
+              << " bytes of data on the device." << std::endl;
+    std::cout << "About to initialize " << blocksPerGrid << " blocks of "
+              << threadsPerBlock << " threads each, resulting in a total of "
+              << blocksPerGrid * threadsPerBlock << " threads." << std::endl;
   }
 
   int kernel_launches = 0;
@@ -85,7 +104,7 @@ void PropagateGPU(Simulator* simulator) {
     // Check if propagation is done
     int done = 0;
     if (CudaError(cudaMemcpy((void*)&done,kernel_args.keys,sizeof(int),cudaMemcpyDeviceToHost))) return;
-    if (done == MAX_INT_VALUE) break;
+    if (done == TRACK_KEY_DEAD) break;
 
   } // End kernel launch loop
 
@@ -96,11 +115,11 @@ void PropagateGPU(Simulator* simulator) {
   if (CudaError(cudaMemcpy(tracks,kernel_args.tracks,size_tracks,cudaMemcpyDeviceToHost))) return;
   CudaError(DeviceFree(&kernel_args));
 
-  simulator->CopyBackTracks();
+  simulator->CopyBackTracks(tracks,N);
 
-  if (simulator->debug)
+  /*if (simulator->debug)
     for (int i=0;i<8;i++)
-      std::cout << simulator->GetTrack(i) << std::endl;
+      std::cout << simulator->GetTrack(i) << std::endl;*/
 
 }
 
@@ -196,7 +215,7 @@ void PropagateKernel(KernelPars args) {
 
   // Get memory pointers
   GPUTrack* track = &args.tracks[index];
-  if (track->alive == 0) return;
+  if (track->state != STATE_ALIVE) return;
   ParticlePars* particle = &args.particles[track->particle_index];
 
   // Initialize random number generator
@@ -209,7 +228,7 @@ void PropagateKernel(KernelPars args) {
     track->volume_index = VolumeQuery(*track,args.volumes,args.n_volumes);
     // If out of bounds or out of energy, break
     if (track->volume_index < 0 || track->momentum[3] < particle->mass) {
-      track->alive = 0;
+      track->state = STATE_DEAD;
       break;
     }
 
@@ -233,8 +252,8 @@ void PropagateKernel(KernelPars args) {
   __syncthreads();
 
   // Set key to sort by
-  int key = MAX_INT_VALUE;
-  if (track->alive == 1) {
+  int key = TRACK_KEY_DEAD;
+  if (track->state == STATE_ALIVE) {
     key = (int)track->position[0];
   }
   args.keys[index] = key;

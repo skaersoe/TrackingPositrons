@@ -7,6 +7,9 @@
 #include "Geometry/Material.hh"
 #include <curand_kernel.h>
 
+#define TRACK_KEY_DEAD MAX_INT_VALUE - 1
+#define TRACK_KEY_AVAILABLE MAX_INT_VALUE
+
 namespace na63 {
 
 typedef struct {

@@ -1,7 +1,9 @@
-#include "Simulation/Track.hh"
-#include "Geometry/Volume.hh"
-#include "Simulation/Simulator.hh"
 #include <cassert>
+
+#include "Simulation/Track.hh"
+#include "Simulation/Simulator.hh"
+#include "Geometry/Volume.hh"
+#include "Geometry/Constants.hh"
 
 namespace na63 {
 
@@ -18,13 +20,13 @@ void Track::Boost(const Float bx, const Float by, const Float bz) {
   Float b2 = pow(bx,2) + pow(by,2) + pow(bz,2);
 
   Float gamma = 1.0 / sqrt(1.0 - b2);
-  Float bp = bx*position[0] + by*position[1] + bz*position[2];
+  Float bp = bx*momentum[0] + by*momentum[1] + bz*momentum[2];
   Float gamma2 = b2 > 0 ? (gamma - 1.0) / b2 : 0.0;
 
-  position[0] += gamma2*bp*bx + gamma*bx*position[3];
-  position[1] += gamma2*bp*by + gamma*by*position[3];
-  position[2] += gamma2*bp*bz + gamma*bz*position[3];
-  position[3] = gamma * (position[3] + bp);
+  momentum[0] += gamma2*bp*bx + gamma*bx*momentum[3];
+  momentum[1] += gamma2*bp*by + gamma*by*momentum[3];
+  momentum[2] += gamma2*bp*bz + gamma*bz*momentum[3];
+  momentum[3] = gamma * (momentum[3] + bp);
 
 }
 	
@@ -52,10 +54,12 @@ void Track::SpawnChild(Track child) {
 }
 
 Track& Track::operator=(const GPUTrack& gpu_track) {
+  alive = (gpu_track.state == STATE_ALIVE) ? true : false;
   particle_id = gpu_track.particle_id;
   initial_index = gpu_track.initial_index;
   position = gpu_track.position;
   momentum = gpu_track.momentum;
+  vertex_ = gpu_track.vertex;
   return *this;
 }
 

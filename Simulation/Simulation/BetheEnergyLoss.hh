@@ -2,6 +2,7 @@
 #define NA63_SIMULATION_BETHEENERGYLOSS_H
 
 #include "Geometry/Library.hh"
+#include "Geometry/Constants.hh"
 #include "Geometry/Material.hh"
 #include "Simulation/Track.hh"
 

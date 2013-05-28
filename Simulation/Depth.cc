@@ -23,14 +23,14 @@ int main(int argc,char *argv[]) {
 
   // Set up geometry
   Geometry geometry;
-  geometry.AddMaterial(Material("vacuum",0,0));
-  geometry.AddMaterial(Material("iron",26,286));
+  geometry.AddMaterial(Material("vacuum",0,0,0));
+  geometry.AddMaterial(Material("iron",26.0,286.0,13.84));
   geometry.SetBounds(Sphere("vacuum",ThreeVector(0,0,0),1e10));
   geometry.AddVolume(Sphere("iron",ThreeVector(0,0,0),1e10));
 
   // Create simulator
   Simulator simulator = Simulator(&geometry);
-  Particle muon = Particle("muon",13,-1,105.6583715);
+  Particle muon = Particle("muon",13,105.6583715);
   muon.RegisterProcess(BetheEnergyLoss);
   simulator.AddParticle(muon);
   simulator.step_size = 0.1;
@@ -39,8 +39,8 @@ int main(int argc,char *argv[]) {
   simulator.device = CPU;
   simulator.debug = true;
   simulator.cpu_threads = 8;
-  const unsigned x_samples = 256;
-  const unsigned y_samples = 4;
+  const unsigned x_samples = 512;
+  const unsigned y_samples = 8;
   const unsigned n_tracks = x_samples * y_samples;
   const Float energy_range[2] = {1e3,1e5};
 
@@ -50,7 +50,7 @@ int main(int argc,char *argv[]) {
   for (int i=0;i<x_samples;i++) {
     energy[i] = energy_range[0] + (energy_range[1] - energy_range[0]) * ((Float)i / (Float)x_samples);
     for (int j=0;j<y_samples;j++) {
-      tracks.push_back(Track(13,FourVector(),
+      tracks.push_back(Track(13,-1,FourVector(),
           FourVector(energy[i],0,0,energy[i])));
     }
   }
@@ -83,8 +83,8 @@ int main(int argc,char *argv[]) {
   //hist_2d.Draw("COLZ");
   graph_cpu.Draw("AP");
   graph_gpu.Draw("same P");
-  graph_cpu.SetMarkerStyle(5);
-  graph_gpu.SetMarkerStyle(5);
+  graph_cpu.SetMarkerStyle(1);
+  graph_gpu.SetMarkerStyle(1);
   graph_cpu.SetMarkerColor(4);
   graph_gpu.SetMarkerColor(8);
   graph_cpu.SetTitle("Muon depth in iron");
@@ -94,7 +94,8 @@ int main(int argc,char *argv[]) {
   graph_cpu.GetYaxis()->CenterTitle();
   canvas.Modified();
   canvas.Update();
-  gPad->WaitPrimitive();
+  canvas.SaveAs("Plots/depth_cpu_gpu.png");
+  //gPad->WaitPrimitive();
 
   return 0;
 

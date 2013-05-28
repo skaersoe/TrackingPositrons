@@ -41,8 +41,8 @@ public:
   void ClearTracks();
   //void SetTracks(std::vector<Track> t);
   unsigned TrackSize() { return tracks.size(); }
-  GPUTrack* GPUTracks();
-  void CopyBackTracks();
+  void GPUTracks(GPUTrack* dst);
+  void CopyBackTracks(GPUTrack* src, int N);
 
   /**
    * Generates some hardcoded electrons.
@@ -58,10 +58,7 @@ private:
   std::vector<Track> tracks;
   std::vector<Particle> particles;
   ParticlePars *particle_arr_;
-  GPUTrack *gpu_tracks;
-  bool external_tracks;
   bool external_geometry;
-  bool gpu_tracks_alive;
 
   void GenerateParticleArray();
   void GenerateParticleIndices(int start, int end);

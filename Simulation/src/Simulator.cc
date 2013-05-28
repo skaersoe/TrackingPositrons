@@ -17,18 +17,14 @@ Simulator::Simulator(Geometry *g) {
   geometry = g;
   device = GPU;
   debug = false;
-  external_tracks = true;
   external_geometry = true;
   step_size = 0.1;
   particle_arr_ = nullptr;
-  gpu_tracks = nullptr;
-  gpu_tracks_alive = false;
   cpu_threads = 1;
 }
 Simulator::~Simulator() {
   if (!external_geometry) delete geometry;
   if (particle_arr_ != nullptr) delete particle_arr_;
-  if (gpu_tracks_alive) delete gpu_tracks;
 }
 
 int Simulator::GetParticleIndex(int id) const {
@@ -97,24 +93,20 @@ void Simulator::ClearTracks() {
   std::cout << "All tracks cleared." << std::endl;
 }
 
-GPUTrack* Simulator::GPUTracks() {
-  if (gpu_tracks_alive) delete gpu_tracks;
-  gpu_tracks = new GPUTrack[tracks.size()];
-  gpu_tracks_alive = true;
+void Simulator::GPUTracks(GPUTrack* dst) {
   for (int i=0;i<tracks.size();i++) {
-    gpu_tracks[i] = tracks[i].GPU();
-    gpu_tracks[i].initial_index = i;
+    dst[i] = tracks[i].GPU();
+    dst[i].initial_index = i;
   }
-  return gpu_tracks;
 }
 
-void Simulator::CopyBackTracks() {
-  if (!gpu_tracks_alive) throw "No GPU tracks allocated.";
-  for (int i=0;i<tracks.size();i++) {
-    tracks[i] = gpu_tracks[i];
+void Simulator::CopyBackTracks(GPUTrack* src, int N) {
+  tracks.clear();
+  for (int i=0;i<N;i++) {
+    Track t;
+    t = src[i];
+    tracks.push_back(t);
   }
-  delete gpu_tracks;
-  gpu_tracks_alive = false;
 }
 
 void PropagateTrack(Geometry &geometry, Track &track, const Float dl) {

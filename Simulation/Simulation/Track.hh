@@ -8,26 +8,31 @@
 
 namespace na63 {
 
+#define STATE_ALIVE 0
+#define STATE_DEAD 1
+#define STATE_FREE 2
+
 /**
  * Track data struct, should always be aligned to 32 bytes to take advantage
  * of memory bursts.
  */
 typedef struct {
   // int particle_index;
-  int alive;
+  int state;
   int particle_id;    // According to Monte Carlo Particle Numbering Scheme
   int particle_index; // Set at propagation time for the GPU
   int volume_index;   // Remembers which volume the particle is currently inside
   int initial_index;  // For reconciliation with original indices
   int charge;
+  GPUFourVector vertex;
   GPUFourVector position;
   GPUFourVector momentum;
-  // Align to 64 bytes
-  char padding[64 - 6*sizeof(int) - 2*sizeof(GPUFourVector)];
+  // Align to 128 bytes
+  char padding[128 - 6*sizeof(int) - 3*sizeof(GPUFourVector)];
 } GPUTrack;
 
 #ifdef RUNNING_CPP11
-static_assert(sizeof(GPUTrack) == 64,"Unaligned GPUTrack struct");
+static_assert(sizeof(GPUTrack) == 128,"Unaligned GPUTrack struct");
 #endif /* RUNNING_CPP11 */
 
 class Simulator;
@@ -66,10 +71,12 @@ public:
   #ifdef RUNNING_CPP11
   Track(const int particle_id, const int c)
       : Track(particle_id,c,FourVector(0,0,0,0),FourVector(0,0,0,0)) {}
+  Track() : Track(0,0) {}
   #endif /* RUNNING_CPP11 */
 
   Float time() const { return position[3]; }
   Float energy() const { return momentum[3]; }
+  Float kinetic_energy() const { return momentum[3] - mass(); }
   Float charge() const { return charge_; }
   Float mass() const { return particle->mass(); }
   Float momentum_magnitude() const {
@@ -104,7 +111,7 @@ public:
   void Step(const Float dl);
 
   void UpdateMomentum(const Float change) {
-    Float length = CartesianToSpherical_R(momentum[0],momentum[1],momentum[2]);
+    Float length = momentum.length();
     momentum[0] += change * momentum[0] / length;
     momentum[1] += change * momentum[1] / length;
     momentum[2] += change * momentum[2] / length;
@@ -113,15 +120,17 @@ public:
 
   GPUTrack GPU() const {
     GPUTrack retval;
-    retval.alive = (alive) ? 1 : 0;
+    retval.state = (alive) ? STATE_ALIVE : STATE_DEAD;
     if (particle == nullptr || particle->index < 0) {
       throw "Particle not properly registered to track.";
     }
     retval.particle_index = particle->index;
+    retval.charge = charge_;
     retval.particle_id = particle_id;
     retval.volume_index = -1;
     position.GPU(retval.position);
     momentum.GPU(retval.momentum);
+    vertex_.GPU(retval.vertex);
     return retval;
   }
 

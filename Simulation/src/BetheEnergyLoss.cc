@@ -1,3 +1,4 @@
+#include "Simulation/Landau.hh"
 #include "Simulation/BetheEnergyLoss.hh"
 #include "Geometry/Library.hh"
 
@@ -10,7 +11,7 @@ void BetheEnergyLoss(Track& track, const Material& material,
 
   TRandom3 rng;
 
-  rng.SetSeed((size_t)&track+(size_t)BetheEnergyLoss);
+  rng.SetSeed((size_t)&track+(size_t)track.energy());
 
   // Only treat particles with charge
   if (track.charge() == 0) return;
@@ -21,7 +22,8 @@ void BetheEnergyLoss(Track& track, const Material& material,
       material.mean_excitation_potential(),dl);
 
   // Get random number from Landau distribution
-  Float energy_loss = rng.Landau(p.mean,p.sigma);
+  // Float energy_loss = rng.Landau(p.mean,p.sigma);
+  Float energy_loss = ThrowLandauHost(p.mean,p.sigma,rng.Rndm());
 
   // Update track
   track.UpdateMomentum(-energy_loss * dl);

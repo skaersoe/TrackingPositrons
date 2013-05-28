@@ -1,5 +1,6 @@
 #include "Geometry/BoxCUDA.cuh"
 #include "Geometry/SphereCUDA.cuh"
+#include "Geometry/Constants.hh"
 #include "Simulation/TrackGPU.cuh"
 
 namespace na63 {
@@ -56,7 +57,7 @@ void Boost(GPUTrack& track, const Float bx, const Float by, const Float bz) {
 
 __device__
 void Step(GPUTrack& track, const ParticlePars& particle, const Float dl) {
-  if (!track.alive) return;
+  if (track.state != STATE_ALIVE) return;
   GPUThreeVector change;
   CUDA_SphericalToCartesian(
     change,

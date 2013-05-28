@@ -8,6 +8,25 @@ namespace na63 {
 
 #define MAX_INT_VALUE 2147483647
 
+template <typename A, typename B>
+__device__ inline
+void ThreeVector_Copy(
+    A& a, const B& b) {
+  a[0] = b[0];
+  a[1] = b[1];
+  a[2] = b[2];
+}
+
+template <typename A, typename B>
+__device__ inline
+void FourVector_Copy(
+    A& a, const B& b) {
+  a[0] = b[0];
+  a[1] = b[1];
+  a[2] = b[2];
+  a[3] = b[3];
+}
+
 template <typename A, typename B, typename C>
 __device__ inline
 void ThreeVector_Add(

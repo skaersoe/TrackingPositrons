@@ -23,11 +23,6 @@ typedef float Float;
 typedef int Int_t;
 #endif
 
-const Float kC = 2.99792458e8; // m/s
-const Float kPi = 3.14159265;
-const Float kElectronMass = 5.10998910e-1; // MeV
-const Float kMuonMass = 1.056583715e2; // MeV
-
 // All volumes must be defined here
 typedef enum {
   SPHERE,
@@ -68,6 +63,10 @@ inline Float Gamma(const Float& beta) {
 
 inline Float Gamma(const Float& energy, const Float& mass) {
   return energy / mass;
+}
+
+inline Float Beta(const Float& gamma) {
+  return sqrt(1-1/pow(gamma,2));
 }
 
 typedef Float GPUThreeVector[3];
@@ -133,11 +132,43 @@ public:
     vector[2] /= l;
   }
 
+  ThreeVector Normalized() const {
+    Float l = length();
+    return ThreeVector(vector[0]/l,vector[1]/l,vector[2]/l);
+  }
+
   void Extend(Float a) {
     vector[0] *= a;
     vector[1] *= a;
     vector[2] *= a;
   }
+
+  void Set(Float a, Float b, Float c) {
+    vector[0] = a;
+    vector[1] = b;
+    vector[2] = c;
+  }
+
+  void Rotate(const ThreeVector& unit_vector) {
+
+    Float u1 = unit_vector[0];
+    Float u2 = unit_vector[1];
+    Float u3 = unit_vector[2];
+    Float up = u1*u1 + u2*u2;
+
+    if (up) {
+      up = sqrt(up);
+      Float px = vector[0], py = vector[1], pz = vector[2];
+      vector[0] = (u1*u3*px - u2*py + u1*up*pz)/up;
+      vector[1] = (u2*u3*px + u1*py + u2*up*pz)/up;
+      vector[2] = (u3*u3*px -    px + u3*up*pz)/up;
+    } else {
+      if (u3 < 0.0) {
+        vector[0] = -vector[0]; vector[2] = -vector[2];
+      }
+    }
+
+}
 
   // Insert into GPU format (array)
   void GPU(GPUThreeVector tv) const {
@@ -224,6 +255,29 @@ public:
     vector[2] -= rhs.vector[2];
     vector[3] -= rhs.vector[3];
     return *this;
+  }
+
+  void Set(Float a, Float b, Float c, Float d) {
+    vector[0] = a;
+    vector[1] = b;
+    vector[2] = c;
+    vector[3] = d;
+  }
+
+  void Normalize() {
+    Float l = length();
+    vector[0] /= l;
+    vector[1] /= l;
+    vector[2] /= l;
+  }
+
+  ThreeVector Normalized() const {
+    Float l = length();
+    return ThreeVector(vector[0]/l,vector[1]/l,vector[2]/l);
+  }
+
+  Float length() const {
+    return sqrt(vector[0]*vector[0] + vector[1]*vector[1] + vector[2]*vector[2]);
   }
 
   // Insert into GPU format (array)

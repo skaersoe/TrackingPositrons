@@ -29,7 +29,7 @@ nvccobjects:
 	$(NVCC) $(NVCCFLAGS) $(INCLUDE_CUDA) -dc $(SRC)/*.cu
 
 dlink: nvccobjects
-	$(NVCC) $(NVCCFLAGS) -dlink ../Geometry/SphereCUDA.o ../Geometry/BoxCUDA.o BetheEnergyLossCUDA.o PropagateGPU.o TrackGPU.o
+	$(NVCC) $(NVCCFLAGS) -dlink ../Geometry/SphereCUDA.o ../Geometry/BoxCUDA.o BetheEnergyLossCUDA.o BremsstrahlungCUDA.o PropagateGPU.o TrackGPU.o
 
 geometry:
 	make -C ../Geometry

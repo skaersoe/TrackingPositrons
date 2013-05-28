@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <TApplication.h>
 #include <TCanvas.h>
 #include <TGraph.h>
@@ -15,20 +16,19 @@ using namespace na63;
 
 int main(int argc,char *argv[]) {
 
-  const unsigned n_tracks = 64;
+  const unsigned n_tracks = 256;
 
   // Geometry
   Geometry geometry;
   geometry.AddMaterial(Material("vacuum",0.0,0.0,0.0));
   geometry.AddMaterial(Material("iron",26.0,286.0,13.84));
-  geometry.SetBounds(Box("vacuum",ThreeVector(2e3,0,0),ThreeVector(4e3,4e3,4e3)));
-  geometry.AddVolume(Box("iron",ThreeVector(2e3,0,0),ThreeVector(1e3,1e3,1e3)));
+  geometry.SetBounds(Box("vacuum",ThreeVector(2e2,0,0),ThreeVector(4e2,4e2,4e2)));
+  geometry.AddVolume(Box("iron",ThreeVector(2e2,0,0),ThreeVector(1e2,1e2,1e2)));
 
   // Simulator
   Simulator simulator(&geometry);
   Particle electron("electron",11,kElectronMass);
   Particle photon("photon",22,0);
-  InitializeBremsstrahlung();
   electron.RegisterProcess(Bremsstrahlung);
   photon.RegisterProcess(Bremsstrahlung);
   simulator.AddParticle(electron);
@@ -43,12 +43,18 @@ int main(int argc,char *argv[]) {
   // Tracks
   std::vector<Track> tracks;
   const Float arc = kPi/4;
-  const Float beta = 0.999;
-  const Float E = Gamma(beta) * kElectronMass;
+  const Float E = 10; // 100 MeV
+  const Float gamma = E / kElectronMass;
+  const Float beta = Beta(gamma);
   Float angles[n_tracks];
   TRandom3 rng((size_t)clock());
   for (int i=0;i<n_tracks;i++) {
-    Float angle = -arc + 2*arc * (rng.Rndm());
+    Float angle;
+    if (n_tracks > 1) {
+      angle = -arc + 2*arc * (rng.Rndm());
+    } else {
+      angle = 0;
+    }
     angles[i] = angle;
     Float bx = beta * cos(angle);
     Float by = beta * sin(angle);
@@ -69,6 +75,8 @@ int main(int argc,char *argv[]) {
   TH1F photons("Bremsstrahlung photons","Bremsstrahlung photons",96,-arc,arc);
   electrons.SetLineColor(kRed);
   photons.SetLineColor(kBlue);
+  std::ofstream outfile;
+  outfile.open("Data/bremsstrahlung_shower");
   for (int i=0;i<simulator.TrackSize();i++) {
     Track t = simulator.GetTrack(i);
     if (t.particle_id == 11) {
@@ -76,14 +84,26 @@ int main(int argc,char *argv[]) {
     } else if (t.particle_id == 22) {
       photons.Fill(angles[t.initial_index]);
     }
+    FourVector vertex = t.vertex();
+    outfile << t.particle_id << ","
+            << vertex[0] << ","
+            << vertex[1] << ","
+            << vertex[2] << ","
+            << vertex[3] << ","
+            << t.position[0] << ","
+            << t.position[1] << ","
+            << t.position[2] << ","
+            << t.position[3] << std::endl;
   }
+  outfile.close();
   photons.Draw();
   electrons.Draw("same");
   photons.SetTitle("Bremsstrahlung");
   photons.GetXaxis()->SetTitle("Angle [radians]");
   canvas.Modified();
   canvas.Update();
-  gPad->WaitPrimitive();
+  //canvas.SaveAs("Plots/bremsstrahlung.png");
+  //gPad->WaitPrimitive();
 
   return 0;
 }

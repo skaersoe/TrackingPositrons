@@ -1,11 +1,11 @@
 #ifndef NA63_SIMULATION_LANDAU_H
 #define NA63_SIMULATION_LANDAU_H
 
-#include "Geometry/LibraryCUDA.cuh"
+#include "Geometry/Library.hh"
 
 namespace na63 {
 
-const Float landau_array_host[977] = {
+const Float landau_array[977] = {
                                                    -2.244733,
   -2.204365,-2.168163,-2.135219,-2.104898,-2.076740,-2.050397,
   -2.025605,-2.002150,-1.979866,-1.958612,-1.938275,-1.918760,
@@ -220,7 +220,7 @@ Float RandomLandauHost(const Float x) {
 Float ThrowLandauHost(const Float mpv, const Float sigma,
     const Float random_uniform) {
   const Float xmpv = -0.22278298;
-  return mpv+sigma*(RandomLandau(random_uniform)-xmpv);
+  return mpv+sigma*(RandomLandauHost(random_uniform)-xmpv);
 }
   
 } // End namespace na63
