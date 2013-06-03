@@ -14,16 +14,21 @@ void CUDA_BetheEnergyLoss(GPUTrack& track, const ParticlePars& particle,
   // Only treat particles with charge
   if (track.charge == 0) return;
 
+  Float mass = particle.mass;
+
+  // Don't handle electrons for now
+  if (mass < 1 * MeV) return;
+
   // Get -<dE/dx> and sigma
-  const LandauParameters p = CUDA_GetSkewedLandauParameters(
-      CUDA_Beta(track.momentum[3],particle.mass),particle.mass,track.charge,
+  LandauParameters p = CUDA_GetSkewedLandauParameters(
+      CUDA_Beta(track.momentum[3],mass),mass,
       material.atomic_number,material.mean_excitation_potential,dl);
 
   // Get random number from Landau distribution
-  const Float energy_loss = ThrowLandau(p.mean,p.sigma,curand_uniform(rng_state));
+  Float energy_loss = ThrowLandau(p.mean,p.sigma,curand_uniform(rng_state));
 
   // Update track
-  CUDA_UpdateMomentum(track.momentum,-energy_loss * dl);
+  CUDA_UpdateEnergy(track.momentum,mass,-energy_loss * dl);
 }
 
 } // End namespace na63

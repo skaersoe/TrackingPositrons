@@ -8,14 +8,14 @@
 namespace na63 {
 
 __device__
-int VolumeQuery(const GPUTrack& track, const VolumePars* volumes,
-    const unsigned n_volumes);
+int VolumeQuery(const GPUTrack& track);
 
 __device__
 void Step(GPUTrack& track, const ParticlePars& particle, const Float dl);
 
 __device__
-void CUDA_UpdateMomentum(GPUFourVector& momentum, const Float change);
+void CUDA_UpdateEnergy(GPUFourVector& momentum, const Float mass,
+    const Float change);
 
 } // End namespace na63
 

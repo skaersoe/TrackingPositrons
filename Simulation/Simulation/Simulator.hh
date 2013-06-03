@@ -10,14 +10,17 @@
 namespace na63 {
 
 enum Device {CPU,GPU};
+enum SortMethod {X,Y,Z,RADIUS};
 
 class Simulator {
 
 public:
   // Allow these parameters to be altered freely
   Device device;
+  SortMethod sorting;
   bool debug;
   int cpu_threads;
+  int pool_size;
   Float step_size;
   Geometry *geometry;
 

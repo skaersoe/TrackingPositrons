@@ -1,6 +1,5 @@
 #include <cmath>
 #include <algorithm>
-#include <cfloat>
 
 #include "Simulation/Bremsstrahlung.hh"
 #include "Simulation/AngularDistribution.hh"
@@ -24,6 +23,7 @@ Bremsstrahlung::Bremsstrahlung(const Particle* p) :
 
 }
     
+/** Used in SampleSecondaries() */
 void Bremsstrahlung::SetMaterial(const Material* material_new) {
   
   // std::cout<<"SetCurrentElement Z="<<Z<<std::endl;
@@ -58,6 +58,7 @@ void Bremsstrahlung::SetMaterial(const Material* material_new) {
 
 } // End Bremsstrahlung::SetMaterial
 
+/** Used in constructor */
 void Bremsstrahlung::SetParticle(const Particle* particle_new) {
 
   if (particle == particle_new) return;
@@ -73,6 +74,7 @@ void Bremsstrahlung::SetParticle(const Particle* particle_new) {
 
 } // End Bremsstrahlung::SetParticle
 
+/** Used in SampleSecondaries() */
 void Bremsstrahlung::SetupForMaterial(const Material* mat,
     const Float kin_energy) {
 
@@ -85,6 +87,8 @@ void Bremsstrahlung::SetupForMaterial(const Material* mat,
 
 }
 
+/** Used in SampleSecondaries(),
+            ComputeCrossSectionPerAtom() */
 Float Bremsstrahlung::ComputeDXSectionPerAtom(const Float gamma_energy) const {
 
   if (gamma_energy < 0.0) return 0.0;
@@ -122,6 +126,7 @@ Float Bremsstrahlung::ComputeDXSectionPerAtom(const Float gamma_energy) const {
 
 } // End Bremsstrahlung::ComputeDXSectionPerAtom()
 
+/** Used in ComputeCrossSectionPerAtom() */
 Float Bremsstrahlung::ComputeXSectionPerAtom(const Float cut) const {
 
   Float cross = 0.0;
@@ -156,6 +161,7 @@ Float Bremsstrahlung::ComputeXSectionPerAtom(const Float cut) const {
 
 } // End Bremsstrahlung::ComputeXSectionPerAtom()
 
+/** Used in ComputeCrossSectionPerAtom() */
 Float Bremsstrahlung::ComputeCrossSectionPerAtom(const Float cut_energy, 
     const Float max_energy) const {
 
@@ -270,8 +276,8 @@ void Bremsstrahlung::SampleSecondaries(
 
   } else {
     
-    // No new gamma was generated.
     // Just update momentum and energy...
+
     track.momentum = momentum;
 
   }
@@ -308,7 +314,8 @@ Float ScreenFunction2(Float screen_variable) {
   return screen_value;
 }
 
-// Parametrized cross section
+/** Parametrized cross section.
+    Used in SampleSecondaries() */
 Float ComputeParametrizedDXSectionPerAtom(Float kinetic_energy, Float gamma_energy, Float Z) {
 
   static const double

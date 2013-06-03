@@ -16,7 +16,7 @@ typedef struct {
 } LandauParameters;
 
 inline LandauParameters GetSkewedLandauParameters(const Float beta,
-    const Float mass, const Float charge, const Float atomic_number,
+    const Float mass, const Float atomic_number,
     const Float mean_excitation_potential, const Float dl) {
 
   LandauParameters p;
@@ -25,9 +25,9 @@ inline LandauParameters GetSkewedLandauParameters(const Float beta,
   const Float beta_squared = pow(beta,2);
   const Float gamma = Gamma(beta);
   const Float gamma_squared = pow(gamma,2);
-  const Float xi = 4.0 * 0.307075 * atomic_number * dl / beta_squared;
+  const Float xi = 0.5 * 0.307075 * atomic_number * dl / beta_squared;
 
-  p.mean = xi * (log(2 * kElectronMass * pow(kC,2) * beta_squared
+  p.mean = xi * (log(2 * mass * /*pow(kC,2) **/ beta_squared
       * gamma_squared / mean_excitation_potential)
       + log(xi/mean_excitation_potential) + 0.200 - beta_squared);
   p.sigma = 4 * xi;
@@ -60,9 +60,38 @@ inline LandauParameters GetBetheLandauParameters(const Float beta,
 
   // xi = (K/A) * Z * (x/beta^2)
   // sigma = 4 * xi [PDG 27.2.7]
-  p.sigma = 4.0 * 0.307075 * atomic_number * dl / beta_squared;
+  p.sigma = 2.0 * 0.307075 * atomic_number * dl / beta_squared;
 
   return p;
+}
+
+inline LandauParameters GetElectronCollisionLoss(const Float density,
+    const Float atomic_number, const Float beta, const Float kinetic_energy,
+    const Float mean_excitation_potential, const Float charge, const Float dl) {
+
+  LandauParameters p;
+
+  // Kinetic energy in terms of electron masses
+  Float tau = kinetic_energy / kElectronMass;
+  Float beta_squared = beta*beta;
+
+  Float F_tau_electron = 1.0 - beta_squared
+      + (tau*tau / 8.0 - log(2.0) * (2.0*kElectronRadius + 1.0)) / pow(tau + 1.0,2);
+
+  Float F_tau_positron = 2 * log(2) - beta_squared / 12
+      * (23 + 14/(tau + 2) + 10/pow(tau + 2,2) + 4/pow(tau+2,3));
+
+  p.mean = dl * 2.0 * kPi * kAvogadro * kElectronRadiusSquared * kElectronMass
+      * density * atomic_number / (beta*beta);
+  p.mean *= log((tau*tau * (tau + 2.0))
+      / (2.0 * pow(1e-6 * mean_excitation_potential / kElectronMass,2)))
+      + ((charge < 0) ? F_tau_electron : F_tau_positron);
+  //printf("%f, %f, %f\n",(tau*tau * (tau + 2.0)),(2.0 * pow(mean_excitation_potential / kElectronMass,2)),F_tau_electron);
+
+  p.sigma = 2.0 * 0.307075 * atomic_number * dl / beta_squared;
+
+  return p;
+
 }
 
 void BetheEnergyLoss(Track& track, const Material& material,

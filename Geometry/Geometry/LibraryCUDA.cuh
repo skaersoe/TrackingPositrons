@@ -60,6 +60,12 @@ void ThreeVector_Negate(const A& a, B& b) {
   b[2] = -a[2];
 }
 
+template <typename A>
+__device__ inline
+Float ThreeVector_Length(const A& a) {
+  return sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
+}
+
 __device__ inline
 Float CUDA_CartesianToSpherical_R(const Float x, const Float y, const Float z) {
   return sqrt(pow(x,2) + pow(y,2) + pow(z,2));
@@ -67,12 +73,12 @@ Float CUDA_CartesianToSpherical_R(const Float x, const Float y, const Float z) {
 
 __device__ inline
 Float CUDA_CartesianToSpherical_Theta(const Float x, const Float y, const Float z) {
-  return acos(z/CUDA_CartesianToSpherical_R(x,y,z));
+  return (!x && !y && !z) ? 0.0 : acos(z/CUDA_CartesianToSpherical_R(x,y,z));
 }
 
 __device__ inline
 Float CUDA_CartesianToSpherical_Phi(const Float x, const Float y) {
-  return atan(y/x);
+  return (!x && !y) ? 0.0 : atan(y/x);
 }
 
 __device__ inline

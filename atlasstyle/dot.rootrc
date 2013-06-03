@@ -1,0 +1,4 @@
+Unix.*.Root.DynamicPath:    .:$(ROOTSYS)/lib:$(HOME)/Dropbox/Development/mdjrepo/Styles/atlasstyle:
+Unix.*.Root.MacroPath:	    .:$(HOME)/Dropbox/Development/mdjrepo/Styles/atlasstyle:
+
+Root.ShowPath: false

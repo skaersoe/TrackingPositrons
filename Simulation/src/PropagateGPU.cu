@@ -6,8 +6,17 @@
 #include "Simulation/CudaHelper.hh"
 
 #include "Simulation/BetheEnergyLossCUDA.cuh"
+#include "Simulation/BremsstrahlungCUDA.cuh"
 
 namespace na63 {
+
+__constant__ VolumePars *volumes;
+__constant__ int n_volumes;
+__constant__ GPUTrack *track_pool;
+__constant__ int maximum_index;
+
+__constant__ int electron_index;
+__constant__ int photon_index;
 
 /** Forward declarations */
 __host__ void PropagateGPU(Simulator* simulator);
@@ -35,12 +44,11 @@ void PropagateGPU(Simulator* simulator) {
   if (threads < n_tracks_initial) threads = threads << 1;
   int threadsPerBlock = 256;
   int blocksPerGrid = (threads - 1) / threadsPerBlock + 1;
-  // Actually allocate three times as much to allow for pair production
-  int N = 3 * n_tracks_initial;
+  // Allocate more to allow for particle pool
+  int N = (1 + simulator->pool_size) * n_tracks_initial;
 
   // Initialize arguments
   KernelPars kernel_args;
-  kernel_args.N = N;
   kernel_args.n_volumes = simulator->geometry->volumes_size();
   kernel_args.tracks = nullptr;
   kernel_args.keys = nullptr;
@@ -48,38 +56,101 @@ void PropagateGPU(Simulator* simulator) {
   kernel_args.particles = nullptr;
   kernel_args.volume_types = nullptr;
   kernel_args.volumes = nullptr;
+  kernel_args.sorting = simulator->sorting;
 
   // Get track information from simulator
   GPUTrack *tracks = new GPUTrack[N];
   simulator->GPUTracks(tracks);
+  int *keys = new int[N];
   // Initialize free tracks
   for (int i=n_tracks_initial;i<N;i++) {
     tracks[i].state = STATE_FREE;
+    keys[i] = TRACK_KEY_FREE;
   }
   if (simulator->debug) std::cout << "Generated GPU tracks." << std::endl;
 
   // Allocate and copy to device
-  const unsigned size_tracks_initial = n_tracks_initial * sizeof(GPUTrack);
+  //const unsigned size_tracks_initial = n_tracks_initial * sizeof(GPUTrack);
   const unsigned size_tracks = N*sizeof(GPUTrack);
   const unsigned size_keys = N*sizeof(int);
+  if (simulator->debug) std::cout << "Copying tracks and keys... ";
   if (CudaError(cudaMalloc((void**)&kernel_args.tracks,size_tracks))) return;
   if (CudaError(cudaMalloc((void**)&kernel_args.keys,size_keys))) return;
-  if (CudaError(cudaMemcpy(kernel_args.tracks,tracks,size_tracks_initial,cudaMemcpyHostToDevice))) return;
-  if (simulator->debug) std::cout << "Copied tracks and keys." << std::endl;
+  if (CudaError(cudaMemcpy(kernel_args.tracks,tracks,size_tracks,cudaMemcpyHostToDevice))) return;
+  if (CudaError(cudaMemcpy(kernel_args.keys,keys,size_keys,cudaMemcpyHostToDevice))) return;
+  if (simulator->debug) std::cout << "OK" << std::endl;
+
   // Random number generator states
   if (CudaError(cudaMalloc(&kernel_args.rng_states,N*sizeof(curandState)))) return;
   // Thrust wrappers
   thrust::device_ptr<GPUTrack> devptr_thrust_tracks(kernel_args.tracks);
   thrust::device_ptr<int>      devptr_thrust_keys(kernel_args.keys);
+  if (simulator->debug) std::cout << "Copying geometry... ";
   if (CudaError(DeviceAllocation(simulator, &kernel_args))) return;
-  if (simulator->debug) std::cout << "Copied geometry." << std::endl;
+  if (simulator->debug) std::cout << "OK" << std::endl;
+
+  // Set device global variables
+  if (simulator->debug) std::cout << "Copying global variables... ";
+  if (CudaError(cudaMemcpyToSymbol(
+    volumes,
+    &kernel_args.volumes,
+    sizeof(VolumePars*),
+    0,
+    cudaMemcpyHostToDevice
+  ))) return;
+  int volume_size = simulator->geometry->volumes_size();
+  if (CudaError(cudaMemcpyToSymbol(
+    n_volumes,
+    &volume_size,
+    sizeof(int),
+    0,
+    cudaMemcpyHostToDevice
+  ))) return;
+  GPUTrack *pool = kernel_args.tracks+n_tracks_initial;
+  if (CudaError(cudaMemcpyToSymbol(
+    track_pool,
+    &pool,
+    sizeof(GPUTrack*),
+    0,
+    cudaMemcpyHostToDevice
+  ))) return;
+  int max_idx = N - 1;
+  if (CudaError(cudaMemcpyToSymbol(
+    maximum_index,
+    &max_idx,
+    sizeof(int),
+    0,
+    cudaMemcpyHostToDevice
+  ))) return;
+  // Specific particles for processes (Bremsstrahlung)
+  int electron_idx = simulator->GetParticleIndex(11);
+  if (electron_idx >= 0) {
+    if (CudaError(cudaMemcpyToSymbol(
+      electron_index,
+      &electron_idx,
+      sizeof(int),
+      0,
+      cudaMemcpyHostToDevice
+    ))) return;
+  }
+  int photon_idx = simulator->GetParticleIndex(22);
+  if (photon_idx >= 0) {
+    if (CudaError(cudaMemcpyToSymbol(
+      photon_index,
+      &photon_idx,
+      sizeof(int),
+      0,
+      cudaMemcpyHostToDevice
+    ))) return;
+  }
+  if (simulator->debug) std::cout << "OK" << std::endl;;
 
 
   if (simulator->debug) {
-    std::cout << "Copied " << N << " tracks of size " << sizeof(GPUTrack)
+    /*std::cout << "Copied " << N << " tracks of size " << sizeof(GPUTrack)
               << " bytes each (of which " << n_tracks_initial 
               << " are initially alive), resulting in a total of " << size_tracks
-              << " bytes of data on the device." << std::endl;
+              << " bytes of data on the device." << std::endl;*/
     std::cout << "About to initialize " << blocksPerGrid << " blocks of "
               << threadsPerBlock << " threads each, resulting in a total of "
               << blocksPerGrid * threadsPerBlock << " threads." << std::endl;
@@ -96,6 +167,10 @@ void PropagateGPU(Simulator* simulator) {
 
     // Launch kernel
     kernel_launches++;
+    if (simulator->debug && kernel_launches % 100 == 0) {
+      std::cout << "Kernel launch number "
+      << kernel_launches << "..." << std::endl;
+    }
     PropagateKernel<<<blocksPerGrid,threadsPerBlock>>>(kernel_args);
     cudaDeviceSynchronize();
     thrust::sort_by_key(devptr_thrust_keys, devptr_thrust_keys + N, devptr_thrust_tracks);
@@ -104,7 +179,12 @@ void PropagateGPU(Simulator* simulator) {
     // Check if propagation is done
     int done = 0;
     if (CudaError(cudaMemcpy((void*)&done,kernel_args.keys,sizeof(int),cudaMemcpyDeviceToHost))) return;
-    if (done == TRACK_KEY_DEAD) break;
+    if (done == TRACK_KEY_DEAD) {
+      break;
+    }/* else if (done == TRACK_KEY_WAITING) {
+      std::cout << "Propagation did not finish because of missing memory necessary for generated particles." << std::endl;
+      break;
+    }*/
 
   } // End kernel launch loop
 
@@ -211,23 +291,41 @@ void PropagateKernel(KernelPars args) {
 
   // Set and check thread index
   int index = threadIdx.x + blockDim.x * blockIdx.x;
-  if (index >= args.N) return;
+  if (index >= maximum_index) return;
 
   // Get memory pointers
   GPUTrack* track = &args.tracks[index];
-  if (track->state != STATE_ALIVE) return;
+  if (track->state == STATE_WAITING) {
+    track->state = STATE_ALIVE;
+  } else {
+    if (track->state != STATE_ALIVE) return;
+  }
   ParticlePars* particle = &args.particles[track->particle_index];
+  curandState* rng_state = &args.rng_states[index];
+
+  __syncthreads();
 
   // Initialize random number generator
-  curand_init(args.rng_seed,index,0,&args.rng_states[index]);
+  curand_init(args.rng_seed,index,0,rng_state);
 
   // Perform steps
   for (int i=0;i<args.steps;i++) {
 
+    // Run physics
+    if (track->volume_index > 0) {
+      const int material_index = args.volumes[track->volume_index].material_index;
+      if (material_index >= 0) {
+        const MaterialPars *material = &args.materials[args.volumes[track->volume_index].material_index];
+        CUDA_BetheEnergyLoss(*track,*particle,*material,args.dl,rng_state);
+        __syncthreads();
+        CUDA_Bremsstrahlung(*track,*particle,*material,args.dl,rng_state,index);
+      }
+    }
+
     // Update volume if necessary
-    track->volume_index = VolumeQuery(*track,args.volumes,args.n_volumes);
-    // If out of bounds or out of energy, break
-    if (track->volume_index < 0 || track->momentum[3] < particle->mass) {
+    track->volume_index = VolumeQuery(*track);
+    // If out of bounds or out of energy, kill and break
+    if (track->volume_index < 0 || track->momentum[3] <= particle->mass) {
       track->state = STATE_DEAD;
       break;
     }
@@ -237,24 +335,20 @@ void PropagateKernel(KernelPars args) {
     // Propagate position
     Step(*track,*particle,args.dl);
 
-    // Run physics
-    if (track->volume_index > 0) {
-      const int material_index = args.volumes[track->volume_index].material_index;
-      if (material_index >= 0) {
-        const MaterialPars *material = &args.materials[args.volumes[track->volume_index].material_index];
-        __syncthreads();
-        CUDA_BetheEnergyLoss(*track,*particle,*material,args.dl,&args.rng_states[index]);
-      }
-    }
-
   }
 
   __syncthreads();
 
   // Set key to sort by
   int key = TRACK_KEY_DEAD;
-  if (track->state == STATE_ALIVE) {
-    key = (int)track->position[0];
+  if (track->state == STATE_WAITING) {
+    key = TRACK_KEY_WAITING;
+  } else if (track->state == STATE_ALIVE) {
+    if (args.sorting < 3) {
+      key = (int)track->position[args.sorting];
+    } else if (args.sorting == RADIUS) {
+      key = ThreeVector_Length(track->position);
+    }
   }
   args.keys[index] = key;
 

@@ -185,10 +185,9 @@ const Float landau_array[977] = {
 
 };
 
-inline
-Float RandomLandauHost(const Float x) {
+inline Float RandomLandauHost(const Float x) {
 
-  // ranlan function from CERNLIB converted to C by
+  // ranlan function from CERNLIB converted to C++ by
   // mr. Kristjan Gulbrandsen, NBI
 
   Float u=1000*x;

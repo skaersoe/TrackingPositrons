@@ -1,6 +1,8 @@
 #ifndef NA63_SIMULATION_BREMSSTRAHLUNG_H
 #define NA63_SIMULATION_BREMSSTRAHLUNG_H
 
+#include <cfloat>
+
 #include "Geometry/Library.hh"
 #include "Simulation/Track.hh"
 #include "Simulation/Simulator.hh"

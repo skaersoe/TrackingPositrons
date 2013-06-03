@@ -33,6 +33,8 @@ const Float ampere = coulomb / s;
 const Float weber = volt * s;
 const Float henry = weber / ampere;
 
+const Float mol = 1;
+
 const Float kPi = 3.14159265;
 const Float kC = 2.99792458e8 * m/s;
 const Float kCSquared = kC * kC;
@@ -47,12 +49,14 @@ const Float kMu0 = 4 * kPi * 1.0e-7 * henry / m;
 const Float kEpsilon0 = 1.0 / (kCSquared * kMu0);
 const Float kElmCoupling = e_squared / (4 * kPi * kEpsilon0);
 const Float kElectronRadius = kElmCoupling / kElectronMass;
+const Float kElectronRadiusSquared = kElectronRadius*kElectronRadius;
 const Float kElectronComptonLength = kHBarC / kElectronMass;
 const Float kMigdalConstant = kElectronRadius * kElectronComptonLength
     * kElectronComptonLength * 4.0 * kPi;
 const Float kFineStructure = kElmCoupling / kHBarC;
 const Float kBremFactor = kFineStructure * kElectronRadius*kElectronRadius
     * 16.0/3.0;
+const Float kAvogadro = 6.022e23 * 1/mol; // Mol^-1
 
 } // End namespace na63
 

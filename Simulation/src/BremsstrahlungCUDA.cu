@@ -1,15 +1,25 @@
 #include "Simulation/BremsstrahlungCUDA.cuh"
+#include "Simulation/Spawner.cuh"
 #include "Geometry/Constants.hh"
+#include "Simulation/DeviceGlobalVariables.cuh"
 
 namespace na63 {
 
-__device__
-inline void CUDA_BremsstrahlungPhoton(GPUTrack& mother,
+__device__ inline
+void CUDA_BremsstrahlungPhoton(GPUTrack& mother,
     const MaterialPars& material, const ParticlePars& particle,
-    const Float dl, curandState *rng_state) {
+    const Float dl, curandState *rng_state, const int index) {
 
   // Must have sufficient energy to be considered
   if (mother.momentum[3] <= 2*kElectronMass) return;
+
+  // Must be able to spawn two children
+  GPUTrack *child_destination_1 = CanHaveTwoChildren(index);
+  if (child_destination_1 == nullptr) {
+    mother.state = STATE_WAITING;
+    return;
+  }
+  GPUTrack *child_destination_2 = child_destination_1 + 1;
 
   // See if anything happens
   Float chance_to_interact = dl / material.radiation_length;
@@ -23,11 +33,11 @@ inline void CUDA_BremsstrahlungPhoton(GPUTrack& mother,
   GPUThreeVector direction;
   CUDA_SphericalToCartesian(direction,child_momentum,phi,theta);
 
-  // Spawn electron and positron back to back and boost them
+  // Spawn electron and positron back to back
   GPUTrack electron;
   electron.particle_id = 11;
+  electron.particle_index = electron_index;
   electron.charge = -1;
-  FourVector_Copy(electron.position,mother.position);
   electron.momentum[0] = direction[0];
   electron.momentum[1] = direction[1];
   electron.momentum[2] = direction[2];
@@ -36,17 +46,24 @@ inline void CUDA_BremsstrahlungPhoton(GPUTrack& mother,
   positron.charge = 1;
   ThreeVector_Negate(positron.momentum,positron.momentum);
 
-
   // Queue new particles for propagation and murder photon
   mother.state = STATE_DEAD;
-  // ...
+  SpawnChild(mother,child_destination_1,electron);
+  SpawnChild(mother,child_destination_2,positron);
 
 }
 
-__device__
-inline void CUDA_BremsstrahlungElectron(GPUTrack& mother,
+__device__ inline
+void CUDA_BremsstrahlungElectron(GPUTrack& mother,
     const MaterialPars& material, const ParticlePars& particle,
-    const Float dl, curandState *rng_state) {
+    const Float dl, curandState *rng_state, const int index) {
+
+  // Must be able to spawn a child
+  GPUTrack *child_destination = CanHaveChild(index);
+  if (child_destination == nullptr) {
+    mother.state = STATE_WAITING;
+    return;
+  }
 
   // See if anything happens
   Float chance_to_interact = dl / material.radiation_length;
@@ -66,7 +83,7 @@ inline void CUDA_BremsstrahlungElectron(GPUTrack& mother,
   // Create new track
   GPUTrack photon;
   photon.particle_id = 22;
-  FourVector_Copy(photon.position,mother.position);
+  photon.particle_index = photon_index;
   ThreeVector_Copy(photon.momentum,photon_direction);
   photon.momentum[3] = photon_energy;
 
@@ -74,16 +91,22 @@ inline void CUDA_BremsstrahlungElectron(GPUTrack& mother,
   ThreeVector_Subtract(mother.momentum,photon.momentum,mother.momentum);
   
   // Spawn photon
-  // ...
+  SpawnChild(mother,child_destination,photon);
 
 }
 
 __device__
-void CUDA_Bremsstrahlung(GPUTrack& mother, const MaterialPars& material,
-    const ParticlePars& particle, const Float dl, curandState *rng_state) {
+void CUDA_Bremsstrahlung(
+    GPUTrack& mother,
+    const ParticlePars& particle,
+    const MaterialPars& material,
+    const Float dl,
+    curandState *rng_state, 
+    const int index) {
 
-  if (mother.particle_id == 11) CUDA_BremsstrahlungElectron(mother,material,particle,dl,rng_state);
-  if (mother.particle_id == 22) CUDA_BremsstrahlungPhoton(mother,material,particle,dl,rng_state);
+  int id = mother.particle_id;
+  if (id == 11) CUDA_BremsstrahlungElectron(mother,material,particle,dl,rng_state,index);
+  if (id == 22) CUDA_BremsstrahlungPhoton(mother,material,particle,dl,rng_state,index);
 
 }
 

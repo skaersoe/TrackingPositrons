@@ -8,7 +8,12 @@
 namespace na63 {
 
 __device__
-void CUDA_Bremsstrahlung(GPUTrack& mother, const MaterialPars& material,
-    const ParticlePars& particle, const Float dl, curandState *rng_state);
+void CUDA_Bremsstrahlung(
+    GPUTrack& mother,
+    const ParticlePars& particle,
+    const MaterialPars& material,
+    const Float dl,
+    curandState *rng_state, 
+    const int index);
 
 } // End namespace na63

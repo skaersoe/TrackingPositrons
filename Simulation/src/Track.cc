@@ -64,12 +64,8 @@ Track& Track::operator=(const GPUTrack& gpu_track) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Track& t) {
-  if (t.particle != nullptr) {
-    os << t.particle->name();
-  } else {
-    os << t.particle_id;
-  }
-  os << ", " << t.position << ", "
+  os << t.particle_id
+     << ", " << t.position << ", "
      << t.momentum;
   return os;
 }

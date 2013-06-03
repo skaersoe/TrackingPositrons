@@ -34,6 +34,7 @@ int main(int argc,char *argv[]) {
   simulator.AddParticle(electron);
   simulator.AddParticle(photon);
   simulator.step_size = 0.1;
+  simulator.sorting = X;
 
   // Arguments
   simulator.device = CPU;

@@ -18,7 +18,7 @@ void BetheEnergyLoss(Track& track, const Material& material,
 
   // Get -<dE/dx> and sigma
   LandauParameters p = GetSkewedLandauParameters(
-      track.beta(),track.mass(),track.charge(),material.atomic_number(),
+      track.beta(),track.mass(),material.atomic_number(),
       material.mean_excitation_potential(),dl);
 
   // Get random number from Landau distribution

@@ -11,6 +11,7 @@ namespace na63 {
 #define STATE_ALIVE 0
 #define STATE_DEAD 1
 #define STATE_FREE 2
+#define STATE_WAITING 3
 
 /**
  * Track data struct, should always be aligned to 32 bytes to take advantage

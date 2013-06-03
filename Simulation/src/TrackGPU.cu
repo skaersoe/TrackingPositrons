@@ -2,6 +2,7 @@
 #include "Geometry/SphereCUDA.cuh"
 #include "Geometry/Constants.hh"
 #include "Simulation/TrackGPU.cuh"
+#include "Simulation/DeviceGlobalVariables.cuh"
 
 namespace na63 {
 
@@ -18,8 +19,7 @@ bool InsideVolume(const GPUFourVector& position, const VolumePars& volume) {
 }
 
 __device__
-int VolumeQuery(const GPUTrack& track, const VolumePars* volumes,
-    const unsigned n_volumes) {
+int VolumeQuery(const GPUTrack& track) {
 
   // Check bounds first
   if (!InsideVolume(track.position,volumes[0])) return -1;
@@ -42,6 +42,8 @@ int VolumeQuery(const GPUTrack& track, const VolumePars* volumes,
 void Boost(GPUTrack& track, const Float bx, const Float by, const Float bz) {
 
   const Float b2 = pow(bx,2) + pow(by,2) + pow(bz,2);
+
+  if (b2 == 1.0) return;
 
   const Float gamma = 1.0 / sqrt(1.0 - b2);
   const Float bp = bx*track.position[0] + by*track.position[1] + bz*track.position[2];
@@ -76,12 +78,15 @@ void Step(GPUTrack& track, const ParticlePars& particle, const Float dl) {
 }
 
 __device__
-void CUDA_UpdateMomentum(GPUFourVector& momentum, const Float change) {
+void CUDA_UpdateEnergy(GPUFourVector& momentum, const Float mass,
+    const Float change_energy) {
   Float length = CUDA_CartesianToSpherical_R(momentum[0],momentum[1],momentum[2]);
-  momentum[0] += change * momentum[0] / length;
-  momentum[1] += change * momentum[1] / length;
-  momentum[2] += change * momentum[2] / length;
-  momentum[3] += change;
+  // p_i' = p_new / p_old * p_i
+  Float momentum_new = sqrt(sqrt(change_energy*change_energy - mass*mass)) / length;
+  momentum[0] += momentum_new * momentum[0];
+  momentum[1] += momentum_new * momentum[1];
+  momentum[2] += momentum_new * momentum[2];
+  momentum[3] += change_energy;
 }
 
 } // End namespace na63

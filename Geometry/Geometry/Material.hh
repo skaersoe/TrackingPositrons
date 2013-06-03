@@ -3,6 +3,7 @@
 
 #include <string>
 #include "Geometry/Library.hh"
+#include "Geometry/Constants.hh"
 
 namespace na63 {
 
@@ -17,30 +18,44 @@ namespace na63 {
 
   class Material {
 
+  private:
+    Float ComputeCoulombCorrection() const {
+      static const Float k1 = 0.0083 , k2 = 0.20206 ,k3 = 0.0020 , k4 = 0.0369;
+      Float az2 = (kFineStructure*atomic_number_)
+         * (kFineStructure*atomic_number_);
+      Float az4 = az2 * az2;
+      return (k1*az4 + k2 + 1.0/(1.0+az2)) * az2 - (k3*az4 + k4)*az4;
+    }
+
   public:
-    Material(const char* n, Float atomic_number,
-        Float mean_excitation_potential, Float rl, Float elec_dens,
-        Float coulomb_corr) : name_(n) {
+    Material(
+        const char* n,
+        Float atomic_number,
+        Float mean_excitation_potential,
+        Float rl) : name_(n) {
+
       atomic_number_ = atomic_number;
       mean_excitation_potential_ = mean_excitation_potential;
       radiation_length_ = rl;
-      electron_density_ = elec_dens;
-      coulomb_correction_ = coulomb_corr;
+      coulomb_correction_ = ComputeCoulombCorrection();
+
     }
-    ~Material() {}
 
     std::string name() const { return name_; }
     Float atomic_number() const { return atomic_number_; }
     Float mean_excitation_potential() const { return mean_excitation_potential_; }
     Float radiation_length() const { return radiation_length_; }
-    Float electron_density() const { return electron_density_; }
+    // Since there are currently no composite materials, number of electrons is
+    // just the atomic number.
+    Float electron_density() const { return atomic_number_; }
     Float coulomb_correction() const { return coulomb_correction_; }
     MaterialPars GPU() const {
       MaterialPars retval;
       retval.atomic_number = atomic_number_;
       retval.mean_excitation_potential = mean_excitation_potential_;
       retval.radiation_length = radiation_length_;
-      retval.electron_density = electron_density_;
+      // No composite materials
+      retval.electron_density = atomic_number_;
       retval.coulomb_correction = coulomb_correction_;
       return retval;
     }
@@ -50,7 +65,7 @@ namespace na63 {
     Float atomic_number_;
     Float mean_excitation_potential_;
     Float radiation_length_;
-    Float electron_density_;
+    // Float electron_density_;
     Float coulomb_correction_;
 
   };

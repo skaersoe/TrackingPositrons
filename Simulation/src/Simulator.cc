@@ -21,6 +21,8 @@ Simulator::Simulator(Geometry *g) {
   step_size = 0.1;
   particle_arr_ = nullptr;
   cpu_threads = 1;
+  pool_size = 2;
+  sorting = RADIUS;
 }
 Simulator::~Simulator() {
   if (!external_geometry) delete geometry;
@@ -101,12 +103,15 @@ void Simulator::GPUTracks(GPUTrack* dst) {
 }
 
 void Simulator::CopyBackTracks(GPUTrack* src, int N) {
+  std::cout << "Copying back tracks...";
   tracks.clear();
   for (int i=0;i<N;i++) {
     Track t;
+    if (src[i].state == STATE_FREE) continue;
     t = src[i];
     tracks.push_back(t);
   }
+  std::cout << " OK" << std::endl;
 }
 
 void PropagateTrack(Geometry &geometry, Track &track, const Float dl) {

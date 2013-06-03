@@ -13,7 +13,7 @@ namespace na63 {
 
 __device__ inline
 LandauParameters CUDA_GetSkewedLandauParameters(const Float beta,
-    const Float mass, const Float charge, const Float atomic_number,
+    const Float mass, const Float atomic_number,
     const Float mean_excitation_potential, const Float dl) {
 
   LandauParameters p;
@@ -24,7 +24,7 @@ LandauParameters CUDA_GetSkewedLandauParameters(const Float beta,
   const Float gamma_squared = pow(gamma,2);
   const Float xi = 4.0 * 0.307075 * atomic_number * dl / beta_squared;
 
-  p.mean = xi * (log(2 * kElectronMass * pow(kC,2) * beta_squared
+  p.mean = xi * (log(2 * mass * /*pow(kC,2) **/ beta_squared
       * gamma_squared / mean_excitation_potential)
       + log(xi/mean_excitation_potential) + 0.200 - beta_squared);
   p.sigma = 4 * xi;

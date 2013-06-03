@@ -7,13 +7,13 @@
 #include "Geometry/Material.hh"
 #include <curand_kernel.h>
 
-#define TRACK_KEY_DEAD MAX_INT_VALUE - 1
-#define TRACK_KEY_AVAILABLE MAX_INT_VALUE
+#define TRACK_KEY_FREE MAX_INT_VALUE
+#define TRACK_KEY_DEAD TRACK_KEY_FREE - 1
+#define TRACK_KEY_WAITING TRACK_KEY_FREE - 2
 
 namespace na63 {
 
 typedef struct {
-  unsigned N;
   unsigned steps;
   Float dl;
   GPUTrack *tracks;
@@ -25,6 +25,7 @@ typedef struct {
   VolumePars   *volumes;
   curandState *rng_states;
   unsigned long rng_seed;
+  SortMethod sorting;
 } KernelPars;
 
 void PropagateGPU(Simulator *simulator);

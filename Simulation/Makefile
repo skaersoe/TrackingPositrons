@@ -6,9 +6,9 @@ SRC=src
 INCLUDE_CUDA=-I../Geometry -I../Simulation -I$(SRC)
 INCLUDE=-I$(CUDA)/include -L$(CUDA)/lib64 -lcuda -lcudart -I../Geometry -I../Simulation -I$(SRC) `root-config --libs --cflags`
 
-all: clean simulator
+all: simulator
 
-test: simulator Main.cc dlink
+test: simulator Main.cc
 	$(CC) $(CCFLAGS) $(INCLUDE) ./*.o ../Geometry/*.o Main.cc -o bin/Simulator
 
 energyloss: EnergyLoss.cc
@@ -19,6 +19,9 @@ depth: Depth.cc
 
 bremsstrahlung: Bremsstrahlung.cc
 	$(CC) $(CCFLAGS) $(INCLUDE) ./*.o ../Geometry/*.o Bremsstrahlung.cc -o bin/Bremsstrahlung
+
+photonpropagate: PhotonPropagate.cc
+	$(CC) $(CCFLAGS) $(INCLUDE) ./*.o ../Geometry/*.o PhotonPropagate.cc -o bin/PhotonPropagate
 
 simulator: ccobjects nvccobjects geometry dlink
 
