@@ -96,7 +96,7 @@ bool Box::Inside(const FourVector& particle_position) const {
     x_bottom_sign = -1;
 
   if (x_top_sign == x_bottom_sign)
-    return true;
+    return false;
 
   // Check if the particle is between the two edges normal to the y_vector.
   // if not, return false.
@@ -121,7 +121,7 @@ bool Box::Inside(const FourVector& particle_position) const {
     y_bottom_sign = -1;
 
   if (y_top_sign == y_bottom_sign)
-    return true;
+    return false;
 
   // Check if the particle is between the two edges normal to the z_vector.
   // if not, return false.
@@ -146,9 +146,9 @@ bool Box::Inside(const FourVector& particle_position) const {
     z_bottom_sign = -1;
 
   if (z_top_sign == z_bottom_sign)
-    return true;
+    return false;
 
-  return false;
+  return true;
 
 }
 

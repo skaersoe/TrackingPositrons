@@ -63,7 +63,23 @@ void ThreeVector_Negate(const A& a, B& b) {
 template <typename A>
 __device__ inline
 Float ThreeVector_Length(const A& a) {
+  // printf("sqrt(%f^2 + %f^2 + %f^2) = %f\n",a[0],a[1],a[2],sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2]));
   return sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
+}
+
+template <typename A>
+__device__ inline
+void ThreeVector_Extend(A& a, const Float l) {
+  a[0] *= l;
+  a[1] *= l;
+  a[2] *= l;
+}
+
+template <typename A>
+__device__ inline
+void ThreeVector_Normalize(A& a) {
+  Float l = 1.0/ThreeVector_Length(a);
+  ThreeVector_Extend(a,l);
 }
 
 __device__ inline

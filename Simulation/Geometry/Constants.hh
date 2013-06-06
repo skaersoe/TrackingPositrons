@@ -41,8 +41,7 @@ const Float kCSquared = kC * kC;
 const Float kHPlanck = 6.6260755e-34 * joule*s;
 const Float kHBarPlanck = kHPlanck / (2 * kPi);
 const Float kHBarC = kHBarPlanck * kC;
-const Float kElectronMass = 5.10998910e-1 * MeV;
-const Float kMuonMass = 1.056583715e2 * MeV;
+const Float kElectronMass = 0.510998910 * MeV;
 const Float fac_fel = log(184.15);
 const Float fac_finel = log(1194.0);
 const Float kMu0 = 4 * kPi * 1.0e-7 * henry / m;
@@ -57,6 +56,19 @@ const Float kFineStructure = kElmCoupling / kHBarC;
 const Float kBremFactor = kFineStructure * kElectronRadius*kElectronRadius
     * 16.0/3.0;
 const Float kAvogadro = 6.022e23 * 1/mol; // Mol^-1
+
+const Float kMuonMass = 1.05658372e2; // MeV
+const Float kMuonCharge = -1.0 * eplus;
+const Float kIronAtomicNumber = 26.0;
+// http://www.physics.nist.gov/cgi-bin/Star/compos.pl?refer=ap&matno=026
+const Float kIronMeanExcitationPotential = 286.0e-6 * MeV;
+const Float kCopperMeanExcitationPotential = 322.0e-6 * MeV;
+const Float kIronDensity = 7.874; // g/cm^-3
+const Float kIronAtomicWeight = 55.84;
+const Float kCopperAtomicNumber = 29.0;
+const Float kCopperDensity = 8.96;
+const Float kCopperAtomicWeight = 63.546;
+const Float kIronRadiationLength = 13.84;
 
 } // End namespace na63
 

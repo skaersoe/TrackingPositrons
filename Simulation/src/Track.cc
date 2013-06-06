@@ -70,4 +70,13 @@ std::ostream& operator<<(std::ostream& os, const Track& t) {
   return os;
 }
 
+void Track::UpdateEnergy(const Float change_energy) {
+  // p_i' = p_new / p_old * p_i
+  momentum[3] += change_energy;
+  if (momentum[3] < mass()) Kill();
+  Float momentum_new = momentum_magnitude();
+  momentum.Normalize();
+  momentum.Extend(momentum_new);
+}
+
 } // End namespace na63

@@ -111,13 +111,7 @@ public:
   /* Propagates the track by dl */
   void Step(const Float dl);
 
-  void UpdateMomentum(const Float change) {
-    Float length = momentum.length();
-    momentum[0] += change * momentum[0] / length;
-    momentum[1] += change * momentum[1] / length;
-    momentum[2] += change * momentum[2] / length;
-    momentum[3] += change;
-  }
+  void UpdateEnergy(const Float change);
 
   GPUTrack GPU() const {
     GPUTrack retval;

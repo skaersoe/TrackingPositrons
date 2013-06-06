@@ -1,41 +1,75 @@
 CC=g++
 NVCC=nvcc
+
 NVCCFLAGS=-arch=sm_30 -m64
 CCFLAGS=-m64 -std=c++11
-SRC=src
-INCLUDE_CUDA=-I../Geometry -I../Simulation -I$(SRC)
-INCLUDE=-I$(CUDA)/include -L$(CUDA)/lib64 -lcuda -lcudart -I../Geometry -I../Simulation -I$(SRC) `root-config --libs --cflags`
+
+SRCDIR=src
+CCOBJDIR=ccobjects
+NVCCOBJDIR=nvccobjects
+
+CCSRC=$(shell find $(SRCDIR) -name '*.cc')
+NVCCSRC=$(shell find $(SRCDIR) -name '*.cu')
+CCOBJ=$(patsubst src/%.cc,$(CCOBJDIR)/%.o,$(CCSRC))
+NVCCOBJ=$(patsubst src/%.cu,$(NVCCOBJDIR)/%.o,$(NVCCSRC))
+LINKOBJ=$(NVCCOBJDIR)/dlink.o
+
+ROOT=`root-config --cflags --libs`
+INCLUDE_NVCC=-I.
+INCLUDE_CC=-I. -I$(CUDA)/include -L$(CUDA)/lib64 -lcuda -lcudart $(ROOT)
+INCLUDE_LINK=$(INCLUDE_CC) $(CCOBJ) $(NVCCOBJ) $(LINKOBJ)
 
 all: simulator
 
-test: simulator Main.cc
-	$(CC) $(CCFLAGS) $(INCLUDE) ./*.o ../Geometry/*.o Main.cc -o bin/Simulator
+simulator: folders $(CCOBJ) $(NVCCOBJ) $(LINKOBJ)
+
+folders:
+	@-mkdir ccobjects
+	@-mkdir nvccobjects
 
 energyloss: EnergyLoss.cc
-	$(CC) $(CCFLAGS) $(INCLUDE) ./*.o ../Geometry/*.o EnergyLoss.cc -o bin/EnergyLoss
+	$(CC) $(CCFLAGS) $(INCLUDE_LINK) EnergyLoss.cc -o bin/EnergyLoss
 
 depth: Depth.cc
-	$(CC) $(CCFLAGS) $(INCLUDE) ./*.o ../Geometry/*.o Depth.cc -o bin/Depth
+	$(CC) $(CCFLAGS) $(INCLUDE_LINK) Depth.cc -o bin/Depth
 
 bremsstrahlung: Bremsstrahlung.cc
-	$(CC) $(CCFLAGS) $(INCLUDE) ./*.o ../Geometry/*.o Bremsstrahlung.cc -o bin/Bremsstrahlung
+	$(CC) $(CCFLAGS) $(INCLUDE_LINK) Bremsstrahlung.cc -o bin/Bremsstrahlung
 
 photonpropagate: PhotonPropagate.cc
-	$(CC) $(CCFLAGS) $(INCLUDE) ./*.o ../Geometry/*.o PhotonPropagate.cc -o bin/PhotonPropagate
+	$(CC) $(CCFLAGS) $(INCLUDE_LINK) PhotonPropagate.cc -o bin/PhotonPropagate
 
-simulator: ccobjects nvccobjects geometry dlink
+stepsperlaunchbenchmark: StepsPerLaunchBenchmark.cc
+	$(CC) $(CCFLAGS) $(INCLUDE_LINK) StepsPerLaunchBenchmark.cc -o bin/StepsPerLaunchBenchmark
 
-ccobjects:
-	$(CC) $(CCFLAGS) $(INCLUDE) -c $(SRC)/*.cc
+stepsperlaunchbenchmarkdiverse: StepsPerLaunchBenchmarkDiverse.cc
+	$(CC) $(CCFLAGS) $(INCLUDE_LINK) StepsPerLaunchBenchmarkDiverse.cc -o bin/StepsPerLaunchBenchmarkDiverse
+	
+$(CCOBJDIR)/%.o: $(SRCDIR)/%.cc
+	$(CC) $(CCFLAGS) $(INCLUDE_CC) -c $< -o $@
 
-nvccobjects:
-	$(NVCC) $(NVCCFLAGS) $(INCLUDE_CUDA) -dc $(SRC)/*.cu
+$(NVCCOBJDIR)/%.o: $(SRCDIR)/%.cu
+	$(NVCC) $(NVCCFLAGS) $(INCLUDE_NVCC) -dc $< -o $@
 
-dlink: nvccobjects
-	$(NVCC) $(NVCCFLAGS) -dlink ../Geometry/SphereCUDA.o ../Geometry/BoxCUDA.o BetheEnergyLossCUDA.o BremsstrahlungCUDA.o PropagateGPU.o TrackGPU.o
+$(LINKOBJ): $(NVCCOBJ)
+	$(NVCC) $(NVCCFLAGS) $(NVCCOBJ) -dlink -o $(LINKOBJ)
 
-geometry:
-	make -C ../Geometry
+atlasstyle:
+	$(CC) $(CCFLAGS) $(INCLUDE) -c ../atlasstyle/*.C
 
-clean:
-	@rm ./*.o
+landau:
+	$(NVCC) -arch=sm_30 $(INCLUDE_NVCC) $(ROOT) $(CCOBJDIR)/Landau.o Landau.cu -o bin/Landau
+
+boxtest:
+	$(CC) $(CCFLAGS) $(INCLUDE_LINK) BoxTest.cc -o bin/BoxTest
+
+clean: cleancc cleancuda
+	@-rm bin/*
+
+cleancc:
+	@-rm -rf ccobjects
+
+cleancuda:
+	@-rm -rf nvccobjects
+
+.PHONY: clean

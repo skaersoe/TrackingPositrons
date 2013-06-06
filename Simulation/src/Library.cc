@@ -9,4 +9,8 @@ ThreeVector& ThreeVector::operator=(const FourVector& fv) {
   return *this;
 }
 
+Float FourVector::length() const {
+  return sqrt(vector[0]*vector[0] + vector[1]*vector[1] + vector[2]*vector[2]);
+}
+
 } // End namespace na63

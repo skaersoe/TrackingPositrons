@@ -26,7 +26,8 @@ typedef int Int_t;
 // All volumes must be defined here
 typedef enum {
   SPHERE,
-  BOX
+  BOX,
+  SIMPLEBOX
 } VolumeType;
 
 template <class A, class B>
@@ -257,14 +258,14 @@ public:
     return *this;
   }
 
-  void Set(Float a, Float b, Float c, Float d) {
+  inline void Set(Float a, Float b, Float c, Float d) {
     vector[0] = a;
     vector[1] = b;
     vector[2] = c;
     vector[3] = d;
   }
 
-  void Normalize() {
+  inline void Normalize() {
     Float l = length();
     vector[0] /= l;
     vector[1] /= l;
@@ -276,8 +277,12 @@ public:
     return ThreeVector(vector[0]/l,vector[1]/l,vector[2]/l);
   }
 
-  Float length() const {
-    return sqrt(vector[0]*vector[0] + vector[1]*vector[1] + vector[2]*vector[2]);
+  Float length() const;
+
+  inline void Extend(Float a) {
+    vector[0] *= a;
+    vector[1] *= a;
+    vector[2] *= a;
   }
 
   // Insert into GPU format (array)

@@ -2,6 +2,9 @@
 
 #include "AtlasLabels.h"
 
+#include <TApplication.h>
+#include <TCanvas.h>
+#include <TGraph.h>
 #include "TLatex.h"
 #include "TLine.h"
 #include "TPave.h"

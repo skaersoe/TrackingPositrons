@@ -1,13 +1,15 @@
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 // ROOT crap
 #include <TApplication.h>
 #include <TCanvas.h>
 #include <TGraph.h>
-#include "TRandom2.h"
+#include "TRandom3.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TLegend.h"
 
 #include "Simulation/Simulator.hh"
 #include "Geometry/Geometry.hh"
@@ -21,16 +23,18 @@ using namespace na63;
 
 int main(int argc,char *argv[]) {
 
+  TRandom3 rng;
+
   // Set up geometry
   Geometry geometry;
-  geometry.AddMaterial(Material("vacuum",0,0,0));
-  geometry.AddMaterial(Material("iron",26.0,286.0,13.84));
+  geometry.AddMaterial(Material("vacuum",0,0,0,0));
+  geometry.AddMaterial(Material("iron",kIronAtomicNumber,kIronDensity,kIronMeanExcitationPotential,kIronRadiationLength));
   geometry.SetBounds(Sphere("vacuum",ThreeVector(0,0,0),1e10));
   geometry.AddVolume(Sphere("iron",ThreeVector(0,0,0),1e10));
 
   // Create simulator
   Simulator simulator = Simulator(&geometry);
-  Particle muon = Particle("muon",13,105.6583715);
+  Particle muon = Particle("muon",13,kMuonMass);
   muon.RegisterProcess(BetheEnergyLoss);
   simulator.AddParticle(muon);
   simulator.step_size = 0.1;
@@ -39,31 +43,38 @@ int main(int argc,char *argv[]) {
   simulator.device = CPU;
   simulator.debug = true;
   simulator.cpu_threads = 8;
-  const unsigned x_samples = 512;
-  const unsigned y_samples = 8;
+  simulator.steps_per_launch = 1000;
+  const unsigned x_samples = 128;
+  const unsigned y_samples = 16;
   const unsigned n_tracks = x_samples * y_samples;
   const Float energy_range[2] = {1e3,1e5};
+  const Float energy_step = (energy_range[1] - energy_range[0]) / x_samples;
 
   // Generate tracks
   std::vector<Track> tracks;
-  Float energy[x_samples];
+  Float energy[n_tracks];
   for (int i=0;i<x_samples;i++) {
-    energy[i] = energy_range[0] + (energy_range[1] - energy_range[0]) * ((Float)i / (Float)x_samples);
     for (int j=0;j<y_samples;j++) {
+      int idx = i*y_samples+j;
+      energy[idx] = (Float)i * energy_step + rng.Rndm() * energy_step;
       tracks.push_back(Track(13,-1,FourVector(),
-          FourVector(energy[i],0,0,energy[i])));
+          FourVector(energy[idx]/kMuonMass,0,0,energy[idx])));
     }
   }
 
   // Propagate on CPU
   simulator.AddTracks(tracks);
+  double elapsed_cpu = InSeconds(GetTime());
   simulator.Propagate();
+  elapsed_cpu = InSeconds(GetTime()) - elapsed_cpu;
   std::vector<Track> result_cpu = simulator.GetTracks();
   simulator.ClearTracks();
   // Propagate on GPU
   simulator.device = GPU;
   simulator.AddTracks(tracks);
+  double elapsed_gpu = InSeconds(GetTime());
   simulator.Propagate();
+  elapsed_gpu = InSeconds(GetTime()) - elapsed_gpu;
   std::vector<Track> result_gpu = simulator.GetTracks();
 
   // Report
@@ -76,8 +87,8 @@ int main(int argc,char *argv[]) {
       100,energy_range[0],energy_range[1],100,0,500
   );*/
   for (int i=0;i<n_tracks;i++) {
-    graph_gpu.SetPoint(i,1e-3*energy[result_gpu[i].initial_index / y_samples],result_gpu[i].position[0]);
-    graph_cpu.SetPoint(i,1e-3*energy[i / y_samples],result_cpu[i].position[0]);
+    graph_gpu.SetPoint(i,1e-3*energy[result_gpu[i].initial_index],result_gpu[i].position[0]);
+    graph_cpu.SetPoint(i,1e-3*energy[i],result_cpu[i].position[0]);
     //hist_2d.Fill(energy[i],t.position[0]);
   }
   //hist_2d.Draw("COLZ");
@@ -94,8 +105,16 @@ int main(int argc,char *argv[]) {
   graph_cpu.GetYaxis()->CenterTitle();
   canvas.Modified();
   canvas.Update();
-  canvas.SaveAs("Plots/depth_cpu_gpu.png");
-  //gPad->WaitPrimitive();
+  TLegend *legend = new TLegend(0.13,0.89,0.33,0.79);
+  std::stringstream cpu_legend;
+  cpu_legend << "CPU, ran in " << elapsed_cpu << " seconds.";
+  std::stringstream gpu_legend;
+  gpu_legend << "GPU, ran in " << elapsed_gpu << " seconds.";
+  legend->AddEntry(&graph_cpu,cpu_legend.str().c_str(),"p");
+  legend->AddEntry(&graph_gpu,gpu_legend.str().c_str(),"p");
+  legend->Draw();
+  gPad->WaitPrimitive();
+  //canvas.SaveAs("Plots/depth_cpu_gpu.png");
 
   return 0;
 

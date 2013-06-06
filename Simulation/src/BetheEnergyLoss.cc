@@ -6,27 +6,25 @@
 
 namespace na63 {
 
+TRandom3 rng;
+
 void BetheEnergyLoss(Track& track, const Material& material,
     const Float dl) {
-
-  TRandom3 rng;
-
-  rng.SetSeed((size_t)&track+(size_t)track.energy());
 
   // Only treat particles with charge
   if (track.charge() == 0) return;
 
   // Get -<dE/dx> and sigma
-  LandauParameters p = GetSkewedLandauParameters(
+  LandauParameters p = LandauEnergyLossParameters(
       track.beta(),track.mass(),material.atomic_number(),
       material.mean_excitation_potential(),dl);
 
   // Get random number from Landau distribution
   // Float energy_loss = rng.Landau(p.mean,p.sigma);
-  Float energy_loss = ThrowLandauHost(p.mean,p.sigma,rng.Rndm());
+  Float energy_loss = ThrowLandauHost(p.mpv,4*p.xi,rng.Rndm());
 
   // Update track
-  track.UpdateMomentum(-energy_loss * dl);
+  track.UpdateEnergy(-energy_loss * dl);
 }
 
 } // End namespace na63

@@ -161,7 +161,7 @@ void PropagateGPU(Simulator* simulator) {
   while (1) {
 
     // Should be dynamic
-    kernel_args.steps = 100;
+    kernel_args.steps = simulator->steps_per_launch;
     kernel_args.dl = simulator->step_size;
     kernel_args.rng_seed = kernel_launches;
 
@@ -351,6 +351,8 @@ void PropagateKernel(KernelPars args) {
     }
   }
   args.keys[index] = key;
+
+  //printf("%i, %i, (%f,%f,%f,%f), (%f,%f,%f,%f)\n",key,track->particle_id,track->position[0],track->position[1],track->position[2],track->position[3],track->momentum[0],track->momentum[1],track->momentum[2],track->momentum[3]);
 
 }
 

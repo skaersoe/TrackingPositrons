@@ -35,20 +35,21 @@ void Geometry::AddVolumeGeneric(Volume *volume) {
   int function_index = -1;
   VolumeType volume_type = volume->volume_type();
   // See if volume type exists
-  for (int i=0;i<volume_types.size();i++) {
-    if (volume_types[i].type == volume_type) {
-      function_index = i;
-    }
-  }
-  if (function_index == -1) {
-    // Add the type if it doesn't
-    function_index = AddVolumeType(volume_type,volume->inside_function());
-  }
+  // for (int i=0;i<volume_types.size();i++) {
+  //   if (volume_types[i].type == volume_type) {
+  //     function_index = i;
+  //   }
+  // }
+  // if (function_index == -1) {
+  //   // Add the type if it doesn't
+  //   function_index = AddVolumeType(volume_type,volume->inside_function());
+  // }
+  function_index = volume_type;
   // Update volume parameters
   if (material_index < 0 || material_index >= materials.size()) {
     throw "Invalid index generated for volume material.";
   }
-  if (function_index < 0 || function_index >= volume_types.size()) {
+  if (function_index < 0/* || function_index >= volume_types.size()*/) {
     throw "Invalid index generated for volume type.";
   }
   volume->material = &materials[material_index];
@@ -148,6 +149,10 @@ void Geometry::PrintContent() {
     std::cout << "Volume of type " << volumes[i]->volume_type()
               << " and material " << volumes[i]->material_name() << std::endl;
   }
+}
+
+int Geometry::materials_size() const {
+  return materials.size();
 }
 
 } // End namespace na63

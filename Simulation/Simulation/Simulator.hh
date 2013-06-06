@@ -22,6 +22,7 @@ public:
   int cpu_threads;
   int pool_size;
   Float step_size;
+  int steps_per_launch;
   Geometry *geometry;
 
   Simulator(void);

@@ -23,6 +23,7 @@ Simulator::Simulator(Geometry *g) {
   cpu_threads = 1;
   pool_size = 2;
   sorting = RADIUS;
+  steps_per_launch = 100;
 }
 Simulator::~Simulator() {
   if (!external_geometry) delete geometry;

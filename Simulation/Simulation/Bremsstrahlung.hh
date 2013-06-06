@@ -54,13 +54,11 @@ private:
   Float low_limit;
   Float secondary_threshold;
 
-  static const double xgi[8], wgi[8];
-
 };
 
-const double Bremsstrahlung::xgi[] = { 0.0199, 0.1017, 0.2372, 0.4083, 0.5917,
+const Float xgi[] = { 0.0199, 0.1017, 0.2372, 0.4083, 0.5917,
     0.7628, 0.8983, 0.9801 };
-const double Bremsstrahlung::wgi[] = { 0.0506, 0.1112, 0.1569, 0.1813, 0.1813,
+const Float wgi[] = { 0.0506, 0.1112, 0.1569, 0.1813, 0.1813,
     0.1569, 0.1112, 0.0506 };
 
 } // End namespace na63

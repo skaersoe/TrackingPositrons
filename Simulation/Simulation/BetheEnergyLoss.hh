@@ -11,65 +11,91 @@
 namespace na63 {
 
 typedef struct {
-  Float mean;
-  Float sigma;
+  Float mpv;
+  Float xi;
 } LandauParameters;
 
-inline LandauParameters GetSkewedLandauParameters(const Float beta,
+inline LandauParameters LandauEnergyLossParameters(const Float beta,
     const Float mass, const Float atomic_number,
     const Float mean_excitation_potential, const Float dl) {
 
   LandauParameters p;
 
   // Calculate necessary values
-  const Float beta_squared = pow(beta,2);
-  const Float gamma = Gamma(beta);
-  const Float gamma_squared = pow(gamma,2);
-  const Float xi = 0.5 * 0.307075 * atomic_number * dl / beta_squared;
+  Float beta_squared = pow(beta,2);
+  Float gamma = Gamma(beta);
+  Float gamma_squared = pow(gamma,2);
+  p.xi = 0.5 * 0.307075 * atomic_number * dl / beta_squared;
 
-  p.mean = xi * (log(2 * mass * /*pow(kC,2) **/ beta_squared
+  p.mpv = p.xi * (log(2 * mass * beta_squared
       * gamma_squared / mean_excitation_potential)
-      + log(xi/mean_excitation_potential) + 0.200 - beta_squared);
-  p.sigma = 4 * xi;
+      + log(p.xi/mean_excitation_potential) + 0.200 - beta_squared);
 
   return p;
 
 }
 
-inline LandauParameters GetBetheLandauParameters(const Float beta,
+// inline LandauParameters GetBetheLandauParameters(const Float beta,
+//     const Float mass, const Float charge, const Float atomic_number,
+//     const Float mean_excitation_potential, const Float dl) {
+
+//   LandauParameters p;
+
+//   // Grab and calculate necessary values
+//   const Float beta_squared = pow(beta,2);
+//   const Float gamma = Gamma(beta);
+//   const Float gamma_squared = pow(gamma,2);
+
+//   // [PDG 27.2.2, eq. 27.4]
+//   Float T_max = 2.0 * kElectronMass * beta_squared * gamma_squared /
+//         (1.0 + 2.0 * kElectronMass * gamma / mass + pow(kElectronMass / mass,2));
+
+//   // [PDG 27.2.2, eq. 27.3]
+//   p.mean = pow(charge,2) * atomic_number
+//       * 0.307075 / beta_squared;
+//   p.mean *= (0.5 * log((2.0 * kElectronMass
+//       * beta_squared * gamma_squared * T_max) 
+//       / pow(mean_excitation_potential,2)) - beta_squared);
+//   printf("%f, %f\n",pow(charge,2) * atomic_number
+//       * 0.307075 / beta_squared,(0.5 * log((2.0 * kElectronMass/* * pow(kC,2)*/
+//       * beta_squared * gamma_squared * T_max) 
+//       / pow(mean_excitation_potential,2)) - beta_squared));
+
+//   // xi = (K/A) * Z * (x/beta^2)
+//   // sigma = 4 * xi [PDG 27.2.7]
+//   p.sigma = 2.0 * 0.307075 * atomic_number * dl / beta_squared;
+
+//   return p;
+// }
+
+inline Float Bethe_dEdx(const Float beta,
     const Float mass, const Float charge, const Float atomic_number,
-    const Float mean_excitation_potential, const Float dl) {
+    const Float mean_excitation_potential, const Float density,
+    const Float atomic_weight, const Float dl) {
 
-  LandauParameters p;
+  Float beta_squared = beta*beta;
+  Float betagamma_squared = pow(Gamma(beta),2) * beta_squared;
 
-  // Grab and calculate necessary values
-  const Float beta_squared = pow(beta,2);
-  const Float gamma = Gamma(beta);
-  const Float gamma_squared = pow(gamma,2);
+  Float mean;
 
-  // [PDG 27.2.2, eq. 27.4]
-  Float T_max = 2.0 * kElectronMass * pow(kC,2) * beta_squared * gamma_squared /
-        (1.0 + 2.0 * kElectronMass * gamma / mass + pow(kElectronMass / mass,2));
+  Float s = kElectronMass / mass;
+  Float W_max = 2.0 * kElectronMass * betagamma_squared
+      / (1.0 + 2.0 * s * sqrt(1 + betagamma_squared) + s*s);
 
-  // [PDG 27.2.2, eq. 27.3]
-  p.mean = pow(charge,2) * atomic_number
-      * 0.307075 / beta_squared;
-  p.mean *= (0.5 * log((2.0 * kElectronMass * pow(kC,2)
-      * beta_squared * gamma_squared * T_max) 
-      / pow(mean_excitation_potential,2)) - beta_squared);
+  mean = 0.1535 * density * atomic_number / atomic_weight * charge*charge
+      / beta_squared;
 
-  // xi = (K/A) * Z * (x/beta^2)
-  // sigma = 4 * xi [PDG 27.2.7]
-  p.sigma = 2.0 * 0.307075 * atomic_number * dl / beta_squared;
+  mean *= std::log((2.0 * kElectronMass * betagamma_squared * W_max)
+      / (mean_excitation_potential*mean_excitation_potential))
+      - 2.0 * beta_squared;
 
-  return p;
+  return mean;
+
 }
 
-inline LandauParameters GetElectronCollisionLoss(const Float density,
+inline Float BetheElectron_dEdx(const Float density,
     const Float atomic_number, const Float beta, const Float kinetic_energy,
-    const Float mean_excitation_potential, const Float charge, const Float dl) {
-
-  LandauParameters p;
+    const Float mean_excitation_potential, const Float charge) {
 
   // Kinetic energy in terms of electron masses
   Float tau = kinetic_energy / kElectronMass;
@@ -81,16 +107,13 @@ inline LandauParameters GetElectronCollisionLoss(const Float density,
   Float F_tau_positron = 2 * log(2) - beta_squared / 12
       * (23 + 14/(tau + 2) + 10/pow(tau + 2,2) + 4/pow(tau+2,3));
 
-  p.mean = dl * 2.0 * kPi * kAvogadro * kElectronRadiusSquared * kElectronMass
+  Float mean = 2.0 * kPi * kAvogadro * kElectronRadiusSquared * kElectronMass
       * density * atomic_number / (beta*beta);
-  p.mean *= log((tau*tau * (tau + 2.0))
+  mean *= log((tau*tau * (tau + 2.0))
       / (2.0 * pow(1e-6 * mean_excitation_potential / kElectronMass,2)))
       + ((charge < 0) ? F_tau_electron : F_tau_positron);
-  //printf("%f, %f, %f\n",(tau*tau * (tau + 2.0)),(2.0 * pow(mean_excitation_potential / kElectronMass,2)),F_tau_electron);
 
-  p.sigma = 2.0 * 0.307075 * atomic_number * dl / beta_squared;
-
-  return p;
+  return mean;
 
 }
 

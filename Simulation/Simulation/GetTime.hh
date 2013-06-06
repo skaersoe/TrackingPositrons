@@ -34,6 +34,11 @@ timespec GetTime() {
 
 }
 
+double InSeconds(timespec ts) {
+  double s(ts.tv_sec);
+  return s + (1e-9*(double)ts.tv_nsec);
+}
+
 } // End namespace na63
 
 #endif /* NA63_COMMON_GETTIME_H */

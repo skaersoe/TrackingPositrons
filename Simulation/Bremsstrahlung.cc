@@ -9,35 +9,35 @@
 #include <cassert>
 
 #include "Geometry/Geometry.hh"
-#include "Geometry/Box.hh"
+#include "Geometry/SimpleBox.hh"
 #include "Simulation/Bremsstrahlung.hh"
 
 using namespace na63;
 
 int main(int argc,char *argv[]) {
 
-  const unsigned n_tracks = 256;
+  const unsigned n_tracks = 512;
 
   // Geometry
   Geometry geometry;
-  geometry.AddMaterial(Material("vacuum",0.0,0.0,0.0));
-  geometry.AddMaterial(Material("iron",26.0,286.0,13.84));
-  geometry.SetBounds(Box("vacuum",ThreeVector(2e2,0,0),ThreeVector(4e2,4e2,4e2)));
-  geometry.AddVolume(Box("iron",ThreeVector(2e2,0,0),ThreeVector(1e2,1e2,1e2)));
+  geometry.AddMaterial(Material("vacuum",0.0,0.0,0.0,0.0));
+  geometry.AddMaterial(Material("iron",kIronAtomicNumber,kIronDensity,kIronMeanExcitationPotential,kIronRadiationLength));
+  geometry.SetBounds(SimpleBox("vacuum",ThreeVector(2e2,0,0),ThreeVector(4e2,4e2,4e2)));
+  geometry.AddVolume(SimpleBox("iron",ThreeVector(2e2,0,0),ThreeVector(1e2,1e2,1e2)));
 
   // Simulator
   Simulator simulator(&geometry);
   Particle electron("electron",11,kElectronMass);
   Particle photon("photon",22,0);
-  electron.RegisterProcess(Bremsstrahlung);
-  photon.RegisterProcess(Bremsstrahlung);
+  // electron.RegisterProcess(Bremsstrahlung);
+  // photon.RegisterProcess(Bremsstrahlung);
   simulator.AddParticle(electron);
   simulator.AddParticle(photon);
   simulator.step_size = 0.1;
   simulator.sorting = X;
 
   // Arguments
-  simulator.device = CPU;
+  simulator.device = GPU;
   simulator.debug = true;
   simulator.cpu_threads = 8;
 
@@ -80,6 +80,7 @@ int main(int argc,char *argv[]) {
   outfile.open("Data/bremsstrahlung_shower");
   for (int i=0;i<simulator.TrackSize();i++) {
     Track t = simulator.GetTrack(i);
+    std::cout << t.position << std::endl;
     if (t.particle_id == 11) {
       electrons.Fill(angles[t.initial_index]);
     } else if (t.particle_id == 22) {
@@ -97,12 +98,12 @@ int main(int argc,char *argv[]) {
             << t.position[3] << std::endl;
   }
   outfile.close();
-  photons.Draw();
-  electrons.Draw("same");
-  photons.SetTitle("Bremsstrahlung");
-  photons.GetXaxis()->SetTitle("Angle [radians]");
-  canvas.Modified();
-  canvas.Update();
+  // photons.Draw();
+  // electrons.Draw("same");
+  // photons.SetTitle("Bremsstrahlung");
+  // photons.GetXaxis()->SetTitle("Angle [radians]");
+  // canvas.Modified();
+  // canvas.Update();
   //canvas.SaveAs("Plots/bremsstrahlung.png");
   //gPad->WaitPrimitive();
 

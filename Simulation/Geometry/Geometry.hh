@@ -41,7 +41,7 @@ public:
    * generated.
    */
   void GenerateParameterArrays();
-  int materials_size() const { return materials.size(); }
+  int materials_size() const;
   int volumes_size()   const { return volumes.size();   }
   int volume_types_size() const { return volume_types.size(); }
   MaterialPars   *material_arr();

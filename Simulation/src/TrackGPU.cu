@@ -1,5 +1,6 @@
 #include "Geometry/BoxCUDA.cuh"
 #include "Geometry/SphereCUDA.cuh"
+#include "Geometry/SimpleBoxCUDA.cuh"
 #include "Geometry/Constants.hh"
 #include "Simulation/TrackGPU.cuh"
 #include "Simulation/DeviceGlobalVariables.cuh"
@@ -9,8 +10,12 @@ namespace na63 {
 __device__ inline
 bool InsideVolume(const GPUFourVector& position, const VolumePars& volume) {
   const void *specific = (void*)volume.specific;
+  // printf("Function index: %i\n",volume.function_index);
   if (volume.function_index == SPHERE) {
     return Sphere_Inside(position,specific);
+  }
+  if (volume.function_index == SIMPLEBOX) {
+    return SimpleBox_Inside(position,specific);
   }
   if (volume.function_index == BOX) {
     return Box_Inside(position,specific);
@@ -22,7 +27,10 @@ __device__
 int VolumeQuery(const GPUTrack& track) {
 
   // Check bounds first
-  if (!InsideVolume(track.position,volumes[0])) return -1;
+  if (!InsideVolume(track.position,volumes[0])) {
+    // printf("(%f,%f,%f) out of bounds\n",track.position[0],track.position[1],track.position[2]);
+    return -1;
+  }
 
   // Check if still inside current object, if any
   int current = track.volume_index;
@@ -80,13 +88,12 @@ void Step(GPUTrack& track, const ParticlePars& particle, const Float dl) {
 __device__
 void CUDA_UpdateEnergy(GPUFourVector& momentum, const Float mass,
     const Float change_energy) {
-  Float length = CUDA_CartesianToSpherical_R(momentum[0],momentum[1],momentum[2]);
   // p_i' = p_new / p_old * p_i
-  Float momentum_new = sqrt(sqrt(change_energy*change_energy - mass*mass)) / length;
-  momentum[0] += momentum_new * momentum[0];
-  momentum[1] += momentum_new * momentum[1];
-  momentum[2] += momentum_new * momentum[2];
   momentum[3] += change_energy;
+  if (momentum[3] < mass) return;
+  Float momentum_new = sqrt(momentum[3]*momentum[3] - mass*mass);
+  ThreeVector_Normalize(momentum);
+  ThreeVector_Extend(momentum,momentum_new);
 }
 
 } // End namespace na63
