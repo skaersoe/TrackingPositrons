@@ -7,12 +7,43 @@
 
 namespace na63 {
 
+Float Track::beta() const {
+  Float b = momentum_magnitude() / energy();
+  assert(b <= 1);
+  assert(b == b);
+  if (b < 0 || b != b) {
+    // Particle is not moving
+    b = 0;
+  }
+  if (b == 1) {
+    // Float precision exceeded
+    b = 1 - 1e-6;
+  }
+  assert(b > 0 && b < 1);
+  return b;
+}
+
+Float Track::gamma() const {
+  Float g = Gamma(beta());
+  assert(g >= 1);
+  return g;
+}
+
 ThreeVector Track::beta_vector() const {
   ThreeVector r;
   r = momentum;
   r.Normalize();
   r.Extend(beta());
   return r;
+}
+
+void Track::Stop() {
+  alive = false;
+}
+
+void Track::Kill() {
+  momentum[3] = mass();
+  Stop();
 }
 
 void Track::Boost(const Float bx, const Float by, const Float bz) {
@@ -40,7 +71,7 @@ void Track::Step(const Float dl) {
 	position[3] += dl * (energy() / (momentum_magnitude() * kC));
 	// Let's do physics!
 	if (volume != nullptr) {
-    particle->Query(*this,*volume->material,dl);
+    particle->Query(this,volume->material,dl);
   }
   // Suicide if energy goes below mass
   if (energy() < mass()) Kill();
@@ -50,11 +81,18 @@ void Track::SpawnChild(Track child) {
   child.mother = this;
   child.volume = volume;
   child.initial_index = initial_index;
-  simulator->AddTrack(child);
+  simulator->AddTrackLive(child);
+}
+
+void Track::SpawnChildren(std::vector<Track> children) {
+  bool live_one = false;
+  for (int i=0;i<children.size();i++) {
+    SpawnChild(children[i]);
+  }
 }
 
 Track& Track::operator=(const GPUTrack& gpu_track) {
-  alive = (gpu_track.state == STATE_ALIVE) ? true : false;
+  alive = (gpu_track.state == ALIVE) ? true : false;
   particle_id = gpu_track.particle_id;
   initial_index = gpu_track.initial_index;
   position = gpu_track.position;
@@ -71,12 +109,25 @@ std::ostream& operator<<(std::ostream& os, const Track& t) {
 }
 
 void Track::UpdateEnergy(const Float change_energy) {
-  // p_i' = p_new / p_old * p_i
+  assert(change_energy == change_energy);
+  if (change_energy < 0 && simulator->record_energyloss) {
+    simulator->FillEnergyLoss(position,-change_energy);
+  }
   momentum[3] += change_energy;
   if (momentum[3] < mass()) Kill();
   Float momentum_new = momentum_magnitude();
   momentum.Normalize();
   momentum.Extend(momentum_new);
+}
+
+void Track::UpdateMomentum(const FourVector change) {
+  momentum -= change;
+  if (momentum[3] < mass()) Kill();
+}
+
+void Track::SetMomentum(const FourVector momentum_new) {
+  momentum = momentum_new;
+  if (momentum[3] < mass()) Kill();
 }
 
 } // End namespace na63

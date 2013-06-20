@@ -24,7 +24,7 @@ using namespace na63;
 
 int main(void) {
 
-  const int number_of_runs = 10;
+  const int number_of_runs = 12;
   const int number_of_tracks = 4096;
   int step_runs[] = {
     50,
@@ -36,9 +36,11 @@ int main(void) {
     800,
     1000,
     1500,
-    2000
+    2000,
+    3500,
+    5000
   };
-  double *benchmarks = new double[number_of_runs];
+  double *benchmarks = new double[number_of_runs+1];
 
   TRandom3 rng;
 
@@ -63,6 +65,8 @@ int main(void) {
   muon.RegisterProcess(BetheEnergyLoss);
   simulator.AddParticle(muon);
   simulator.step_size = 0.1;
+  simulator.cpu_threads = 8;
+  simulator.pool_size = 0;
 
   // Set parameters
   simulator.device = GPU;
@@ -85,13 +89,20 @@ int main(void) {
 
     // Propagate on GPU
     simulator.AddTracks(tracks);
-    double elapsed = InSeconds(GetTime());
     std::cout << "Running with step size " << step_runs[i] << "..." << std::endl;
     simulator.Propagate();
-    benchmarks[i] = InSeconds(GetTime()) - elapsed;
+    benchmarks[i] = simulator.GetBenchmark();
     simulator.ClearTracks();
 
   }
+
+  simulator.AddTracks(tracks);
+  std::cout << "Running on CPU..." << std::endl;
+  simulator.device = CPU;
+  simulator.Propagate();
+  benchmarks[number_of_runs] = simulator.GetBenchmark();
+  simulator.ClearTracks();
+
 
   std::ofstream outfile;
   outfile.open("Data/stepsperlaunchdiverse_benchmark");
@@ -99,6 +110,7 @@ int main(void) {
   for (int i=0;i<number_of_runs;i++) {
     outfile << step_runs[i] << "," << benchmarks[i] << std::endl;
   }
+  outfile << 0 << "," << benchmarks[number_of_runs];
   outfile.close();
 
   return 0;

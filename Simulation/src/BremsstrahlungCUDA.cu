@@ -2,6 +2,7 @@
 #include "Simulation/Spawner.cuh"
 #include "Geometry/Constants.hh"
 #include "Simulation/DeviceGlobalVariables.cuh"
+#include "Geometry/LibraryCUDA.cuh"
 
 namespace na63 {
 
@@ -14,12 +15,12 @@ void CUDA_BremsstrahlungPhoton(GPUTrack& mother,
   if (mother.momentum[3] <= 2*kElectronMass) return;
 
   // Must be able to spawn two children
-  GPUTrack *child_destination_1 = CanHaveTwoChildren(index);
-  if (child_destination_1 == nullptr) {
-    mother.state = STATE_WAITING;
+  int child_destination_1 = CanHaveTwoChildren(index);
+  if (child_destination_1 == -1) {
+    UpdateState(index,WAITING);
     return;
   }
-  GPUTrack *child_destination_2 = child_destination_1 + 1;
+  int child_destination_2 = child_destination_1 - 1;
 
   // See if anything happens
   Float chance_to_interact = dl / material.radiation_length;
@@ -34,22 +35,23 @@ void CUDA_BremsstrahlungPhoton(GPUTrack& mother,
   CUDA_SphericalToCartesian(direction,child_momentum,phi,theta);
 
   // Spawn electron and positron back to back
-  GPUTrack electron;
-  electron.particle_id = 11;
-  electron.particle_index = electron_index;
-  electron.charge = -1;
-  electron.momentum[0] = direction[0];
-  electron.momentum[1] = direction[1];
-  electron.momentum[2] = direction[2];
-  electron.momentum[3] = child_energy;
-  GPUTrack positron = electron;
-  positron.charge = 1;
-  ThreeVector_Negate(positron.momentum,positron.momentum);
+  GPUTrack *electron = &tracks[child_destination_1];
+  electron->particle_id = 11;
+  electron->particle_index = electron_index;
+  electron->charge = -1;
+  electron->momentum[0] = direction[0];
+  electron->momentum[1] = direction[1];
+  electron->momentum[2] = direction[2];
+  electron->momentum[3] = child_energy;
+  GPUTrack *positron = &tracks[child_destination_2];
+  *positron = *electron;
+  positron->charge = 1;
+  ThreeVector_Negate(positron->momentum,positron->momentum);
 
   // Queue new particles for propagation and murder photon
-  mother.state = STATE_DEAD;
-  SpawnChild(mother,child_destination_1,electron);
-  SpawnChild(mother,child_destination_2,positron);
+  UpdateState(index,DEAD);
+  SpawnChild(mother,child_destination_1);
+  SpawnChild(mother,child_destination_2);
 
 }
 
@@ -59,9 +61,9 @@ void CUDA_BremsstrahlungElectron(GPUTrack& mother,
     const Float dl, curandState *rng_state, const int index) {
 
   // Must be able to spawn a child
-  GPUTrack *child_destination = CanHaveChild(index);
-  if (child_destination == nullptr) {
-    mother.state = STATE_WAITING;
+  int child_destination = CanHaveChild(index);
+  if (child_destination == -1) {
+    UpdateState(index,WAITING);
     return;
   }
 
@@ -69,8 +71,8 @@ void CUDA_BremsstrahlungElectron(GPUTrack& mother,
   Float chance_to_interact = dl / material.radiation_length;
   if (curand_uniform(rng_state) > chance_to_interact) return;
 
-  // Distribute energy from 10% to 30% of electron energy
-  Float photon_energy = mother.momentum[3] * (0.1 + 0.2 * curand_uniform(rng_state));
+  // Distribute energy between 10% and 30% of electron energy
+  Float photon_energy = mother.momentum[3] * (0.10 + 0.20 * curand_uniform(rng_state));
 
   // Photon direction
   Float mother_phi = CUDA_CartesianToSpherical_Phi(mother.momentum[0],mother.momentum[1]);
@@ -81,17 +83,17 @@ void CUDA_BremsstrahlungElectron(GPUTrack& mother,
   CUDA_SphericalToCartesian(photon_direction,photon_energy,mother_theta,phi);
 
   // Create new track
-  GPUTrack photon;
-  photon.particle_id = 22;
-  photon.particle_index = photon_index;
-  ThreeVector_Copy(photon.momentum,photon_direction);
-  photon.momentum[3] = photon_energy;
+  GPUTrack *photon = &tracks[child_destination];
+  photon->particle_id = 22;
+  photon->particle_index = photon_index;
+  ThreeVector_Copy(photon->momentum,photon_direction);
+  photon->momentum[3] = photon_energy;
 
   // Subtract from mother
-  ThreeVector_Subtract(mother.momentum,photon.momentum,mother.momentum);
+  FourVector_Subtract(mother.momentum,photon->momentum,mother.momentum);
   
   // Spawn photon
-  SpawnChild(mother,child_destination,photon);
+  SpawnChild(mother,child_destination);
 
 }
 

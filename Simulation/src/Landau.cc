@@ -215,7 +215,8 @@ inline Float RandomLandauHost(const Float x) {
 
 Float ThrowLandauHost(const Float mpv, const Float sigma,
     const Float random_uniform) {
-  const Float xmpv = -0.22278298;
+  // static const Float xmpv = -0.22278298;
+  static const Float xmpv = 0.0;
   return mpv+sigma*(RandomLandauHost(random_uniform)-xmpv);
 }
   

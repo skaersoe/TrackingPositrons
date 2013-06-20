@@ -1,5 +1,10 @@
-# Ignore binaries
+# Binaries
 bin/
+
+# Images
+*.png
+*.pdf
+*.psd
 
 # Compiled Object files
 *.slo

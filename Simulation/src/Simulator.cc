@@ -5,6 +5,7 @@
 #include "Simulation/Simulator.hh"
 #include "Simulation/PropagateGPU.cuh"
 #include "Geometry/Library.hh"
+#include "Simulation/GetTime.hh"
 
 namespace na63 {
 
@@ -24,6 +25,10 @@ Simulator::Simulator(Geometry *g) {
   pool_size = 2;
   sorting = RADIUS;
   steps_per_launch = 100;
+  thread_multiplier = 1;
+  record_energyloss = false;
+  gpu_bremsstrahlung = true;
+  secondary_threshold = 2.0*kElectronMass;
 }
 Simulator::~Simulator() {
   if (!external_geometry) delete geometry;
@@ -57,10 +62,15 @@ void Simulator::GenerateParticleArray() {
 }
 
 void Simulator::AddTrack(Track t) {
-  t.particle = GetParticle(t.particle_id);
-  assert(t.particle != nullptr);
-  t.simulator = this;
-  tracks.push_back(t);
+  AddTracksGeneric(t,&tracks);
+}
+
+void Simulator::AddTrackLive(Track t) {
+  AddTracksGeneric(t,&tracks_waiting);
+}
+
+void Simulator::AddTracksLive(std::vector<Track> t) {
+  for (int i=0;i<t.size();i++) AddTrackLive(t[i]);
 }
 
 void Simulator::AddTracks(std::vector<Track> t) {
@@ -78,13 +88,17 @@ void Simulator::AddTracks(std::vector<Track> t) {
       previous_id = current_id;
     }
   }
-  tracks.assign(t.begin(),t.end());
+  tracks.insert(tracks.end(),t.begin(),t.end());
   std::cout << "Tracks added. New size is " << tracks.size() 
             << "." << std::endl;
 }
 
 Track Simulator::GetTrack(int index) const {
   return tracks[index];
+}
+
+Track* Simulator::GetTrackAddress(int index) {
+  return &tracks[index];
 }
 
 std::vector<Track> Simulator::GetTracks() const {
@@ -104,33 +118,78 @@ void Simulator::GPUTracks(GPUTrack* dst) {
 }
 
 void Simulator::CopyBackTracks(GPUTrack* src, int N) {
-  std::cout << "Copying back tracks...";
+  std::cout << "Copying back tracks... ";
   tracks.clear();
+  int j=0;
   for (int i=0;i<N;i++) {
+    assert(src[i].state != WAITING);
+    if (src[i].state == FREE) continue;
     Track t;
-    if (src[i].state == STATE_FREE) continue;
     t = src[i];
     tracks.push_back(t);
+    j++;
   }
-  std::cout << " OK" << std::endl;
+  std::cout << j << " tracks were successfully copied back." << std::endl;
+}
+
+void Simulator::PrintTracks() const {
+  for (int i=0;i<tracks.size();i++) {
+    std::cout << tracks[i].particle_id << ", " << tracks[i].position << ", "
+              << tracks[i].momentum << ((!tracks[i].alive) ? " (dead)" : "") << std::endl;
+  }
+  for (int i=0;i<tracks_waiting.size();i++) {
+    std::cout << tracks_waiting[i].particle_id << ", " << tracks_waiting[i].position << ", "
+              << tracks_waiting[i].momentum << ((!tracks_waiting[i].alive) ? " (dead)" : "") << std::endl;
+  }
+}
+
+void Simulator::SetBenchmark(double t) {
+  benchmark = t;
+}
+
+double Simulator::GetBenchmark() const {
+  return benchmark;
+}
+
+void Simulator::AppendWaitingTracks() {
+  tracks.insert(tracks.end(),tracks_waiting.begin(),tracks_waiting.end());
+  tracks_waiting.clear();
+}
+
+void Simulator::RecordEnergyLoss(EnergyLoss *energyloss_) {
+  record_energyloss = true;
+  energyloss = energyloss_;
+}
+
+void Simulator::FillEnergyLoss(const Float x, const Float y, const Float z,
+    const Float E) {
+  assert(E >= 0);
+  energyloss->Fill(x,y,z,E);
+}
+
+void Simulator::FillEnergyLoss(const FourVector& position, const Float E) {
+  FillEnergyLoss(position[0],position[1],position[2],E);
 }
 
 void PropagateTrack(Geometry &geometry, Track &track, const Float dl) {
-  bool hit = false;
+  Float travelled = 0;
   while (track.alive && geometry.InBounds(track)) {
     track.Step(dl);
     geometry.Query(track);
-    if (hit == false && track.volume != nullptr) {
-      hit = true;
-      // std::cout << "A particle hit the box." << std::endl;
+    travelled += dl;
+    if (travelled > 1e6) {
+      std::cout << "Stopping track that has propagated for too long: " << track << std::endl;
+      break;
     }
   }
+  track.Stop();
 }
 
 void Simulator::Propagate() {
 
   // Propagate on GPU
   if (device == GPU) {
+    std::cout << "Running simulation GPU." << std::endl;
     if (debug) std::cout << "Generating parameter arrays...";
     geometry->GenerateParameterArrays();
     GenerateParticleArray();
@@ -140,11 +199,14 @@ void Simulator::Propagate() {
   }
 
   // Propagate on CPU
+  std::cout << "Running simulation on CPU." << std::endl;
+  benchmark = InSeconds(GetTime());
   if (cpu_threads > 1) {
     if (debug) std::cout << "Running simulation on " << cpu_threads
         << " threads." << std::endl;
     int i=0;
     int progress = tracks.size()/10;
+    int previous = 0;
     std::thread threads[cpu_threads];
     while (i < tracks.size()) {
       int j=0;
@@ -157,9 +219,17 @@ void Simulator::Propagate() {
       for (int k=0;k<j;k++) {
         threads[k].join();
       }
-      if (debug && i > progress) {
-        std::cout << "Propagated " << i << "/" << tracks.size() << " particles..." << std::endl;
-        progress += tracks.size()/10;
+      AppendWaitingTracks();
+      if (debug) {
+        if (i > progress) {
+          std::cout << "Propagated " << i << "/" << tracks.size() << " particles..." << std::endl;
+          previous = i;
+          progress += tracks.size()/10;
+        } else if (i > previous + 1000) {
+          std::cout << "Propagated " << i << "/" << tracks.size() << " particles..." << std::endl;
+          previous = i;
+          progress += tracks.size()/10;
+        }
       }
     }
   } else {
@@ -167,6 +237,8 @@ void Simulator::Propagate() {
       na63::PropagateTrack(*geometry,tracks[i],step_size);
     }
   }
+  benchmark = InSeconds(GetTime()) - benchmark;
+  std::cout << "Propagation ran for " << benchmark << " seconds, and returned " << TrackSize() << " tracks." << std::endl;
 
 }
 

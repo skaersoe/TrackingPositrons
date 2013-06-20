@@ -18,6 +18,11 @@ Geometry::~Geometry() {
   DeleteParameterArrays();
 }
 
+int Geometry::AddMaterial(Material m) {
+  materials.push_back(m);
+  return materials.size()-1;
+}
+
 int Geometry::AddVolumeType(VolumeType type, InsideFunction function) {
   // Save the type for reconciliation. Indices will be used on the GPU
   VolumeTypeFunction type_function = {
@@ -31,7 +36,7 @@ int Geometry::AddVolumeType(VolumeType type, InsideFunction function) {
 void Geometry::AddVolumeGeneric(Volume *volume) {
   // Material should already have been added
   int material_index = GetMaterialIndex(volume->material_name());
-  if (material_index < 0) throw "Material doesn't exist.";
+  assert(material_index >= 0);
   int function_index = -1;
   VolumeType volume_type = volume->volume_type();
   // See if volume type exists
@@ -140,12 +145,13 @@ void Geometry::DeleteParameterArrays() {
 void Geometry::PrintContent() {
   std::cout << "Content of geometry: " << std::endl;
   for (int i=0;i<materials.size();i++) {
-    std::cout << "Material \"" << materials[i].name() << "\"" << std::endl;
+    std::cout << "Material " << materials[i].atomic_number() << ", \"" << materials[i].name() << "\"" << std::endl;
   }
   for (int i=0;i<volume_types.size();i++) {
     std::cout << "Volume type " << i << std::endl;
   }
   for (int i=0;i<volumes.size();i++) {
+    if (volumes[i] == nullptr) continue;
     std::cout << "Volume of type " << volumes[i]->volume_type()
               << " and material " << volumes[i]->material_name() << std::endl;
   }

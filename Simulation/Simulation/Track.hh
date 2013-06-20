@@ -8,10 +8,12 @@
 
 namespace na63 {
 
-#define STATE_ALIVE 0
-#define STATE_DEAD 1
-#define STATE_FREE 2
-#define STATE_WAITING 3
+typedef enum {
+  ALIVE = 0,
+  DEAD = 1,
+  FREE = 2,
+  WAITING = 3
+} TrackState;
 
 /**
  * Track data struct, should always be aligned to 32 bytes to take advantage
@@ -19,7 +21,7 @@ namespace na63 {
  */
 typedef struct {
   // int particle_index;
-  int state;
+  TrackState state;
   int particle_id;    // According to Monte Carlo Particle Numbering Scheme
   int particle_index; // Set at propagation time for the GPU
   int volume_index;   // Remembers which volume the particle is currently inside
@@ -57,9 +59,9 @@ public:
   Volume *volume;
   Track *mother;
 
-  void Kill() {
-    alive = false;
-  }
+  void Kill();
+
+  void Stop();
 
   Track(const int particle_id, const int c, const FourVector pos,
       const FourVector mom) : position(pos), vertex_(pos), momentum(mom) {
@@ -83,14 +85,9 @@ public:
   Float momentum_magnitude() const {
     return sqrt(pow(energy(),2) - pow(mass(),2));
   }
-  Float beta() const {
-    Float energy_squared = pow(energy(),2);
-    return sqrt((energy_squared - pow(mass(),2)) / energy_squared);
-  }
+  Float beta() const;
   ThreeVector beta_vector() const;
-  Float gamma() const {
-    return Gamma(beta());
-  }
+  Float gamma() const;
   Float theta() const {
     return momentum.Theta();
   }
@@ -102,6 +99,7 @@ public:
   }
 
   void SpawnChild(Track child);
+  void SpawnChildren(std::vector<Track> children);
   void Boost(const Float bx, const Float by, const Float bz);
   #ifdef RUNNING_CPP11
   void Boost(ThreeVector tv) {
@@ -112,10 +110,12 @@ public:
   void Step(const Float dl);
 
   void UpdateEnergy(const Float change);
+  void UpdateMomentum(const FourVector change);
+  void SetMomentum(const FourVector momentum_new);
 
   GPUTrack GPU() const {
     GPUTrack retval;
-    retval.state = (alive) ? STATE_ALIVE : STATE_DEAD;
+    retval.state = (alive) ? ALIVE : DEAD;
     if (particle == nullptr || particle->index < 0) {
       throw "Particle not properly registered to track.";
     }

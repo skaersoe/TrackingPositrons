@@ -12,19 +12,22 @@
 namespace na63 {
 
 __device__
-inline LandauParameters CUDA_LandauEnergyLossParameters(const Float beta,
+inline LandauParameters CUDA_LandauEnergyLossParameters(const Float gamma,
     const Float mass, const Float atomic_number,
+    const Float density, const Float atomic_weight,
     const Float mean_excitation_potential, const Float dl) {
 
   LandauParameters p;
 
   // Calculate necessary values
+  Float beta = CUDA_Beta(gamma);
   Float beta_squared = beta*beta;
-  Float gamma = CUDA_Gamma(beta);
   Float gamma_squared = gamma*gamma;
-  p.xi = 0.5 * 0.307075 * atomic_number * dl / beta_squared;
 
-  p.mpv = p.xi * (std::log(2 * mass * beta_squared
+  p.xi = 0.5 * dl * 0.1535 * density * atomic_number /
+      (atomic_weight * beta_squared);
+
+  p.mpv = p.xi * (std::log(2.0 * mass * beta_squared
       * gamma_squared / mean_excitation_potential)
       + std::log(p.xi/mean_excitation_potential) + 0.200 - beta_squared);
 
@@ -108,7 +111,8 @@ inline Float CUDA_BetheElectron_dEdx(const Float density,
 
 __device__
 void CUDA_BetheEnergyLoss(GPUTrack& track, const ParticlePars& particle,
-    const MaterialPars& material, const Float dl, curandState *rng_state);
+    const MaterialPars& material, const Float dl, const Float index,
+    curandState *rng_state);
 
 } // End namespace na63
 

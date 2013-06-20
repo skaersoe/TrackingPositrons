@@ -1,3 +1,6 @@
+#ifndef NA63_SIMULATION_CUDABREMSSTRAHLUNG_CUH
+#define NA63_SIMULATION_CUDABREMSSTRAHLUNG_CUH
+
 #include <curand_kernel.h>
 
 #include "Geometry/LibraryCUDA.cuh"
@@ -17,3 +20,5 @@ void CUDA_Bremsstrahlung(
     const int index);
 
 } // End namespace na63
+
+#endif /* NA63_SIMULATION_CUDABREMSSTRAHLUNG_CUH */

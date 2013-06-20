@@ -218,11 +218,12 @@ Float RandomLandau(const Float x) {
   return ret;
 }
 
+__constant__ Float xmpv = 0;
 
 __device__
 Float ThrowLandau(const Float mpv, const Float sigma,
     const Float random_uniform) {
-  const Float xmpv = -0.22278298;
+  // static const Float xmpv = -0.22278298;
   return mpv+sigma*(RandomLandau(random_uniform)-xmpv);
 }
 

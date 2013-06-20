@@ -32,9 +32,7 @@ public:
   ~Geometry(void);
 
   // For now, assume there's no reason to remove instances
-  void AddMaterial(Material m) {
-    materials.push_back(m);
-  }
+  int AddMaterial(Material m);
   /**
    * Should be called explicitly before requesting parameter arrays, but the
    * individual arrays will be generated if requested before they have been

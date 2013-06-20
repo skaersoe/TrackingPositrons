@@ -5,6 +5,7 @@
 #include "Geometry/Constants.hh"
 #include "Geometry/Material.hh"
 #include "Simulation/Track.hh"
+#include "Simulation/Process.hh"
 
 // K/A = 0.307075 MeV g^-1 cm^2
 
@@ -15,19 +16,22 @@ typedef struct {
   Float xi;
 } LandauParameters;
 
-inline LandauParameters LandauEnergyLossParameters(const Float beta,
+inline LandauParameters LandauEnergyLossParameters(const Float gamma,
     const Float mass, const Float atomic_number,
+    const Float density, const Float atomic_weight,
     const Float mean_excitation_potential, const Float dl) {
 
   LandauParameters p;
 
   // Calculate necessary values
-  Float beta_squared = pow(beta,2);
-  Float gamma = Gamma(beta);
-  Float gamma_squared = pow(gamma,2);
-  p.xi = 0.5 * 0.307075 * atomic_number * dl / beta_squared;
+  Float beta = Beta(gamma);
+  Float beta_squared = beta*beta;
+  Float gamma_squared = gamma*gamma;
 
-  p.mpv = p.xi * (log(2 * mass * beta_squared
+  p.xi = 0.5 * dl * 0.1535 * density * atomic_number /
+      (atomic_weight * beta_squared);
+
+  p.mpv = p.xi * (log(2.0 * mass * beta_squared
       * gamma_squared / mean_excitation_potential)
       + log(p.xi/mean_excitation_potential) + 0.200 - beta_squared);
 
@@ -68,13 +72,14 @@ inline LandauParameters LandauEnergyLossParameters(const Float beta,
 //   return p;
 // }
 
-inline Float Bethe_dEdx(const Float beta,
+inline Float Bethe_dEdx(const Float gamma,
     const Float mass, const Float charge, const Float atomic_number,
     const Float mean_excitation_potential, const Float density,
     const Float atomic_weight, const Float dl) {
 
+  Float beta = Beta(gamma);
   Float beta_squared = beta*beta;
-  Float betagamma_squared = pow(Gamma(beta),2) * beta_squared;
+  Float betagamma_squared = gamma*gamma * beta_squared;
 
   Float mean;
 
@@ -117,8 +122,10 @@ inline Float BetheElectron_dEdx(const Float density,
 
 }
 
-void BetheEnergyLoss(Track& track, const Material& material,
-    const Float dl);
+class BetheEnergyLoss : public Process {
+  virtual void Query(Track* track, const Material* material,
+      const Float dl);
+};
 
 } // End namespace na63
 

@@ -15,7 +15,19 @@ void Step(GPUTrack& track, const ParticlePars& particle, const Float dl);
 
 __device__
 void CUDA_UpdateEnergy(GPUFourVector& momentum, const Float mass,
-    const Float change);
+    const Float change_energy, const int index);
+
+__device__
+void CUDA_SetEnergy(GPUFourVector& momentum, const Float mass,
+    const Float change_energy, const int index);
+
+// __device__
+// void CUDA_UpdateMomentum(GPUFourVector& momentum, const Float mass,
+//     const GPUFourVector& change_momentum, const int index);
+
+__device__
+void CUDA_SetMomentum(GPUFourVector& momentum, const Float mass,
+    const GPUFourVector& change_momentum, const int index);
 
 } // End namespace na63
 

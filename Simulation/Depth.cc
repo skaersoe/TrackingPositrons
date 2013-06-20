@@ -23,19 +23,20 @@ using namespace na63;
 
 int main(int argc,char *argv[]) {
 
-  TRandom3 rng;
+  TRandom3 rng(InSeconds(GetTime()));
 
   // Set up geometry
   Geometry geometry;
-  geometry.AddMaterial(Material("vacuum",0,0,0,0));
-  geometry.AddMaterial(Material("iron",kIronAtomicNumber,kIronDensity,kIronMeanExcitationPotential,kIronRadiationLength));
+  geometry.AddMaterial(Material("vacuum",0,0,0,0,0));
+  geometry.AddMaterial(Material("iron",kIronAtomicNumber,kIronDensity,kIronAtomicWeight,kIronMeanExcitationPotential,kIronRadiationLength));
   geometry.SetBounds(Sphere("vacuum",ThreeVector(0,0,0),1e10));
   geometry.AddVolume(Sphere("iron",ThreeVector(0,0,0),1e10));
 
   // Create simulator
   Simulator simulator = Simulator(&geometry);
   Particle muon = Particle("muon",13,kMuonMass);
-  muon.RegisterProcess(BetheEnergyLoss);
+  BetheEnergyLoss bethe;
+  muon.RegisterProcess(&bethe);
   simulator.AddParticle(muon);
   simulator.step_size = 0.1;
 
@@ -44,8 +45,9 @@ int main(int argc,char *argv[]) {
   simulator.debug = true;
   simulator.cpu_threads = 8;
   simulator.steps_per_launch = 1000;
+  simulator.step_size = 0.01;
   const unsigned x_samples = 128;
-  const unsigned y_samples = 16;
+  const unsigned y_samples = 8;
   const unsigned n_tracks = x_samples * y_samples;
   const Float energy_range[2] = {1e3,1e5};
   const Float energy_step = (energy_range[1] - energy_range[0]) / x_samples;

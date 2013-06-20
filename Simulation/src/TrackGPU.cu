@@ -67,7 +67,7 @@ void Boost(GPUTrack& track, const Float bx, const Float by, const Float bz) {
 
 __device__
 void Step(GPUTrack& track, const ParticlePars& particle, const Float dl) {
-  if (track.state != STATE_ALIVE) return;
+  if (track.state != ALIVE) return;
   GPUThreeVector change;
   CUDA_SphericalToCartesian(
     change,
@@ -87,13 +87,45 @@ void Step(GPUTrack& track, const ParticlePars& particle, const Float dl) {
 
 __device__
 void CUDA_UpdateEnergy(GPUFourVector& momentum, const Float mass,
-    const Float change_energy) {
-  // p_i' = p_new / p_old * p_i
-  momentum[3] += change_energy;
-  if (momentum[3] < mass) return;
+    const Float change_energy, const int index) {
+  CUDA_SetEnergy(momentum,mass,momentum[3] + change_energy,index);
+}
+
+__device__
+void CUDA_SetEnergy(GPUFourVector& momentum, const Float mass,
+    const Float energy_new, const int index) {
+  if (energy_new != energy_new) return;
+  momentum[3] = energy_new;
+  if (momentum[3] <= mass) {
+    momentum[3] = mass;
+    UpdateState(index,DEAD);
+    return;
+  }
   Float momentum_new = sqrt(momentum[3]*momentum[3] - mass*mass);
   ThreeVector_Normalize(momentum);
   ThreeVector_Extend(momentum,momentum_new);
+}
+
+
+// __device__
+// void CUDA_UpdateMomentum(GPUFourVector& momentum, const Float mass,
+//     const GPUFourVector& change_momentum, const int index) {
+//   FourVector_Add(momentum,change_momentum,momentum);
+//   if (momentum[3] <= mass) {
+//     momentum[3] = mass;
+//     UpdateState(index,DEAD);
+//   }
+// }
+
+
+__device__
+void CUDA_SetMomentum(GPUFourVector& momentum, const Float mass,
+    const GPUFourVector& change_momentum, const int index) {
+  FourVector_Copy(momentum,change_momentum);
+  if (momentum[3] <= mass) {
+    momentum[3] = mass;
+    UpdateState(index,DEAD);
+  }
 }
 
 } // End namespace na63

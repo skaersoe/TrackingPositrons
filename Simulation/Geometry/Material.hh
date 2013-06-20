@@ -10,11 +10,12 @@ namespace na63 {
   typedef struct {
     Float atomic_number;
     Float density;
+    Float atomic_weight;
     Float mean_excitation_potential;
     Float radiation_length;
     Float electron_density;
     Float coulomb_correction;
-    char padding[32 - 5*sizeof(Float)];
+    char padding[32 - 7*sizeof(Float)];
   } MaterialPars;
 
   class Material {
@@ -33,6 +34,7 @@ namespace na63 {
         const char* n,
         Float atomic_number,
         Float rho,
+        Float weight,
         Float mean_excitation_potential,
         Float rl) : name_(n) {
 
@@ -40,6 +42,7 @@ namespace na63 {
       mean_excitation_potential_ = mean_excitation_potential;
       radiation_length_ = rl;
       density_ = rho;
+      atomic_weight_ = weight;
       coulomb_correction_ = ComputeCoulombCorrection();
 
     }
@@ -53,10 +56,12 @@ namespace na63 {
     Float electron_density() const { return atomic_number_; }
     Float coulomb_correction() const { return coulomb_correction_; }
     Float density() const { return density_; }
+    Float atomic_weight() const { return atomic_weight_; }
     MaterialPars GPU() const {
       MaterialPars retval;
       retval.atomic_number = atomic_number_;
       retval.density = density_;
+      retval.atomic_weight = atomic_weight_;
       retval.mean_excitation_potential = mean_excitation_potential_;
       retval.radiation_length = radiation_length_;
       // No composite materials
@@ -73,6 +78,7 @@ namespace na63 {
     // Float electron_density_;
     Float coulomb_correction_;
     Float density_;
+    Float atomic_weight_;
 
   };
 

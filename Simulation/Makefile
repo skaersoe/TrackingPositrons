@@ -27,14 +27,23 @@ folders:
 	@-mkdir ccobjects
 	@-mkdir nvccobjects
 
-energyloss: EnergyLoss.cc
+EnergyLoss: EnergyLoss.cc
 	$(CC) $(CCFLAGS) $(INCLUDE_LINK) EnergyLoss.cc -o bin/EnergyLoss
 
-depth: Depth.cc
+Depth: Depth.cc
 	$(CC) $(CCFLAGS) $(INCLUDE_LINK) Depth.cc -o bin/Depth
 
-bremsstrahlung: Bremsstrahlung.cc
+Benchmark: Benchmark.cc
+	$(CC) $(CCFLAGS) $(INCLUDE_LINK) Benchmark.cc -o bin/Benchmark
+
+MeanDepth: MeanDepth.cc
+	$(CC) $(CCFLAGS) $(INCLUDE_LINK) MeanDepth.cc -o bin/MeanDepth
+
+Bremsstrahlung: Bremsstrahlung.cc
 	$(CC) $(CCFLAGS) $(INCLUDE_LINK) Bremsstrahlung.cc -o bin/Bremsstrahlung
+
+BremsstrahlungBenchmark: BremsstrahlungBenchmark.cc
+	$(CC) $(CCFLAGS) $(INCLUDE_LINK) BremsstrahlungBenchmark.cc -o bin/BremsstrahlungBenchmark
 
 photonpropagate: PhotonPropagate.cc
 	$(CC) $(CCFLAGS) $(INCLUDE_LINK) PhotonPropagate.cc -o bin/PhotonPropagate
@@ -62,6 +71,15 @@ landau:
 
 boxtest:
 	$(CC) $(CCFLAGS) $(INCLUDE_LINK) BoxTest.cc -o bin/BoxTest
+
+ProbabilityTest:
+	$(CC) $(CCFLAGS) $(INCLUDE_LINK) ProbabilityTest.cc -o bin/ProbabilityTest
+
+test:
+	$(CC) $(CCFLAGS) $(INCLUDE_LINK) Test.cc -o bin/Test
+
+EnergyDeposit: EnergyDeposit.cc
+	$(CC) $(CCFLAGS) $(INCLUDE_LINK) EnergyDeposit.cc -o bin/EnergyDeposit
 
 clean: cleancc cleancuda
 	@-rm bin/*

@@ -3,7 +3,7 @@
 #include <curand_kernel.h>
 #include "Simulation/LandauCUDA.cuh"
 #include "Simulation/Landau.hh"
-#include "Simulation/GetTime.hh"
+// #include "Simulation/GetTime.hh"
 
 #include <TApplication.h>
 #include <TCanvas.h>
@@ -11,6 +11,7 @@
 #include <TH1.h>
 #include <TF1.h>
 #include <TRandom3.h>
+#include <TStyle.h>
 
 __global__
 void GenerateLandau(curandState* states, unsigned steps, float* output) {
@@ -46,7 +47,7 @@ int main(int argc, char** argv) {
   const unsigned N = 1 << 26;
   float *output = new float[N];
 
-  double elapsed;
+  // double elapsed;
 
   if (gpu) {
 
@@ -61,7 +62,7 @@ int main(int argc, char** argv) {
     if (CudaError(cudaMalloc(&states,threads*sizeof(curandState)))) return -1;
     if (CudaError(cudaMalloc(&device_output,N*sizeof(float)))) return -1;
 
-    elapsed = na63::InSeconds(na63::GetTime());
+    // elapsed = na63::InSeconds(na63::GetTime());
 
     GenerateLandau<<<blocksPerGrid,threadsPerBlock>>>(states,steps,device_output);
 
@@ -75,7 +76,7 @@ int main(int argc, char** argv) {
 
     TRandom3 rng;
 
-    elapsed = na63::InSeconds(na63::GetTime());
+    // elapsed = na63::InSeconds(na63::GetTime());
 
     for (int i=0;i<N;i++) {
       output[i] = na63::ThrowLandauHost(5,1,rng.Rndm());
@@ -83,13 +84,13 @@ int main(int argc, char** argv) {
 
   }
 
-  elapsed = na63::InSeconds(na63::GetTime()) - elapsed;
-  std::cout << "Ran in " << elapsed << " seconds." << std::endl;
+  // elapsed = na63::InSeconds(na63::GetTime()) - elapsed;
+  // std::cout << "Ran in " << elapsed << " seconds." << std::endl;
 
   TApplication app("app",nullptr,nullptr);
   TCanvas c;
   TPad p;
-  TH1F *h1 = new TH1F("Landau","Landau distributed random numbers",2000,0,40);
+  TH1F *h1 = new TH1F("Landau","Landau distributed random numbers;x [arbitrary units]",2000,0,40);
   for (int i=0;i<N;i++) {
     h1->Fill(output[i]);
   }
@@ -99,8 +100,9 @@ int main(int argc, char** argv) {
   f->SetLineColor(kGreen);
   f->SetLineStyle(7);
   f->Draw("same");
+  gStyle->SetOptFit();
   c.Update();
-  c.SaveAs("Plots/rng_landau_gpu.png");
+  c.SaveAs("Plots/rng_landau_gpu.pdf");
 
   return 0;
 }

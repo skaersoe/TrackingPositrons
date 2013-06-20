@@ -1,5 +1,5 @@
-#ifndef NA63_SIMULATION_PROPAGATE_H
-#define NA63_SIMULATION_PROPAGATE_H
+#ifndef NA63_SIMULATION_PROPAGATEGPU_CUH
+#define NA63_SIMULATION_PROPAGATEGPU_CUH
 
 #include "Simulation/Track.hh"
 #include "Simulation/Simulator.hh"
@@ -16,8 +16,6 @@ namespace na63 {
 typedef struct {
   unsigned steps;
   Float dl;
-  GPUTrack *tracks;
-  int *keys;
   int n_volumes;
   MaterialPars *materials;
   ParticlePars *particles;
@@ -32,4 +30,4 @@ void PropagateGPU(Simulator *simulator);
 
 } // End namespace na63
 
-#endif /* NA63_SIMULATION_PROPAGATE_H */
+#endif /* NA63_SIMULATION_PROPAGATEGPU_CUH */

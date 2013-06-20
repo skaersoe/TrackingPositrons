@@ -1,6 +1,7 @@
 #ifndef NA63_LIBRARY_H
 #define NA63_LIBRARY_H
 
+#include <cassert>
 #include <iostream>
 #include <cmath>
 #ifndef __CUDACC__
@@ -35,7 +36,7 @@ inline
 void Copy3D(A& a, B& b) {
   b[0] = a[0];
   b[1] = a[1];
-  b[2] = b[2];
+  b[2] = a[2];
 }
 
 inline Float ElementaryChargeToCoulomb(const Float e) {
@@ -66,9 +67,7 @@ inline Float Gamma(const Float& energy, const Float& mass) {
   return energy / mass;
 }
 
-inline Float Beta(const Float& gamma) {
-  return sqrt(1-1/pow(gamma,2));
-}
+Float Beta(const Float& gamma);
 
 typedef Float GPUThreeVector[3];
 typedef Float GPUFourVector[4];
@@ -102,8 +101,8 @@ public:
 
   friend std::ostream& operator<<(std::ostream& os, const ThreeVector& tv) {
     os << "(" << tv.vector[0]
-       << "," << tv.vector[1]
-       << "," << tv.vector[2] << ")";
+       << ", " << tv.vector[1]
+       << ", " << tv.vector[2] << ")";
     return os;
   }
 
@@ -169,7 +168,7 @@ public:
       }
     }
 
-}
+  }
 
   // Insert into GPU format (array)
   void GPU(GPUThreeVector tv) const {
@@ -225,6 +224,17 @@ public:
     return *this;
   }
 
+  friend bool operator==(const FourVector& lhs, const FourVector& rhs) {
+    return lhs[0] == rhs[0] &&
+           lhs[1] == rhs[1] &&
+           lhs[2] == rhs[2] &&
+           lhs[3] == rhs[3];
+  }
+
+  friend bool operator!=(const FourVector& lhs, const FourVector& rhs) {
+    return !(lhs == rhs);
+  }
+
   FourVector& operator=(const ThreeVector& tv) {
     vector[0] = tv[0];
     vector[1] = tv[1];
@@ -235,9 +245,9 @@ public:
 
   friend std::ostream& operator<<(std::ostream& os, const FourVector& fv) {
     os << "(" << fv.vector[0]
-       << "," << fv.vector[1]
-       << "," << fv.vector[2]
-       << "," << fv.vector[3] << ")";
+       << ", " << fv.vector[1]
+       << ", " << fv.vector[2]
+       << ", " << fv.vector[3] << ")";
     return os;
   }
 
@@ -304,6 +314,7 @@ inline ThreeVector SphericalToCartesian(
 class Geometry;
 class Volume;
 class Material;
+class Track;
 
 typedef bool (*InsideFunction)(const GPUFourVector&,const void*);
 
