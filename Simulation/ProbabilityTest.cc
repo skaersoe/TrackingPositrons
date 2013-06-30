@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
 
   TH1F *range = new TH1F(
     "Interaction probability for dx=0.1, X_0=10",
-    "Interaction probability;Distance travelled before interaction [cm]",
+    "Interaction probability;Distance travelled before interaction [cm];Probability [arbitrary units]",
     200,
     0,
     100
@@ -35,8 +35,7 @@ int main(int argc, char* argv[]) {
     range->Fill(j * dx);
   }
   TApplication app("app",&argc,argv);
-  gROOT->SetBatch(kTRUE);
-  TCanvas *canvas = new TCanvas("","",1280,1024);
+  TCanvas *canvas = new TCanvas();
   range->Draw();
   range->Fit("expo");
   TF1 *f = range->GetFunction("expo");
@@ -44,7 +43,6 @@ int main(int argc, char* argv[]) {
   // f->SetLineStyle(7);
   f->Draw("same");
   gStyle->SetOptFit();
-  gPad->WaitPrimitive();
   printf("Saving...\n");
   canvas->SaveAs("Plots/probability.pdf");
   return 0;

@@ -18,12 +18,14 @@
 #include <TAxis.h>
 #include <TMath.h>
 #include <TLegend.h>
+#include <TStyle.h>
+#include <TColor.h>
 
 using namespace na63;
 
 TRandom3 rng;
 
-const unsigned samples_per_energy = 1 << 14;
+const unsigned samples_per_energy = 1 << 15;
 
 void LogAxisBins(TAxis *axis) {
 
@@ -109,17 +111,30 @@ int main(int argc, char* argv[]) {
   const Float mean_excitation_potential = kLeadMeanExcitationPotential;
   const Float dl = 0.001; // cm
   
+  // MDJ contour
+  // const int NRGBs = 7, NCont = 999;
+  // gStyle->SetNumberContours(NCont);
+  // Double_t stops[NRGBs] = { 0.05, 0.10, 0.25, 0.45, 0.60, 0.75, 1.00 };
+  // Double_t red[NRGBs]   = { 1.00, 0.00, 0.00, 0.00, 0.97, 0.97, 0.10 };
+  // Double_t green[NRGBs] = { 1.00, 0.97, 0.30, 0.40, 0.97, 0.00, 0.00 };
+  // Double_t blue[NRGBs]  = { 1.00, 0.97, 0.97, 0.00, 0.00, 0.00, 0.00 };
+  // TColor::CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont);
+
   // Initialize ROOT crap
   TApplication app("app",&argc,argv);
   TGraph *graph_muon = new TGraph();
   TGraph *graph_mpv = new TGraph();
   // TGraph *graph_electron= new TGraph();
   TH2F *hist_2d = new TH2F(
-    "Muon energy loss in copper","Muon energy loss in copper;#beta#gamma;Stopping power [MeV cm^2 / g]",
-    500, 0.1, 100, 500, 1e-1, 1e2
+    "Muon energy loss in copper","Muon energy loss in copper;#beta#gamma;Stopping power [MeV cm^{2} / g]",
+    450, 0.1, 100, 450, 1e-1, 1e2
   );
+  // hist_2d->SetMaximum(1.5e3);
+  hist_2d->SetContour(256);
   LogAxisBins(hist_2d->GetXaxis());
   LogAxisBins(hist_2d->GetYaxis());
+  hist_2d->GetXaxis()->SetRangeUser(0.1*(1.001),1e2);
+  // hist_2d->GetYaxis()->SetRangeUser(2e-1,0.9e2);
 
   EnergyLoss(hist_2d,
              graph_muon,
@@ -148,6 +163,7 @@ int main(int argc, char* argv[]) {
   // hist_1d.Draw("COLZ");
   //TCanvas canvas_graph;
 
+
   TCanvas *canvas = new TCanvas();
   canvas->SetLogx();
   canvas->SetLogy();
@@ -169,7 +185,9 @@ int main(int argc, char* argv[]) {
   legend->AddEntry(graph_mpv,"Most probable energy loss","l");
   legend->AddEntry("Step size","dx = 1e-3cm","");
   legend->SetTextSize(0.04);
+  legend->SetFillColor(kWhite);
   legend->Draw();
+  canvas->Update();
   gPad->WaitPrimitive();
   printf("Saving...\n");
   canvas->SaveAs("Plots/stoppingpower_muon.pdf");

@@ -12,6 +12,7 @@
 #include <TF1.h>
 #include <TRandom3.h>
 #include <TStyle.h>
+#include <TLegend.h>
 
 __global__
 void GenerateLandau(curandState* states, unsigned steps, float* output) {
@@ -90,10 +91,13 @@ int main(int argc, char** argv) {
   TApplication app("app",nullptr,nullptr);
   TCanvas c;
   TPad p;
-  TH1F *h1 = new TH1F("Landau","Landau distributed random numbers;x [arbitrary units]",2000,0,40);
+  TH1F *h1 = new TH1F("Landau","Landau distributed random numbers;x [arbitrary units];Probability [arbitrary units]",2000,0,40);
   for (int i=0;i<N;i++) {
     h1->Fill(output[i]);
   }
+  TGraph g;
+  g.SetPoint(1,h1->GetMean(),0);
+  g.SetPoint(2,h1->GetMean(),1e10);
   h1->Draw();
   h1->Fit("landau");
   TF1 *f = h1->GetFunction("landau");
@@ -102,6 +106,15 @@ int main(int argc, char** argv) {
   f->Draw("same");
   gStyle->SetOptFit();
   c.Update();
+  g.Draw("same l");
+  g.SetLineStyle(7);
+  TLegend *legend = new TLegend(0.27,0.65,0.40,0.75);
+  legend->AddEntry(&g,"Mean","");
+  legend->SetTextSize(0.04);
+  legend->SetFillColor(kWhite);
+  legend->SetBorderSize(0);
+  legend->Draw();
+  gPad->WaitPrimitive();
   c.SaveAs("Plots/rng_landau_gpu.pdf");
 
   return 0;

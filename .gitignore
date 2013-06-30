@@ -5,6 +5,7 @@ bin/
 *.png
 *.pdf
 *.psd
+*.jpg
 
 # Compiled Object files
 *.slo

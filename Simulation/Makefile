@@ -30,6 +30,9 @@ folders:
 EnergyLoss: EnergyLoss.cc
 	$(CC) $(CCFLAGS) $(INCLUDE_LINK) EnergyLoss.cc -o bin/EnergyLoss
 
+ImplementationExample: ImplementationExample.cc
+	$(CC) $(CCFLAGS) $(INCLUDE_LINK) ImplementationExample.cc -o bin/ImplementationExample
+
 Depth: Depth.cc
 	$(CC) $(CCFLAGS) $(INCLUDE_LINK) Depth.cc -o bin/Depth
 
